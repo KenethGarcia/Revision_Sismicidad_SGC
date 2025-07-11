@@ -44,13 +44,15 @@ columns = ['time_value', 'publicID', 'text', 'depth_value', 'magnitude_value', '
 result_columns = ['Date', 'Event ID', 'Region', 'Depth', 'M', 'M type', 'RMS', 'Er depth', 'Er lat', 'Er lon', 'Phases',
                   'Author', 'Type', 'Agency', 'Observations']
 
-# Read the model file for both regular and volcanic zones
+# Read the model file for both regular, volcanic and special zones
 volcanic_data = {}
 zone_data = {}
+special_data = {}
 model_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "model_files")
 bna_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "bna_volcanic_files")
 ut.model_reader(model_folder, zone_data, re_order=True)
 ut.model_reader(bna_folder, volcanic_data)
+special_data['colom_ecu_fro.txt'] = zone_data.pop('colom_ecu_fro.txt', None)
 
 
 def connect2mysql(
@@ -153,7 +155,7 @@ def single_check(
 
     # First check: High RMS values
     exceptions = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
-    if event['quality_standardError'] >= 1.51 and event['type'] not in exceptions:
+    if event['quality_standardError'] > 1.4 and event['type'] not in exceptions:
         observations.append("High RMS value")
 
     # Second check: High localization uncertainties
@@ -193,9 +195,13 @@ def single_check(
     if event['quality_associatedPhaseCount'] <= 7 and flag and event['type'] == "not locatable":
         observations.append("Event with 7 or less phase count")
 
-    # Seventh check: Check if the event does NOT have any label (use .null() method)
+    # Seventh check: Check if the event does NOT have any label, or it is anomalous
+    valid_labels = ["earthquake", "not locatable", "volcanic eruption", "explosion", "not existing", "outside of network interest"]
     if pd.isnull(event['type']):
         observations.append("Event without label. Update ASAP!")
+    else:
+        if event['type'] not in valid_labels:
+            observations.append(f"Event with invalid label '{event['type']}'")
 
     # Eighth check: Check if the event has not been processed by the user
     cases = ["scanloc", "scautoloc_reg", "scanlocbay", "AI_picker"]
@@ -232,6 +238,15 @@ def single_check(
     # Fourteenth check: Check if the event has an 'earthquake' label but has less than 6 phases
     if event['type'] == "earthquake" and event['quality_associatedPhaseCount'] < 6:
         observations.append(f"Event with 'earthquake' label but has {event['quality_associatedPhaseCount']} phases")
+
+    # Fifteenth check: Check if the event is inside/outside local zone and has wrong label
+    cases = ["earthquake", "volcanic eruption"]
+    if not ut.inside_the_polygon((lon, lat), special_data['colom_ecu_fro.txt']):
+        if event['type'] in cases:
+            observations.append(f"Event outside local zone with '{event['type']}' label")
+    else:
+        if event['type'] == "outside of network interest":
+            observations.append("Event inside local zone with 'outside of...' label")
 
     if len(observations) > 0:  # If the event has observations, return the information
         return event[columns], observations

@@ -16,7 +16,7 @@ sys.modules["ut"] = ut
 spec.loader.exec_module(ut)
 
 models_available = ('zona_vmm.txt', 'zona3.txt', 'zona2.txt', 'zona_PtoGaitan.txt', 'zona4.txt', 'zona1.txt',
-                    'zona5.txt', 'Modelo_Cesar.txt', 'Modelo_CARMA.txt')
+                    'zona5.txt', 'Modelo_Cesar.txt', 'Modelo_CARMA.txt', 'colom_ecu_fro.txt')
 volcanic_models_available = ('obsman.txt', 'obspas1.txt', 'obspas2.txt', 'obspas3.txt', 'obspas4.txt', 'obspas5.txt',
                              'obspas6.txt', 'obspas7.txt', 'obspas8.txt', 'obspas9.txt', 'obspop.txt', 'obspopvnh.txt')
 
@@ -134,6 +134,7 @@ class TestUtils(unittest.TestCase):
         # Read the regular models
         model_data = {}
         ut.model_reader(model_folder, model_data, re_order=True)
+        model_data.pop('colom_ecu_fro.txt', None)  # Remove the local zone file as it is not a regular zone
         # Start testing zones: 1 to 5
         point_zone1 = (-78.5704, 7.1168)  # Point inside zone1
         inside_test_zone(point_zone1, model_data, 'zona1.txt', checks=False)
@@ -167,6 +168,7 @@ class TestUtils(unittest.TestCase):
         # Read the regular models
         model_data = {}
         ut.model_reader(model_folder, model_data, re_order=True)
+        model_data.pop('colom_ecu_fro.txt', None)  # Remove the local zone file as it is not a regular zone
         # Test zones with different magnitudes:
         # Point inside zone1
         point_zone1 = (-78.5704, 7.1168)

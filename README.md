@@ -79,13 +79,13 @@ Donde:
 
 La rutina de revisión de sismicidad incluye las siguientes inspecciones:
 
-1. Eventos sísmicos con media cuadrática (RMS) superior a $1.51$.
+1. Eventos sísmicos con media cuadrática (RMS) superior a $1.4$.
 2. Eventos sísmicos con errores de localización altos (latitud, longitud o profundidad superiores a 12 km).
 3. Eventos localizables con etiqueta en la base de datos incorrecta (p. ej., "not locatable").
 4. Eventos sísmicos con magnitudes fijadas NO correspondientes a su zona de localización.
 5. Eventos sísmicos con localizaciones realizadas usando modelos de velocidad incorrectos.
 6. Eventos sísmicos no localizables con 7 o menos fases picadas (desactivable con la opción `+f`).
-7. Eventos sísmicos sin ninguna etiqueta disponible en la base de datos.
+7. Eventos sísmicos sin ninguna etiqueta disponible en la base de datos, o aquellos con etiquetas no válidas (p. ej., `nuclear explosion`).
 8. Eventos sísmicos que no fueron procesados por un analista (aquellos que tienen origen automático).
 9. Eventos sísmicos internacionales sin agencia asociada (aquellos con M > 5.0).
 10. Eventos sísmicos destacados sin su etiqueta respectiva (aquellos que tienen magnitud superior a 4.0).
@@ -94,6 +94,7 @@ La rutina de revisión de sismicidad incluye las siguientes inspecciones:
 13. Eventos sísmicos duplicados (aquellos que tienen latitud, longitud similar y están dentro de un rango de 4 segundos).
 14. Eventos sísmicos con profundidades negativas.
 15. Eventos sísmicos con etiqueta `earthquake` pero con menos de 6 fases procesadas.
+16. Eventos sísmicos con etiqueta `earthquake` pero ubicados fuera del área de interés de la RSNC y eventos sísmicos de tipo `outside of network interest` ubicados dentro del área de interés.
 
 ## Contribuciones
 

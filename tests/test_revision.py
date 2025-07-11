@@ -181,6 +181,16 @@ class TestRevision(unittest.TestCase):
         # res, obs = single_check(df_normal, df_special, flag=True)
         # BUG: We need to re-define the lat, lon limits for the Pacific/Caribe region
 
+        # 10. Events inside and outside local zone
+        args = {'start': "20200427T000254", 'end': "20200427T000256"}
+        df_normal, df_special = prepare_test(args)
+        res, obs = single_check(df_normal, df_special, flag=True)
+        self.assertTrue("Event outside local zone with 'earthquake' label" in obs)
+        args = {'start': "20200429T081428", 'end': "20200429T081430"}
+        df_normal, df_special = prepare_test(args)
+        res, obs = single_check(df_normal, df_special, flag=True)
+        self.assertTrue("Event inside local zone with 'outside of...' label" in obs)
+
     def test_check_seismic(self):
         """
         This function test the check_seismic function. The strategy here is to test 2 hours of data and check if there
