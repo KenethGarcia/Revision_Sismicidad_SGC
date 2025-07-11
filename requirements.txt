@@ -1,0 +1,11 @@
+pandas~=2.2.3
+numpy~=2.0.1
+colorama~=0.4.6
+shapely~=2.0.7
+pymysql~=1.0.2
+utils~=1.0.2
+tqdm~=4.66.5
+matplotlib~=3.10.0
+requests~=2.32.3
+pillow~=11.1.0
+haversine~=2.9.0
