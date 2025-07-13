@@ -153,6 +153,8 @@ def single_check(
     has no observations, the tuple will be empty.
     """
     observations = []
+    lat, lon = event['latitude_value'], event['longitude_value']
+    inside_volcanic_zones = ut.inside_bna_polygon((lon, lat), volcanic_data)
 
     # First check: High RMS values
     exceptions = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
@@ -166,11 +168,10 @@ def single_check(
         if any(event[col] >= 12 for col in ['latitude_uncertainty', 'longitude_uncertainty', 'depth_uncertainty']) and event['type'] not in exceptions_loc:
             observations.append("High localization uncertainties")
 
-    lat, lon = event['latitude_value'], event['longitude_value']
     # Third check: Locatable events with anomalous label
     if event['type'] == "not locatable" and event['quality_associatedPhaseCount'] >= 8:
         # Check if the event is inside volcanic zones and it must have not locatable label
-        if not ut.inside_bna_polygon((lon, lat), volcanic_data):
+        if not inside_volcanic_zones:
             observations.append("Locatable event")
 
     # Fourth check: Check correspondence between zones and magnitude labels
@@ -220,7 +221,7 @@ def single_check(
 
     # Eleventh check: Check if any event inside the volcanic zones has the correct 'not locatable' label
     exceptions_vol = ["not locatable", "volcanic eruption", "not existing"]
-    if ut.inside_bna_polygon((lon, lat), volcanic_data):
+    if inside_volcanic_zones:
         if event['creationInfo_agencyID'] == "SGC" and event['type'] not in exceptions_vol:
             observations.append(f"Volcanic event with wrong label '{event['type']}'")
         elif event['type'] == "volcanic eruption" and event['publicID'] not in special_events['publicID'].values:
@@ -250,7 +251,9 @@ def single_check(
             observations.append("Event inside local zone with 'outside of...' label")
 
     # Sixteenth check: Verify if 'DESTACADO' events inside NonLinLoc zone use the correct earth model
-    if event['publicID'] in special_events['publicID'].values and ut.inside_the_polygon((lon,lat), special_data['zona_nll.txt']) and event['earthModelID'] != 'Poveda_et_al_2018':
+    # Define a boolean to check if the event is inside the NonLinLoc zone but outside the VMM and volcanic zones
+    nll_bool = ut.inside_the_polygon((lon,lat), special_data['zona_nll.txt']) and not ut.inside_the_polygon((lon,lat), zone_data['zona_vmm.txt']) and not inside_volcanic_zones
+    if event['publicID'] in special_events['publicID'].values and nll_bool and event['earthModelID'] != 'Poveda_et_al_2018':
         observations.append("'DESTACADO' event inside NonLinLoc zone without NLL localization model")
 
     if len(observations) > 0:  # If the event has observations, return the information
