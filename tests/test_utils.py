@@ -16,7 +16,7 @@ sys.modules["ut"] = ut
 spec.loader.exec_module(ut)
 
 models_available = ('zona_vmm.txt', 'zona3.txt', 'zona2.txt', 'zona_PtoGaitan.txt', 'zona4.txt', 'zona1.txt',
-                    'zona5.txt', 'Modelo_Cesar.txt', 'Modelo_CARMA.txt', 'colom_ecu_fro.txt')
+                    'zona5.txt', 'Modelo_Cesar.txt', 'Modelo_CARMA.txt', 'colom_ecu_fro.txt', 'zona_nll.txt')
 volcanic_models_available = ('obsman.txt', 'obspas1.txt', 'obspas2.txt', 'obspas3.txt', 'obspas4.txt', 'obspas5.txt',
                              'obspas6.txt', 'obspas7.txt', 'obspas8.txt', 'obspas9.txt', 'obspop.txt', 'obspopvnh.txt')
 
@@ -135,6 +135,7 @@ class TestUtils(unittest.TestCase):
         model_data = {}
         ut.model_reader(model_folder, model_data, re_order=True)
         model_data.pop('colom_ecu_fro.txt', None)  # Remove the local zone file as it is not a regular zone
+        model_data.pop('zona_nll.txt', None)  # Remove the NLL zone file as it is not a regular zone
         # Start testing zones: 1 to 5
         point_zone1 = (-78.5704, 7.1168)  # Point inside zone1
         inside_test_zone(point_zone1, model_data, 'zona1.txt', checks=False)
@@ -169,6 +170,7 @@ class TestUtils(unittest.TestCase):
         model_data = {}
         ut.model_reader(model_folder, model_data, re_order=True)
         model_data.pop('colom_ecu_fro.txt', None)  # Remove the local zone file as it is not a regular zone
+        model_data.pop('zona_nll.txt', None)  # Remove the NLL zone file as it is not a regular zone
         # Test zones with different magnitudes:
         # Point inside zone1
         point_zone1 = (-78.5704, 7.1168)
@@ -217,6 +219,30 @@ class TestUtils(unittest.TestCase):
         boolean, correct_mag = ut.magnitude_check(point_outside, 'MLr_2', model_data)
         self.assertFalse(boolean, "Error in magnitude_check: Point outside all zones should not be detected")
         self.assertTrue(correct_mag is None, "Error in magnitude check: Should not have a correct magnitude return value for points outside all zones")
+
+    def test_special_zones(self):
+        """
+        Function to test the special zones in the RSNC maps. The strategy is to test points that are within and outside
+        the special zones (NLL and Colom_Ecu_Fro).
+        """
+        # Read the regular models
+        model_data = {}
+        ut.model_reader(model_folder, model_data, re_order=True)
+        point_1 = (-78.6414, 1.7578)
+        is_inside_nll = ut.inside_the_polygon(point_1, model_data['zona_nll.txt'])
+        is_inside_local = ut.inside_the_polygon(point_1, model_data['colom_ecu_fro.txt'])
+        self.assertTrue(is_inside_nll and is_inside_local, f"Error in special_zones: Point with coordinates {point_1} should be inside both NLL and Colom_Ecu_Fro zones, but got {is_inside_nll} and {is_inside_local} respectively")
+        point_2 = (-84.3, 5)
+        is_inside_nll = ut.inside_the_polygon(point_2, model_data['zona_nll.txt'])
+        is_inside_local = ut.inside_the_polygon(point_2, model_data['colom_ecu_fro.txt'])
+        self.assertTrue(not is_inside_nll and is_inside_local,
+                        f"Error in special_zones: Point with coordinates {point_2} should be outside NLL and inside Colom_Ecu_Fro zones, but got {is_inside_nll} and {is_inside_local} respectively")
+        point_3 = (-78.44, 0.28)
+        is_inside_nll = ut.inside_the_polygon(point_3, model_data['zona_nll.txt'])
+        is_inside_local = ut.inside_the_polygon(point_3, model_data['colom_ecu_fro.txt'])
+        self.assertTrue(is_inside_nll and not is_inside_local,
+                        f"Error in special_zones: Point with coordinates {point_3} should be inside NLL and outside Colom_Ecu_Fro zones, but got {is_inside_nll} and {is_inside_local} respectively")
+
 
 if __name__ == '__main__':
     unittest.main()

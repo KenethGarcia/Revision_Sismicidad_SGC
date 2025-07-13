@@ -53,6 +53,7 @@ bna_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "bna_volca
 ut.model_reader(model_folder, zone_data, re_order=True)
 ut.model_reader(bna_folder, volcanic_data)
 special_data['colom_ecu_fro.txt'] = zone_data.pop('colom_ecu_fro.txt', None)
+special_data['zona_nll.txt'] = zone_data.pop('zona_nll.txt', None)
 
 
 def connect2mysql(
@@ -247,6 +248,10 @@ def single_check(
     else:
         if event['type'] == "outside of network interest":
             observations.append("Event inside local zone with 'outside of...' label")
+
+    # Sixteenth check: Verify if 'DESTACADO' events inside NonLinLoc zone use the correct earth model
+    if event['publicID'] in special_events['publicID'].values and ut.inside_the_polygon((lon,lat), special_data['zona_nll.txt']) and event['earthModelID'] != 'Poveda_et_al_2018':
+        observations.append("'DESTACADO' event inside NonLinLoc zone without NLL localization model")
 
     if len(observations) > 0:  # If the event has observations, return the information
         return event[columns], observations
