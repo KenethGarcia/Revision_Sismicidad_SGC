@@ -95,6 +95,7 @@ La rutina de revisión de sismicidad incluye las siguientes inspecciones:
 14. Eventos sísmicos con profundidades negativas.
 15. Eventos sísmicos con etiqueta `earthquake` pero con menos de 6 fases procesadas.
 16. Eventos sísmicos con etiqueta `earthquake` pero ubicados fuera del área de interés de la RSNC y eventos sísmicos de tipo `outside of network interest` ubicados dentro del área de interés.
+17. Eventos sísmicos destacados dentro de la zona de NonLinLoc sin el modelo de velocidad de Poveda_et_al_2018 fijado.
 
 ## Contribuciones
 
