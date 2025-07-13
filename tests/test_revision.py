@@ -191,6 +191,16 @@ class TestRevision(unittest.TestCase):
         res, obs = single_check(df_normal, df_special, flag=True)
         self.assertTrue("Event inside local zone with 'outside of...' label" in obs)
 
+        # 11. Events inside NLL zone without Poveda_et_al_2018 velocity model
+        args = {'start': "20200604T013240", 'end': "20200604T013242"}
+        df_normal, df_special = prepare_test(args)
+        res, obs = single_check(df_normal, df_special, flag=True)
+        self.assertTrue("'DESTACADO' event inside NonLinLoc zone without NLL localization model" in obs)
+        args = {'start': "20200618T105556", 'end': "20200618T105558"}
+        df_normal, df_special = prepare_test(args)
+        res, obs = single_check(df_normal, df_special, flag=True)
+        self.assertTrue("'DESTACADO' event inside NonLinLoc zone without NLL localization model" in obs)
+
     def test_check_seismic(self):
         """
         This function test the check_seismic function. The strategy here is to test 2 hours of data and check if there
