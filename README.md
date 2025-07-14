@@ -79,7 +79,7 @@ Donde:
 
 La rutina de revisión de sismicidad incluye las siguientes inspecciones:
 
-1. Eventos sísmicos con media cuadrática (RMS) superior a $1.4$.
+1. Eventos sísmicos con media cuadrática (RMS) superior a $1.51$.
 2. Eventos sísmicos con errores de localización altos (latitud, longitud o profundidad superiores a 12 km).
 3. Eventos localizables con etiqueta en la base de datos incorrecta (p. ej., "not locatable").
 4. Eventos sísmicos con magnitudes fijadas NO correspondientes a su zona de localización.

@@ -158,7 +158,7 @@ def single_check(
 
     # First check: High RMS values
     exceptions = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
-    if event['quality_standardError'] > 1.4 and event['type'] not in exceptions:
+    if event['quality_standardError'] > 1.51 and event['type'] not in exceptions:
         observations.append("High RMS value")
 
     # Second check: High localization uncertainties
