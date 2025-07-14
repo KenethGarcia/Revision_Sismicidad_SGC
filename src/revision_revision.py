@@ -163,10 +163,9 @@ def single_check(
 
     # Second check: High localization uncertainties
     exceptions_loc = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
-    # First check if there are latitude, longitude and depth non-null values
-    if not pd.isnull(event['latitude_uncertainty']) and not pd.isnull(event['longitude_uncertainty']) and not pd.isnull(event['depth_uncertainty']):
-        if any(event[col] >= 12 for col in ['latitude_uncertainty', 'longitude_uncertainty', 'depth_uncertainty']) and event['type'] not in exceptions_loc:
-            observations.append("High localization uncertainties")
+    # Check if any of the uncertainties are greater than or equal to 12, avoiding NaN values
+    if any(pd.notnull(event[col]) and event[col] >= 12 for col in ['latitude_uncertainty', 'longitude_uncertainty', 'depth_uncertainty']) and event['type'] not in exceptions_loc:
+        observations.append("High localization uncertainties")
 
     # Third check: Locatable events with anomalous label
     if event['type'] == "not locatable" and event['quality_associatedPhaseCount'] >= 8:
