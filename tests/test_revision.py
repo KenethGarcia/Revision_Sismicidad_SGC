@@ -166,7 +166,7 @@ class TestRevision(unittest.TestCase):
         df_normal, df_special = prepare_test(args)
         res, obs = single_check(df_normal, df_special, flag=True)
         self.assertTrue("Volcanic event with wrong label 'earthquake'" in obs)
-        args = {'start': "20250207T012418", 'end': "20250207T012420"}
+        args = {'start': "20250206T063133", 'end': "20250206T063135"}
         df_normal, df_special = prepare_test(args)
         res, obs = single_check(df_normal, df_special, flag=True)
         self.assertTrue("Volcanic event without 'DESTACADO' label or without 'not locatable' label" in obs)

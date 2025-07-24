@@ -230,7 +230,7 @@ def single_check(
     # BUG: The condition for lon, lat is ambiguous. Events with lon > -72.6 and < -70 inside the network interest are NOT considered yet.
     # if lat > 1 and lon < -72.6 and event['depth_value'] > 30 and event['type'] == "earthquake" and not ut.inside_zone_polygon((lon, lat), zone_data, check_models=False)[0]:
     if 7.5 > lat > 3 and lon < -77.2 and event['depth_value'] > 30 and event['type'] == "earthquake":
-        observations.append(f"Pacific/Caribe event with high depth: {event['depth_value']} km")
+        observations.append(f"Pacific/Caribe event with high depth: {event['depth_value']:.2f} km")
 
     # Thirteenth check: Check if the event has negative depth
     if event['depth_value'] < 0 and event['type'] == "earthquake":
@@ -277,8 +277,10 @@ def check_duplicates(
     duplicates: A pandas dataframe
         Table with information about duplicate events.
     """
-    # Filter events with label 'earthquake'
-    earthquakes = events[events['type'] == 'earthquake'].reset_index(drop=True)
+    # Filter events with the following types
+    checks = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
+    earthquakes = events[events['type'].isin(checks)].reset_index(drop=True)
+    # earthquakes = events[events['type'] == 'earthquake'].reset_index(drop=True)
 
     # Make a pandas dataframe to store the info of the duplicates
     duplicates = pd.DataFrame()
