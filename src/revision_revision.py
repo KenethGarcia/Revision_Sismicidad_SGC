@@ -279,16 +279,15 @@ def check_duplicates(
     """
     # Filter events with the following types
     checks = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
-    earthquakes = events[events['type'].isin(checks)].reset_index(drop=True)
-    # earthquakes = events[events['type'] == 'earthquake'].reset_index(drop=True)
+    selections = events[events['type'].isin(checks)].reset_index(drop=True)
 
     # Make a pandas dataframe to store the info of the duplicates
     duplicates = pd.DataFrame()
 
     # Loop over al earthquakes, ordered by time
-    for i in trange(len(earthquakes) - 1, desc="Checking duplicates", unit="event", leave=False):
-        event1 = earthquakes.iloc[i]  # Take the i-esim event on the list
-        event2 = earthquakes.iloc[i + 1]  # Compared to the next event
+    for i in trange(len(selections) - 1, desc="Checking duplicates", unit="event", leave=False):
+        event1 = selections.iloc[i]  # Take the i-esim event on the list
+        event2 = selections.iloc[i + 1]  # Compared to the next event
 
         # Check if the events are within 4 seconds of each other
         time_diff = abs((event2['time_value'] - event1['time_value']).total_seconds())
