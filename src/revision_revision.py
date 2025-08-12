@@ -160,7 +160,7 @@ def single_check(
     exceptions = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
     if event['quality_standardError'] > 1.51 and event['type'] not in exceptions:
         observations.append("High RMS value")
-
+        
     # Second check: High localization uncertainties
     exceptions_loc = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
     # Check if any of the uncertainties are greater than or equal to 12, avoiding NaN values
@@ -254,7 +254,11 @@ def single_check(
     nll_bool = ut.inside_the_polygon((lon,lat), special_data['zona_nll.txt']) and not ut.inside_the_polygon((lon,lat), zone_data['zona_vmm.txt']) and not inside_volcanic_zones
     if event['publicID'] in special_events['publicID'].values and nll_bool and event['earthModelID'] != 'Poveda_et_al_2018':
         observations.append("'DESTACADO' event inside NonLinLoc zone without NLL localization model")
-
+    
+    # Seventeenth check: Events with Hypo earthmodel but more than 101 phases:
+    if event['methodID'] == 'Hypo71' and event['quality_standardError'] == 0.0 and event['type'] in ["outside of network interest", "earthquake"]:
+        observations.append(f"{event['methodID']}-{event['earthModelID']} event with more than 101 phases? (RMS 0.0)")
+    
     if len(observations) > 0:  # If the event has observations, return the information
         return event[columns], observations
     else:
