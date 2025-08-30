@@ -182,7 +182,7 @@ def single_check(
                     observations.append(f"Correct magnitude with {correct_mag} (Current: {event['magnitude_type']})")
             # Fifth check: Check for correct models for CARMA, Cesar, VMM and PtoGaitan zones
         sol, model_sol = ut.inside_zone_polygon((lon, lat), zone_data, check_models=True)
-        if sol:
+        if sol:  # If event is inside a zone, check if the model is correct
             if model_sol == 'zona_vmm.txt' and event['earthModelID'] != 'VMM':
                 observations.append("Correct model to modelVMM")
             elif model_sol == 'Modelo_Cesar.txt' and event['earthModelID'] != 'modelCesar2':
@@ -191,6 +191,9 @@ def single_check(
                 observations.append("Correct model to CARMA")
             elif model_sol == 'zona_PtoGaitan.txt' and event['earthModelID'] != 'Pto_Gaitan':
                 observations.append("Correct model to Pto_Gaitan")
+        else:  # If the event is outside, check if the model is not one of the local models
+            if event['earthModelID'] in ['VMM', 'modelCesar2', 'CARMA', 'Pto_Gaitan']:
+                observations.append(f"Event located with {event['methodID']}-{event['earthModelID']}")
 
     # Sixth check: Check if the event has 7 or less phase counts
     if event['quality_associatedPhaseCount'] <= 7 and flag and event['type'] == "not locatable":
