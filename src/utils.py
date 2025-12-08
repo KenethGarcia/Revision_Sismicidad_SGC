@@ -135,7 +135,6 @@ def inside_zone_polygon(
         model_dict = {k: v for k, v in model_dict.items() if 'Modelo' in k or 'zona_vmm.txt' in k or 'zona_PtoGaitan.txt' in k}
     else:
         model_dict = {k: v for k, v in model_dict.items() if 'Modelo' not in k}
-
     for model_name, polygon_txt in model_dict.items():
         if inside_the_polygon(p, polygon_txt):
             return True, model_name
