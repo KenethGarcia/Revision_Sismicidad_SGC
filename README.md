@@ -90,7 +90,7 @@ La rutina de revisión de sismicidad incluye las siguientes inspecciones:
 9. Eventos sísmicos internacionales sin agencia asociada (aquellos con M > 5.0).
 10. Eventos sísmicos destacados sin su etiqueta respectiva (aquellos que tienen magnitud superior a 4.0).
 11. Eventos sísmicos ubicados en áreas de influencia volcánica sin la etiqueta `not locatable`.
-12. Eventos sísmicos ubicados en las regiones del Océano Pacífico con alta profundidad (superior a 30 km).
+12. Eventos sísmicos ubicados en las regiones del Océano Pacífico y Mar Caribe con alta profundidad (superior a 30 km).
 13. Eventos sísmicos duplicados (aquellos que tienen latitud, longitud similar y están dentro de un rango de 4 segundos).
 14. Eventos sísmicos con profundidades negativas.
 15. Eventos sísmicos con etiqueta `earthquake` pero con menos de 6 fases procesadas.
