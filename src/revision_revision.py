@@ -392,6 +392,7 @@ def run(
     """
     # Query data from seiscomp3 database
     data = connect2mysql('normal', start_time, end_time)
+    # Query featured events
     featured_events = connect2mysql('destacado', start_time, end_time)
 
     # If user is specified, filter data
@@ -399,6 +400,10 @@ def run(
         # Take into account the different servers for each user and the user 'bdrsn'
         users = [f"{user}@proc{i}" for i in range(1, 5)] if user != 'bdrsn' else ['bdrsn']
         data = data[data['creationInfo_author'].isin(users)]
+
+    # Update global variable with the number of events processed
+    global n_events
+    n_events = len(data)
 
     # Check for duplicates
     duplicates = check_duplicates(data)
@@ -471,6 +476,11 @@ if __name__ == '__main__':
     n = params["n_processes"]
     printer = params["printer"]
 
+    # Check if time1 is earlier than time2
+    if time1 >= time2:
+        print(Fore.RED + "Error: The start time must be earlier than the end time.")
+        sys.exit(1)
+
     start = time.time()
     result = run(time1, time2, flag_def, user_def, n)
 
@@ -483,6 +493,6 @@ if __name__ == '__main__':
             result.to_csv(f"seismic_revision_{params['start']}_{params['end']}.csv", index=False)
             print(Fore.RED + f"File seismic_revision_{params['start']}_{params['end']}.csv saved in {os.getcwd()}")
     else:
-        print(Fore.RED + "No seismic data observations found for the given time range.")
+        print(Fore.RED + "No events require review for the specified time range.")
     end = time.time()
-    print(Fore.GREEN + f"Seismic revision routine executed in {end - start:.2f} seconds.")
+    print(Fore.GREEN + f"Seismic revision routine executed in {end - start:.2f} seconds for {n_events} events.")
