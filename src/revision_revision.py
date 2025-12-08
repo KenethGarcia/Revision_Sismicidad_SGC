@@ -54,6 +54,8 @@ ut.model_reader(model_folder, zone_data, re_order=True)
 ut.model_reader(bna_folder, volcanic_data)
 special_data['colom_ecu_fro.txt'] = zone_data.pop('colom_ecu_fro.txt', None)
 special_data['zona_nll.txt'] = zone_data.pop('zona_nll.txt', None)
+special_data['zona_Caribe_P.txt'] = zone_data.pop('zona_Caribe_P.txt', None)
+special_data['zona_Pacifico_P.txt'] = zone_data.pop('zona_Pacifico_P.txt', None)
 
 
 def connect2mysql(
@@ -229,11 +231,11 @@ def single_check(
         elif event['type'] == "volcanic eruption" and event['publicID'] not in special_events['publicID'].values:
             observations.append("Volcanic event without 'DESTACADO' label or without 'not locatable' label")
 
-    # Twelfth check: Check if any event outside all zone 1-5 and inside the network interest has depth less than 30 km
-    # BUG: The condition for lon, lat is ambiguous. Events with lon > -72.6 and < -70 inside the network interest are NOT considered yet.
-    # if lat > 1 and lon < -72.6 and event['depth_value'] > 30 and event['type'] == "earthquake" and not ut.inside_zone_polygon((lon, lat), zone_data, check_models=False)[0]:
-    if 7.5 > lat > 3 and lon < -77.2 and event['depth_value'] > 30 and event['type'] == "earthquake":
-        observations.append(f"Pacific/Caribe event with high depth: {event['depth_value']:.2f} km")
+    # Twelfth check: Check if any event inside the Caribbean Plate and Pacific Plate zones has depth higher than 30 km
+    if ut.inside_the_polygon((lon, lat), special_data['zona_Caribe_P.txt']) and event['depth_value'] > 30 and event['type'] in ['earthquake', 'outside of network interest']:
+        observations.append(f"Event inside Caribbean Plate zone with high depth: {event['depth_value']:.2f} km")
+    elif ut.inside_the_polygon((lon, lat), special_data['zona_Pacifico_P.txt']) and event['depth_value'] > 30 and event['type'] in ['earthquake', 'outside of network interest']:
+        observations.append(f"Event inside Pacific Plate zone with high depth: {event['depth_value']:.2f} km")
 
     # Thirteenth check: Check if the event has negative depth
     if event['depth_value'] < 0 and event['type'] == "earthquake":

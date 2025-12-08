@@ -10,7 +10,8 @@ from colorama import Fore
 from shapely.geometry import Point, Polygon
 
 files_available = ('zona_vmm.txt', 'zona3.txt', 'zona2.txt', 'zona_PtoGaitan.txt', 'zona4.txt', 'zona1.txt',
-                    'zona5.txt', 'Modelo_Cesar.txt', 'Modelo_CARMA.txt', 'colom_ecu_fro.txt', 'zona_nll.txt')
+                    'zona5.txt', 'Modelo_Cesar.txt', 'Modelo_CARMA.txt', 'colom_ecu_fro.txt', 'zona_nll.txt',
+                    'zona_Caribe_P.txt', 'zona_Pacifico_P.txt')
 
 def model_reader(
         model_folder: str,
