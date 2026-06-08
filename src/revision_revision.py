@@ -158,12 +158,12 @@ def single_check(
     lat, lon = event['latitude_value'], event['longitude_value']
     inside_volcanic_zones = ut.inside_bna_polygon((lon, lat), volcanic_data)
 
-    # First check: High RMS values
+    # First check: High RMS values  (UPDATED)
     exceptions = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
     if event['quality_standardError'] > 1.51 and event['type'] not in exceptions:
         observations.append("High RMS value")
         
-    # Second check: High localization uncertainties
+    # Second check: High localization uncertainties  (UPDATED)
     exceptions_loc = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
     # Check if any of the uncertainties are greater than or equal to 12, avoiding NaN values
     if any(pd.notnull(event[col]) and event[col] >= 12 for col in ['latitude_uncertainty', 'longitude_uncertainty', 'depth_uncertainty']) and event['type'] not in exceptions_loc:
