@@ -197,7 +197,7 @@ def single_check(
             if event['earthModelID'] in ['VMM', 'modelCesar2', 'CARMA', 'Pto_Gaitan']:
                 observations.append(f"Event located with {event['methodID']}-{event['earthModelID']}")
 
-    # Sixth check: Check if the event has 7 or less phase counts
+    # Sixth check: Check if the event has 7 or less phase counts  (UPDATED)
     if event['quality_associatedPhaseCount'] <= 7 and flag and event['type'] == "not locatable":
         observations.append("Event with 7 or less phase count")
 
@@ -237,11 +237,11 @@ def single_check(
     elif ut.inside_the_polygon((lon, lat), special_data['zona_Pacifico_P.txt']) and event['depth_value'] > 30 and event['type'] in ['earthquake', 'outside of network interest']:
         observations.append(f"Event inside Pacific Plate zone with high depth: {event['depth_value']:.2f} km")
 
-    # Thirteenth check: Check if the event has negative depth
+    # Thirteenth check: Check if the event has negative depth (UPDATED)
     if event['depth_value'] < 0 and event['type'] == "earthquake":
         observations.append(f"Event with negative depth: {event['depth_value']:.2f} km")
 
-    # Fourteenth check: Check if the event has an 'earthquake' label but has less than 6 phases
+    # Fourteenth check: Check if the event has an 'earthquake' label but has less than 6 phases (UPDATED)
     if event['type'] == "earthquake" and event['quality_associatedPhaseCount'] < 6:
         observations.append(f"Event with 'earthquake' label but has {event['quality_associatedPhaseCount']} phases")
 
@@ -260,7 +260,7 @@ def single_check(
     if event['publicID'] in special_events['publicID'].values and nll_bool and event['earthModelID'] != 'Poveda_et_al_2018':
         observations.append("'DESTACADO' event inside NonLinLoc zone without NLL localization model")
     
-    # Seventeenth check: Events with Hypo earthmodel but more than 101 phases:
+    # Seventeenth check: Events with Hypo earthmodel but more than 101 phases: (DEPRECATED SINCE 2026-03-17)
     if event['methodID'] == 'Hypo71' and event['quality_standardError'] == 0.0 and event['type'] in ["outside of network interest", "earthquake"]:
         observations.append(f"{event['methodID']}-{event['earthModelID']} event with more than 101 phases? (RMS 0.0)")
     

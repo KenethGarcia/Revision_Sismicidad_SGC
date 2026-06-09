@@ -1,0 +1,116 @@
+# Configuration file for seismic checks
+
+# List of comparison modes:
+#    'gt'       -> values > threshold
+#    'ge'       -> values >= threshold
+#    'lt'       -> values < threshold
+#    'le'       -> values <= threshold
+#    'between'  -> lower <= values <= upper
+#    'outside'  -> values < lower or values > upper
+#    'abs_gt'   -> abs(values) > threshold
+#    'abs_ge'   -> abs(values) >= threshold
+
+# Columns available at the table (up to 2026-06-08)
+#   'time_value': Origin time of the events
+#   'publicID': Unique identifier for the events
+#   'depth_value': Depth of the events
+#   'magnitude_value': Magnitude of the events
+#   'quality_standardError': Standard error of the events (RMS)
+#   'depth_uncertainty': Uncertainty of the depth of the events
+#   'latitude_uncertainty': Uncertainty of the latitude of the events
+#   'longitude_uncertainty': Uncertainty of the longitude of the events
+#   'quality_associatedPhaseCount': Number of associated phases for the events
+#   'quality_usedPhaseCount': Number of used phases for the events
+#   'creationInfo_author': Author of the events
+#   'quality_usedStationCount': Number of used stations for the events
+#   'quality_associatedStationCount': Number of associated stations for the events
+#   'event_type': Type of the events (e.g., earthquake, explosion, volcanic eruption)
+#   'creationInfo_agencyID': Agency ID of the events
+#   'text': Text description of the events (i.e., Los Santos - Santander, Colombia)
+#   'latitude_value': Latitude of the events
+#   'longitude_value': Longitude of the events
+#   'magnitude_type': Type of magnitude of the events (e.g., ML, Mw, mb)
+#   'methodID': Method ID of the events
+#   'earthModelID': Earth model ID of the events
+
+#######################################################################################################################
+# 1. Events with high RMS (1.50)
+[[checks]]
+name = "High RMS"                                                # Name of the check, will be used in the output
+column = "quality_standardError"                                 # Column to check inside the database
+mode = "ge"                                                      # Mode of the check (see list above)
+threshold = 1.5                                                  # Threshold value for the check
+event_type = ["earthquake", "explosion", "volcanic eruption"]    # Event type to apply the check (all for all types)
+
+# 2. Events with high latitude uncertainty (>12 km)
+[[checks]]
+name = "High Latitude Uncertainty"
+column = "latitude_uncertainty"
+mode = "gt"
+threshold = 12
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+# 3. Events with high longitude uncertainty (>12 km)
+[[checks]]
+name = "High Longitude Uncertainty"
+column = "longitude_uncertainty"
+mode = "gt"
+threshold = 12
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+# 4. Events with high depth uncertainty (>12 km)
+[[checks]]
+name = "High Depth Uncertainty"
+column = "depth_uncertainty"
+mode = "gt"
+threshold = 12
+event_type = ["earthquake", "volcanic eruption"]  # Ask for explosion request here
+
+# 5. Events with negative depth values
+[[checks]]
+name = "Negative Depth"
+column = "depth_value"
+mode = "lt"
+threshold = 0
+event_type = ["earthquake", "explosion", "volcanic eruption", "not locatable", "outside of network interest"]
+
+# 6. Events with unreal high depth values (>=200 km)
+[[checks]]
+name = "Noncommon High Depth"
+column = "depth_value"
+mode = "ge"
+threshold = 200
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+# 7. Not locatable events with less than 7 associated phases (WARNING: FUTURE CHECK)
+[[checkss]]
+name = "Event with 7 or less phase count"
+column = "quality_associatedPhaseCount"
+mode = "le"
+threshold = 7
+event_type = ["not locatable"]
+
+# 8. Earthquakes with less than 6 associated phases (WARNING: FUTURE CHECK)
+[[checks]]
+name = "Earthquake with 6 or less phase count"
+column = "quality_associatedPhaseCount"
+mode = "lt"
+threshold = 6
+event_type = ["earthquake"]
+
+# 9. Earthquakes with less than 3 stations used (WARNING: FUTURE CHECK)
+[[checks]]
+name = "Earthquake with 3 or less stations picked"
+column = "quality_usedStationCount"
+mode = "le"
+threshold = 3
+event_type = ["earthquake", "volcanic eruption"]
+
+# 10. Earthquakes with less than 3 stations associated (WARNING: FUTURE CHECK)
+[[checks]]
+name = "Earthquake with 3 or less stations associated"
+column = "quality_associatedStationCount"
+mode = "le"
+threshold = 3
+event_type = ["earthquake", "volcanic eruption"]
+
