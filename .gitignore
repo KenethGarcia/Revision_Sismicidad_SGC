@@ -209,3 +209,7 @@ __marimo__/
 # XML and IML files
 .xml
 .iml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/Revision_Sismicidad_SGC.iml
+/.idea/workspace.xml
