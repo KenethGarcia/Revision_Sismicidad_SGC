@@ -98,7 +98,7 @@ mode = "lt"
 threshold = 6
 event_type = ["earthquake"]
 
-# 9. Earthquakes with less than 3 stations used (WARNING: FUTURE CHECK)
+# 9. Earthquakes with less than 3 stations used (WARNING: FUTURE CHECK - ONLY WORKS AT SC6)
 [[checks]]
 name = "Earthquake with 3 or less stations picked"
 column = "quality_usedStationCount"
