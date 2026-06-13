@@ -169,7 +169,7 @@ def single_check(
     if any(pd.notnull(event[col]) and event[col] >= 12 for col in ['latitude_uncertainty', 'longitude_uncertainty', 'depth_uncertainty']) and event['type'] not in exceptions_loc:
         observations.append("High localization uncertainties")
 
-    # Third check: Locatable events with anomalous label
+    # Third check: Locatable events with anomalous label  (UPDATED)
     if event['type'] == "not locatable" and event['quality_associatedPhaseCount'] >= 8:
         # Check if the event is inside volcanic zones and it must have not locatable label
         if not inside_volcanic_zones:
@@ -201,7 +201,7 @@ def single_check(
     if event['quality_associatedPhaseCount'] <= 7 and flag and event['type'] == "not locatable":
         observations.append("Event with 7 or less phase count")
 
-    # Seventh check: Check if the event does NOT have any label, or it is anomalous
+    # Seventh check: Check if the event does NOT have any label, or it is anomalous  (UPDATED)
     valid_labels = ["earthquake", "not locatable", "volcanic eruption", "explosion", "not existing", "outside of network interest"]
     if pd.isnull(event['type']):
         observations.append("Event without label. Update ASAP!")

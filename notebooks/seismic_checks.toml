@@ -32,6 +32,7 @@
 #   'magnitude_type': Type of magnitude of the events (e.g., ML, Mw, mb)
 #   'methodID': Method ID of the events
 #   'earthModelID': Earth model ID of the events
+#   'comment': Comment of the events, used to set DESTACADO flag for the events
 
 #######################################################################################################################
 # 1. Events with high RMS (1.50)
