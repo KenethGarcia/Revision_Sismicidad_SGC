@@ -209,7 +209,7 @@ def single_check(
         if event['type'] not in valid_labels:
             observations.append(f"Event with invalid label '{event['type']}'")
 
-    # Eighth check: Check if the event has not been processed by the user
+    # Eighth check: Check if the event has not been processed by the user  (UPDATED)
     cases = ["scanloc", "scautoloc_reg", "scanlocbay", "AI_picker"]
     if event['creationInfo_author'] in cases and event['type'] != "not existing" and event['creationInfo_agencyID'] == "SGC":
         observations.append("Unprocessed or unassociated event")
@@ -219,11 +219,11 @@ def single_check(
         if event['creationInfo_agencyID'] == "SGC" and event['magnitude_value'] >= 5.0:
             observations.append("International event without any associated agency")
 
-    # Tenth check: Check if a 'destacado' event has the correct label
+    # Tenth check: Check if a 'destacado' event has the correct label  (UPDATED CONSIDERING NEW <-82W LIMIT CONDITION)
     if event['type'] not in exceptions and event['magnitude_value'] >= 4.0 and event['publicID'] not in special_events['publicID'].values:
         observations.append(f"Event with M = {event['magnitude_value']:.2f} without 'DESTACADO' label")
 
-    # Eleventh check: Check if any event inside the volcanic zones has the correct 'not locatable' label
+    # Eleventh check: Check if any event inside the volcanic zones has the correct 'not locatable' label (DEPRECATED SINCE 2026-03-17)
     exceptions_vol = ["not locatable", "volcanic eruption", "not existing"]
     if inside_volcanic_zones:
         if event['creationInfo_agencyID'] == "SGC" and event['type'] not in exceptions_vol:
@@ -231,7 +231,7 @@ def single_check(
         elif event['type'] == "volcanic eruption" and event['publicID'] not in special_events['publicID'].values:
             observations.append("Volcanic event without 'DESTACADO' label or without 'not locatable' label")
 
-    # Twelfth check: Check if any event inside the Caribbean Plate and Pacific Plate zones has depth higher than 30 km
+    # Twelfth check: Check if any event inside the Caribbean Plate and Pacific Plate zones has depth higher than 30 km (UPDATED)
     if ut.inside_the_polygon((lon, lat), special_data['zona_Caribe_P.txt']) and event['depth_value'] > 30 and event['type'] in ['earthquake', 'outside of network interest']:
         observations.append(f"Event inside Caribbean Plate zone with high depth: {event['depth_value']:.2f} km")
     elif ut.inside_the_polygon((lon, lat), special_data['zona_Pacifico_P.txt']) and event['depth_value'] > 30 and event['type'] in ['earthquake', 'outside of network interest']:
@@ -245,7 +245,7 @@ def single_check(
     if event['type'] == "earthquake" and event['quality_associatedPhaseCount'] < 6:
         observations.append(f"Event with 'earthquake' label but has {event['quality_associatedPhaseCount']} phases")
 
-    # Fifteenth check: Check if the event is inside/outside local zone and has wrong label
+    # Fifteenth check: Check if the event is inside/outside local zone and has wrong label  (UPDATED)
     cases = ["earthquake", "volcanic eruption"]
     if not ut.inside_the_polygon((lon, lat), special_data['colom_ecu_fro.txt']):
         if event['type'] in cases:
@@ -254,7 +254,7 @@ def single_check(
         if event['type'] == "outside of network interest":
             observations.append("Event inside local zone with 'outside of...' label")
 
-    # Sixteenth check: Verify if 'DESTACADO' events inside NonLinLoc zone use the correct earth model
+    # Sixteenth check: Verify if 'DESTACADO' events inside NonLinLoc zone use the correct earth model  (UPDATED)
     # Define a boolean to check if the event is inside the NonLinLoc zone but outside the VMM and volcanic zones
     nll_bool = ut.inside_the_polygon((lon,lat), special_data['zona_nll.txt']) and not ut.inside_the_polygon((lon,lat), zone_data['zona_vmm.txt']) and not inside_volcanic_zones
     if event['publicID'] in special_events['publicID'].values and nll_bool and event['earthModelID'] != 'Poveda_et_al_2018':
