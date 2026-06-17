@@ -175,7 +175,7 @@ def single_check(
         if not inside_volcanic_zones:
             observations.append("Locatable event")
 
-    # Fourth check: Check correspondence between zones and magnitude labels
+    # Fourth check: Check correspondence between zones and magnitude labels  (UPDATED)
     if event['quality_associatedPhaseCount'] >= 7 and event['type'] not in ["not locatable", "not existing"]:
         # Peñaranda request: Ignore events with 'Mw' label and inside 'DESTACADO' events
         if not (event['magnitude_type'] == 'Mw' and event['publicID'] in special_events['publicID'].values):
@@ -214,7 +214,7 @@ def single_check(
     if event['creationInfo_author'] in cases and event['type'] != "not existing" and event['creationInfo_agencyID'] == "SGC":
         observations.append("Unprocessed or unassociated event")
 
-    # Ninth check: Check international events without agency association
+    # Ninth check: Check international events without agency association  (DEPRECATED IN THE PREVIOUS CHECK)
     if event['type'] == "outside of network interest" or event['creationInfo_author'] == cases[1]:
         if event['creationInfo_agencyID'] == "SGC" and event['magnitude_value'] >= 5.0:
             observations.append("International event without any associated agency")
