@@ -1,0 +1,7 @@
+# Database credentials
+[database]
+env_file = ".env"
+
+# SQL query to retrieve the events data
+[query]
+sql_file = "../queries/query.sql"
