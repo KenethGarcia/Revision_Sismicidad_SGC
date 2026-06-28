@@ -1,7 +1,140 @@
-# Database credentials
+# ============================================================
+# seismic_config.toml — RSNC Seismic Revision Configuration
+# ============================================================
+
+
+# ── Database connection ───────────────────────────────────────
 [database]
 env_file = ".env"
 
-# SQL query to retrieve the events data
+
+# ── SQL query ────────────────────────────────────────────────
 [query]
 sql_file = "./queries/revision.sql"
+
+
+# ── Polygon files ────────────────────────────────────────────
+[[polygons]]
+name        = "zone1"
+path        = "../model_files/zona1.txt"
+description = "Magnitude zone 1 — MLr_1 region"
+
+[[polygons]]
+name        = "zone2"
+path        = "../model_files/zona2.txt"
+description = "Magnitude zone 2 — MLr_2 region"
+
+[[polygons]]
+name        = "zone3"
+path        = "../model_files/zona3.txt"
+description = "Magnitude zone 3 — MLr_3 region"
+
+[[polygons]]
+name        = "zone4"
+path        = "../model_files/zona4.txt"
+description = "Magnitude zone 4 — MLr_4 region"
+
+[[polygons]]
+name        = "zone5"
+path        = "../model_files/zona5.txt"
+description = "Magnitude zone 5 — MLr_5 region"
+
+[[polygons]]
+name        = "nll"
+path        = "../model_files/zona_nll.txt"
+description = "NonLinLoc region - NLL"
+
+[[polygons]]
+name        = "caribe"
+path        = "../model_files/zona_Caribe_P.txt"
+description = "Caribbean region - Caribe (Created by dcreina)"
+
+[[polygons]]
+name        = "pacifico"
+path        = "../model_files/zona_Pacifico_P.txt"
+description = "Pacific region - Pacifico (Created by dcreina)"
+
+[[polygons]]
+name        = "vmm"
+path        = "../model_files/zona_vmm.txt"
+description = "VMM region - MLr_vmm"
+
+[[polygons]]
+name        = "pto_gtn"
+path        = "../model_files/zona_PtoGaitan.txt"
+description = "Pto Gaitan region - MLr_PtoGtn"
+
+[[polygons]]
+name        = "local_area"
+path        = "../model_files/colom_ecu_fro.txt"
+description = "Local area region from Colombia"
+
+[[polygons]]
+name        = "carma"
+path        = "../model_files/Modelo_CARMA.txt"
+description = "CARMA region - Model CARMA"
+
+[[polygons]]
+name        = "cesar"
+path        = "../model_files/Modelo_Cesar.txt"
+description = "Cesar region - Model Cesar"
+
+[[polygons]]
+name        = "ovsm"
+path        = "../bna_volcanic_files/obsman.txt"
+description = "Observatorio Sismológico de Manizales - OVSM region"
+
+[[polygons]]
+name        = "ovspop"
+path        = "../bna_volcanic_files/obspop.txt"
+description = "Observatorio Sismológico de Popayán - OVSPOP region"
+
+[[polygons]]
+name        = "ovspopvnh"
+path        = "../bna_volcanic_files/obspopvnh.txt"
+description = "Observatorio Sismológico de Popayán - VNH region"
+
+[[polygons]]
+name        = "ovsp1"
+path        = "../bna_volcanic_files/obspas1.txt"
+description = "Observatorio Sismológico de Pasto - OVS1 region"
+
+[[polygons]]
+name        = "ovsp2"
+path        = "../bna_volcanic_files/obspas2.txt"
+description = "Observatorio Sismológico de Pasto - OVS2 region"
+
+[[polygons]]
+name        = "ovsp3"
+path        = "../bna_volcanic_files/obspas3.txt"
+description = "Observatorio Sismológico de Pasto - OVS3 region"
+
+[[polygons]]
+name        = "ovsp4"
+path        = "../bna_volcanic_files/obspas4.txt"
+description = "Observatorio Sismológico de Pasto - OVS4 region"
+
+[[polygons]]
+name        = "ovsp5"
+path        = "../bna_volcanic_files/obspas5.txt"
+description = "Observatorio Sismológico de Pasto - OVS5 region"
+
+[[polygons]]
+name        = "ovsp6"
+path        = "../bna_volcanic_files/obspas6.txt"
+description = "Observatorio Sismológico de Pasto - OVS6 region"
+
+[[polygons]]
+name        = "ovsp7"
+path        = "../bna_volcanic_files/obspas7.txt"
+description = "Observatorio Sismológico de Pasto - OVS7 region"
+
+[[polygons]]
+name        = "ovsp8"
+path        = "../bna_volcanic_files/obspas8.txt"
+description = "Observatorio Sismológico de Pasto - OVS8 region"
+
+[[polygons]]
+name        = "ovsp9"
+path        = "../bna_volcanic_files/obspas9.txt"
+description = "Observatorio Sismológico de Pasto - OVS9 region"
