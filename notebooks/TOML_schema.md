@@ -57,3 +57,53 @@ description = "Experimental zone — not yet validated"
 skip        = true
 ````
 
+## Conditions
+
+Probably one of the most important parts of the schema is the definition of conditions. Conditions are used to define rules that the input data must satisfy. Each condition will have a name, a description, and a set of rules that define the expected values for the fields in the input data.
+
+The idea behind the TOML configuration is the use of nested arrays of tables to express the rules cleanly. Each condition will be defined as an array of tables, where each table represents a rule. The rules will be defined using a simple syntax that allows the user to specify the field name, the expected value, and any constraints on the value.
+
+Think of every check as a tree of logic nodes, where each node is a condition and the leaves are the rules that define the expected values for the fields in the input data. A check is defined using the `[[checks]]` syntax, and each group of rules is defined using the `[[checks.groups]]` syntax. Finally, each condition is defined using the `[[checks.conditions]]` syntax.
+
+### Root node: `[[checks]]`
+In the root node, it is required to define:
+
+- `name`: label for the rule, used in the output or logs.
+- `logic`: boolean operator that joins all direct children of the root. Options are `and`, `or` or `xor`.
+
+And it is optional to define:
+
+- `description`: human-readable label for documentation/logs.
+- `event_type`: the type of event that the check applies to. If not defined, the check will apply to all events. It should be a string or an array of strings. The event type is used to filter the input data before applying the check.
+
+### Group node: `[[checks.groups]]`
+In the group node, it is required to define:
+
+- `logic`: boolean operator that joins all direct children of the group. Options are `and`, `or` or `xor`.
+
+and it is optional to define:
+
+- `description`: human-readable label for documentation/logs.
+- `name`: label for the group, used in the output or logs.
+
+### Condition node: `[[checks.conditions]]`
+In the condition node, it is required to define:
+
+- `rule_type`: the type of rule that will be applied. Options are `numeric`, `category`, `temporal`, `polygon`, `column_column`.
+- `column`: the name of the column in the input data that the rule will be applied to.
+- `mode`: operator for the rule. It depends on the `rule_type` and can be:
+
+
+#### Numeric rules
+Defined as a numeric comparison between the value of the column and a threshold. The available modes are:
+1. 
+
+## How to define your own conditions
+
+The strategy to define conditions is to first set the condition as a boolean operation and after that set the rules that will be applied to the input data. Please review the following examples before continue reading the rest of the documentation:
+
+1. A simple check with a single condition:
+
+````toml
+[[checks]]
+````toml
