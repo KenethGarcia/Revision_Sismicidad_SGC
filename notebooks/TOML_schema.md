@@ -12,6 +12,19 @@ Simple and easy: Define a .env file with the connection content (host, user, pas
 env_file = ".env"
 ````
 
+You can also define the database connection directly in the TOML file using the following keys:
+
+````toml
+[database]
+host = "localhost"
+user = "your_username"
+password = "your_password"
+database = "your_database"
+port = 5432
+````
+
+However, it is recommended to use the .env file for security reasons, as it allows you to keep sensitive information out of the codebase.
+
 ## Query configuration
 
 You can define a .sql file with the query content and the code will read it. The TOML file only needs to receive the full path to the .sql file using the `sql_file` key.
@@ -139,7 +152,7 @@ And it is optional to define:
 - `factor`: a multiplier for the right column. Default is 1.0.
 - `offset`: an offset for the right column. Default is 0.0.
 
-### Non-numeric rules
+### Category rules
 Defined as search for a value in a list of categories. The available modes are:
 1. `in`: the value is in the list of categories
 2. `not_in`: the value is not in the list of categories
@@ -179,8 +192,115 @@ It is required to define:
 
 The strategy to define conditions is to first set the condition as a boolean operation and after that set the rules that will be applied to the input data. Please review the following examples before continue reading the rest of the documentation:
 
-1. A simple check with a single condition:
+### A simple check with a single condition:
+
+Define a single root node without group nodes, only one condition is defined. For example:
+
+1. Earthquakes with high RMS value:
 
 ````toml
 [[checks]]
+name = "High RMS"
+logic = "and"
+event_type = "earthquake"
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "quality_standardError"
+  mode = "gt"
+  threshold = 1.51
+````
+
+2. Events inside the polygon "zona1":
+
 ````toml
+[[checks]]
+name = "Inside zona1"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude"
+    lon_col = "longitude"
+    mode = "inside"
+    polygon = "zona1"
+````
+
+### Multiple conditions joined with a boolean operator:
+
+We can set multiple conditions that follows the same boolean operator by defining a single root node with n conditions. For example:
+
+1. Earthquakes with high RMS value (Version 2.0):
+
+````toml
+[[checks]]
+name = "Earthquake with high RMS"
+logic = "and"
+
+  [[checks.conditions]]  # Works equal that setting event_type in the root node
+  rule_type = "category"
+  column = "event_type"
+  mode = "in"
+  value = "earthquake"
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "quality_standardError"
+  mode = "gt"
+  threshold = 1.51
+````
+
+2. Events not processed by the user:
+
+To check if an event has not been processed by the user, we need to satisfy all the following conditions:
+
+1. The 'creationInfo_author' should be inside ["scanloc", "scautoloc_reg", "scanlocbay", "AI_picker"]
+2. The event['type'] must be non "not existing"
+3. The 'creationInfo_agencyID' must be "SGC"
+
+We can use two alternatives: Define two conditions with `event_type` in the root node or define a group node with three conditions. For teaching purposes, we will show the second alternative:
+
+````toml
+[[checks]]
+name = "Events not processed by the user"
+logic = "and"
+
+  [[checks.conditions]]
+  rule_type = "category"
+  column = "event_type"
+  mode = "not_in"
+  value = "not existing"
+
+  [[checks.conditions]]
+  rule_type = "category"
+  column = "creationInfo_author"
+  mode = "in"
+  value = ["scanloc", "scautoloc_reg", "scanlocbay", "AI_picker"]
+
+  [[checks.conditions]]
+  rule_type = "category"
+  column = "creationInfo_agencyID"
+  mode = "in"
+  value = "SGC"
+````
+
+However, the less-text alternative is to define just two conditions with `event_type` in the root node:
+
+````toml
+[[checks]]
+name = "Events not processed by the user"
+logic = "and"
+event_type = ["earthquake", "explosion", "outside of network interest", "not locatable"]
+
+  [[checks.conditions]]
+  rule_type = "category"
+  column = "creationInfo_author"
+  mode = "in"
+  value = ["scanloc", "scautoloc_reg", "scanlocbay", "AI_picker"]
+
+  [[checks.conditions]]
+  rule_type = "category"
+  column = "creationInfo_agencyID"
+  mode = "in"
+  value = "SGC"
+````
