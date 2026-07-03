@@ -304,3 +304,87 @@ event_type = ["earthquake", "explosion", "outside of network interest", "not loc
   mode = "in"
   value = "SGC"
 ````
+ 3. How many events are inside the Bucaramanga nest?
+
+To check how many events are inside the Bucaramanga nest, consider three conditions joined by an `and` operator:
+- The event must be inside 6-8 degrees in latitude.
+- The event must be inside -74 to -72 degrees in longitude.
+- The event must be inside 120 to 180 km in depth.
+
+````toml
+[[checks]]
+name = "Events inside Bucaramanga nest"
+logic = "and"
+event_type = ["earthquake"]
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "latitude_value"
+  mode = "between"
+  lower = 6.0
+  upper = 8.0
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "longitude_value"
+  mode = "between"
+  lower = -74.0
+  upper = -72.0
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "depth_value"
+  mode = "between"
+  lower = 120.0
+  upper = 180.0
+````
+
+### Complex checks with groups of conditions:
+
+To write complex conditions like (A xor B) or (B and C) you can use the group node. Each group will represent a boolean operation that will be applied to the conditions defined inside the group. For example:
+
+1. Correspondence between zone3 and magnitude MLr_3:
+
+Zone 3 at RSNC is designed by a polygon defined in the `polygons/zona3.txt` file. We want to check if the events that are inside zone 3 have a magnitude label equal to MLr_3. On the other hand, we want to also check if an event have magnitude label equal to MLr_3, but the event is not inside zone 3. Moreover, it is allowed to have a 'Mw' magnitude label if the event have a 'DESTACADO' comment in seiscomp. This can be expressed as (See Vectorization_vs_Parallelization.ipynb for more details):
+
+$$ V \quad \mathbf{AND} \quad (M \quad \mathbf{XOR} \quad I) \quad \mathbf{AND} \quad \mathbf{NOT} \quad (D \quad \mathbf{AND} \quad A)$$
+
+where:
+
+- I = Events inside zona3 polygon
+- M = magnitude_type == 'MLr_4'
+- V = valid event type, meaning event_type is neither 'not existing' nor 'not locatable'
+- D = comment contains 'DESTACADO'
+- A = magnitude_type == 'Mw'
+
+The strategy is to divide the check into three parts joined by an `and` operator. The first part is a condition that will check if the event is valid, the second part is a group that will check the correspondence between zone3 and magnitude MLr_3, and the third check is another group that will check if the event is not a DESTACADO event with magnitude Mw.
+
+````toml
+[[checks]]
+name = "Correspondence between zone3 and magnitude MLr_3"
+logic = "and"
+    
+    # Part 1: Valid event type condition
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    # Part 2: Correspondence between zone3 and magnitude MLr_3
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone3 and magnitude MLr_3"
+    
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude"
+        lon_col = "longitude"
+        mode = "inside"
+        polygon = "zona3"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_3"]
