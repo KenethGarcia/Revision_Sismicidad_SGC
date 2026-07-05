@@ -147,13 +147,13 @@ description = "Observatorio Sismológico de Pasto - OVS9 region"
 # 1. Events with high RMS (1.50)
 [[checks]]
 name = "High RMS"
-event_type = ["earthquake", "explosion", "volcanic eruption"]
+event_type = ["earthquake", "volcanic eruption"]   # Should we implement explosion here?
 
   [[checks.conditions]]
   rule_type = "numeric"
   column = "quality_standardError"
-  mode = "ge"
-  threshold = 1.501
+  mode = "gt"
+  threshold = 1.50
 
 # 2. Events with high latitude uncertainty (>12 km)
 [[checks]]
@@ -169,7 +169,7 @@ event_type = ["earthquake", "explosion", "volcanic eruption"]
 # 3. Events with high longitude uncertainty (>12 km)
 [[checks]]
 name = "High Longitude Uncertainty"
-event_type = "earthquake"
+event_type = ["earthquake", "explosion", "volcanic eruption"]
 
     [[checks.conditions]]
     rule_type = "numeric"
@@ -180,7 +180,7 @@ event_type = "earthquake"
 # 4. Events with high depth uncertainty (>12 km)
 [[checks]]
 name = "High Depth Uncertainty"
-event_type = "earthquake"
+event_type = ["earthquake", "volcanic eruption"]   # Should we implement explosion here?
 
     [[checks.conditions]]
     rule_type = "numeric"
@@ -236,22 +236,17 @@ logic = "or"
         mode = "ge"
         threshold = 8
 
+# 6. Events with invalid labeling
+[[checks]]
+name = "Invalid label"
 
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["earthquake", "not locatable", "volcanic eruption", "explosion", "not existing", "outside of network interest"]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 5. Events with negative depth values
+# 7. Events with negative depth values
 [[checks]]
 name = "Negative Depth"
 event_type = ["earthquake", "explosion", "volcanic eruption", "not locatable", "outside of network interest"]
@@ -262,7 +257,7 @@ event_type = ["earthquake", "explosion", "volcanic eruption", "not locatable", "
     mode = "lt"
     threshold = 0
 
-# 6. Events with unreal high depth values (>=200 km)
+# 8. Events with unreal high depth values (>=200 km)
 [[checks]]
 name = "Noncommon High Depth"
 event_type = ["earthquake", "explosion", "volcanic eruption"]
@@ -272,4 +267,35 @@ event_type = ["earthquake", "explosion", "volcanic eruption"]
     column = "depth_value"
     mode = "ge"
     threshold = 200
+
+# 9. Events with less than 3 stations used or associated (only works at SC6)
+[[checks]]
+name = "Earthquake with 3 or fewer stations associated/picked"
+event_type = ["earthquake", "volcanic eruption", "outside of network interest"]
+logic = "and"
+
+    # 9.1. Temporal condition for events in SC6
+    [[checks.conditions]]
+    rule_type = "temporal"
+    column = "time_value"
+    mode = "ge"
+    value = "2026-03-17T00:00:00Z"
+
+    [[checks.groups]]
+    logic = "or"
+    description = "Conditions for earthquakes with 3 or less stations picked/associated"
+
+        # 9.2. Condition for earthquakes with 3 or fewer stations picked
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_usedStationCount"
+        mode = "le"
+        threshold = 3
+
+        # 9.3. Condition for earthquakes with 3 or fewer associated phases
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "le"
+        threshold = 3
 
