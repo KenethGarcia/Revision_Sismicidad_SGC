@@ -85,7 +85,7 @@ Think of every check as a tree of logic nodes, where each node is a condition an
 In the root node, it is required to define:
 
 - `name`: label for the rule, used in the output or logs.
-- `logic`: boolean operator that joins all direct children of the root. Options are `and`, `or` or `xor`.
+- `logic`: boolean operator that joins all direct children of the root. Options are `and`, `or` or `xor`. It is not required if one single condition is defined in the root node.
 
 And it is optional to define:
 
@@ -201,7 +201,6 @@ Define a single root node without group nodes, only one condition is defined. Fo
 ````toml
 [[checks]]
 name = "High RMS"
-logic = "and"
 event_type = "earthquake"
 
   [[checks.conditions]]
@@ -216,7 +215,6 @@ event_type = "earthquake"
 ````toml
 [[checks]]
 name = "Inside zona1"
-logic = "and"
 
     [[checks.conditions]]
     rule_type = "polygon"
