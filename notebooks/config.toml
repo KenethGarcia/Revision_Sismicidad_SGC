@@ -138,3 +138,138 @@ description = "Observatorio Sismológico de Pasto - OVS8 region"
 name        = "ovsp9"
 path        = "../bna_volcanic_files/obspas9.txt"
 description = "Observatorio Sismológico de Pasto - OVS9 region"
+
+
+# ──────────────────────────────────────────────────────────────
+# Checks configuration
+# ──────────────────────────────────────────────────────────────
+
+# 1. Events with high RMS (1.50)
+[[checks]]
+name = "High RMS"
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "quality_standardError"
+  mode = "ge"
+  threshold = 1.501
+
+# 2. Events with high latitude uncertainty (>12 km)
+[[checks]]
+name = "High Latitude Uncertainty"
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "latitude_uncertainty"
+    mode = "gt"
+    threshold = 12
+
+# 3. Events with high longitude uncertainty (>12 km)
+[[checks]]
+name = "High Longitude Uncertainty"
+event_type = "earthquake"
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "longitude_uncertainty"
+    mode = "gt"
+    threshold = 12
+
+# 4. Events with high depth uncertainty (>12 km)
+[[checks]]
+name = "High Depth Uncertainty"
+event_type = "earthquake"
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_uncertainty"
+    mode = "gt"
+    threshold = 12
+
+# 5. Locatable events with anomalous labeling
+[[checks]]
+name = "Locatable event"
+event_type = "not locatable"
+logic = "or"
+
+    # Group 1: Conditions for events with time_value >= 2026-03-17 00:00:00
+    [[checks.groups]]
+    logic = "and"
+    description = "Locatable events in sc6 (time_value >= 2026-03-17 00:00:00)"
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "ge"
+        value = "2026-03-17T00:00:00Z"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_usedStationCount"
+        mode = "ge"
+        threshold = 4
+
+        [[checks.groups.conditions]]
+        rule_type = "column_column"
+        left_col = "quality_associatedPhaseCount"
+        right_col = "quality_usedStationCount"
+        mode = "ge"
+        factor = 1.0
+        offset = 2.0
+
+    # Group 2: Conditions for events with time_value < 2026-03-17 00:00:00
+    [[checks.groups]]
+    logic = "and"
+    description = "Conditions for events with time_value < 2026-03-17 00:00:00"
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "lt"
+        value = "2026-03-17T00:00:00Z"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "ge"
+        threshold = 8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 5. Events with negative depth values
+[[checks]]
+name = "Negative Depth"
+event_type = ["earthquake", "explosion", "volcanic eruption", "not locatable", "outside of network interest"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_value"
+    mode = "lt"
+    threshold = 0
+
+# 6. Events with unreal high depth values (>=200 km)
+[[checks]]
+name = "Noncommon High Depth"
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_value"
+    mode = "ge"
+    threshold = 200
+
