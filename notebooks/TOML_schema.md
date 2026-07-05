@@ -388,3 +388,83 @@ logic = "and"
         column = "magnitude_type"
         mode = "in"
         value = ["MLr_3"]
+    
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+    
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+````
+
+2. Check for locatable events
+
+As we see in the _Vectorization_vs_Parallelization.ipynb_ notebook, we can define a check that will verify if an event is locatable and have the wrong label. An event is considered locatable if it satisfies the following conditions:
+
+$$ (event\_type = 'not locatable') \quad \text{and} \quad (quality\_usedStationCount \geq 4) \quad \text{and} \quad (quality\_associatedPhaseCount \geq  quality\_usedStationCount + 2) \quad \text{if} \quad time\_value \geq 2026-03-17 \quad 00:00:00$$
+
+$$\text{or}$$
+
+$$ (event\_type = 'not locatable') \quad \text{and} \quad (quality\_associatedPhaseCount \geq 8) \quad \text{if} \quad time\_value < 2026-03-17 \quad 00:00:00$$
+
+We can implement this check using two groups of conditions joined by an `or` operator. The first group will check the conditions for events with time_value greater than or equal to 2026-03-17 00:00:00, and the second group will check the conditions for events with time_value less than 2026-03-17 00:00:00.
+
+````toml
+[[checks]]
+name = "Check for locatable events"
+event_type = "not locatable"
+logic = "or"
+
+    # Group 1: Conditions for events with time_value >= 2026-03-17 00:00:00
+    [[checks.groups]]
+    logic = "and"
+    description = "Locatable events in sc6 (time_value >= 2026-03-17 00:00:00")
+    
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "ge"
+        value = "2026-03-17T00:00:00Z"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_usedStationCount"
+        mode = "ge"
+        threshold = 4
+
+        [[checks.groups.conditions]]
+        rule_type = "column_column"
+        left_col = "quality_associatedPhaseCount"
+        right_col = "quality_usedStationCount"
+        mode = "ge"
+        factor = 1.0
+        offset = 2.0
+
+    # Group 2: Conditions for events with time_value < 2026-03-17 00:00:00
+    [[checks.groups]]
+    logic = "and"
+    description = "Conditions for events with time_value < 2026-03-17 00:00:00"
+    
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "lt"
+        value = "2026-03-17T00:00:00Z"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "ge"
+        threshold = 8
+````
