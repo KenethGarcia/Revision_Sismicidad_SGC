@@ -203,20 +203,19 @@ logic = "or"
         rule_type = "temporal"
         column = "time_value"
         mode = "ge"
-        value = "2026-03-17T00:00:00Z"
+        value = "2026-03-17 00:00:00"
 
         [[checks.groups.conditions]]
         rule_type = "numeric"
         column = "quality_usedStationCount"
         mode = "ge"
-        threshold = 4
+        threshold = 4.0
 
         [[checks.groups.conditions]]
         rule_type = "column_column"
         left_col = "quality_associatedPhaseCount"
         right_col = "quality_usedStationCount"
         mode = "ge"
-        factor = 1.0
         offset = 2.0
 
     # Group 2: Conditions for events with time_value < 2026-03-17 00:00:00
@@ -228,13 +227,13 @@ logic = "or"
         rule_type = "temporal"
         column = "time_value"
         mode = "lt"
-        value = "2026-03-17T00:00:00Z"
+        value = "2026-03-17 00:00:00"
 
         [[checks.groups.conditions]]
         rule_type = "numeric"
         column = "quality_associatedPhaseCount"
         mode = "ge"
-        threshold = 8
+        threshold = 8.0
 
 # 6. Events with invalid labeling
 [[checks]]
@@ -299,3 +298,44 @@ logic = "and"
         mode = "le"
         threshold = 3
 
+# 10. Events not processed by the network
+[[checks]]
+name = "Unprocessed or unassociated event"
+logic= "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["not existing"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = ["SGC"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_author"
+    mode = "in"
+    values = ["scanloc", "scautoloc_reg", "scanlocbay", "AI_picker", "scautoloc2@sc-principal", "scanloc_b", "scanlocbay"]
+
+# 11. Pacific or Caribbean events with high depth (> 30 km)
+[[checks]]
+name = "Pacific/Caribbean event with high depth"
+logic = "and"
+event_type = ["earthquake", "outside of network interest"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_value"
+    mode = "gt"
+    threshold = 30
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "inside"
+    polygon = ["pacifico", "caribe"]
