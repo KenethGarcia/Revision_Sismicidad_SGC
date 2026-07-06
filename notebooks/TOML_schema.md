@@ -167,13 +167,13 @@ And if the mode is `in` or `not_in`, it is also required to define:
 
 ### Polygon rules
 Defined as a check if the value of the column is inside or outside a polygon. The available modes are:
-1. `inside`: the value is inside the polygon
-2. `outside`: the value is outside the polygon
+1. `inside`: the value is inside the polygon or if inside ANY of the listed polygons
+2. `outside`: the value is outside the polygon or if outside ALL the listed polygons
 
 It is required to define:
 - `lat_col`: the name of the column in the input data that contains the latitude values.
 - `lon_col`: the name of the column in the input data that contains the longitude values.
-- `polygon`: the name of the polygon that will be used for the check. The polygon must be defined in the `[[polygons]]` section of the TOML file.
+- `polygon`: the name or list of names of the polygons that will be used for the check. The polygon must be defined in the `[[polygons]]` section of the TOML file.
 
 ### Temporal rules
 Defined as a numeric comparison between the value of the column and a threshold, but the value is expected to be a timestamp. The available modes are:
@@ -210,7 +210,7 @@ event_type = "earthquake"
   threshold = 1.51
 ````
 
-2. Events inside the polygon "zona1":
+2. Events inside the polygons "zona2" and "zona_vmm":
 
 ````toml
 [[checks]]
@@ -221,7 +221,7 @@ name = "Inside zona1"
     lat_col = "latitude"
     lon_col = "longitude"
     mode = "inside"
-    polygon = "zona1"
+    polygon = ["zona2", "zona_vmm"]
 ````
 
 ### Multiple conditions joined with a boolean operator:
