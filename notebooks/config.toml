@@ -339,3 +339,41 @@ event_type = ["earthquake", "outside of network interest"]
     lon_col = "longitude_value"
     mode = "inside"
     polygon = ["pacifico", "caribe"]
+
+# 12. Events inside local zone without correct labeling
+# The event is inside the local zone and event_type is "outside of network interest".
+[[checks]]
+name = "Event inside local zone with outside label"
+logic= "and"
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "inside"
+    polygon = "local_area"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "in"
+    values = ["outside of network interest"]
+
+# 13. Events outside local zone with incorrect labeling
+# The event is outside the local zone and event_type is NOT outside of network interest or not locatable or not existing
+[[checks]]
+name = "Event outside local zone with incorrect label"
+logic= "and"
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "outside"
+    polygon = "local_area"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["outside of network interest", "not locatable", "not existing"]
