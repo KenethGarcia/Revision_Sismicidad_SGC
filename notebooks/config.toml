@@ -147,7 +147,7 @@ description = "Observatorio Sismológico de Pasto - OVS9 region"
 # 1. Events with high RMS (1.50)
 [[checks]]
 name = "High RMS"
-event_type = ["earthquake", "volcanic eruption"]   # Should we implement explosion here?
+event_type = ["earthquake"]
 
   [[checks.conditions]]
   rule_type = "numeric"
@@ -180,7 +180,7 @@ event_type = ["earthquake", "explosion", "volcanic eruption"]
 # 4. Events with high depth uncertainty (>12 km)
 [[checks]]
 name = "High Depth Uncertainty"
-event_type = ["earthquake", "volcanic eruption"]   # Should we implement explosion here?
+event_type = ["earthquake"]
 
     [[checks.conditions]]
     rule_type = "numeric"
