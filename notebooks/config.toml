@@ -269,7 +269,7 @@ event_type = ["earthquake", "explosion", "volcanic eruption"]
 
 # 9. Events with less than 3 stations used or associated (only works at SC6)
 [[checks]]
-name = "Earthquake with 3 or fewer stations associated/picked"
+name = "Earthquake with 3 or fewer stations (sc6)"
 event_type = ["earthquake", "volcanic eruption", "outside of network interest"]
 logic = "and"
 
@@ -340,8 +340,7 @@ event_type = ["earthquake", "outside of network interest"]
     mode = "inside"
     polygon = ["pacifico", "caribe"]
 
-# 12. Events inside local zone without correct labeling
-# The event is inside the local zone and event_type is "outside of network interest".
+# 12. The event is inside the local zone and event_type is "outside of network interest".
 [[checks]]
 name = "Event inside local zone with outside label"
 logic= "and"
@@ -359,8 +358,7 @@ logic= "and"
     mode = "in"
     values = ["outside of network interest"]
 
-# 13. Events outside local zone with incorrect labeling
-# The event is outside the local zone and event_type is NOT outside of network interest or not locatable or not existing
+# 13.The event is outside the local zone and event_type is NOT outside of network interest, not locatable or not existing
 [[checks]]
 name = "Event outside local zone with incorrect label"
 logic= "and"
@@ -377,3 +375,222 @@ logic= "and"
     column = "event_type"
     mode = "not_in"
     values = ["outside of network interest", "not locatable", "not existing"]
+
+# 14. 'DESTACADO' events with incorrect labeling
+[[checks]]
+name = "Event without DESTACADO comment"
+logic= "and"
+
+    # The event is NOT ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
+
+    # The event have NOT a comment with the word "DESTACADO"
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "not_in"
+    values = ['DESTACADO']
+
+    # The event have M > 4.0 or M > 5.0 depending on the longitude condition
+    [[checks.groups]]
+    logic = "or"
+    description = "Magnitude conditions based on longitude"
+
+        # Group 1: Events with longitude <= -82.5 and magnitude > 5.0
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Longitude <= -82.5 and Magnitude > 5.0"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "longitude_value"
+            mode = "le"
+            threshold = -82.5
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "magnitude_value"
+            mode = "gt"
+            threshold = 5.0
+
+        # Group 2: Events with longitude > -82.5 and magnitude > 4.0
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Longitude > -82.5 and Magnitude > 4.0"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "longitude_value"
+            mode = "gt"
+            threshold = -82.5
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "magnitude_value"
+            mode = "gt"
+            threshold = 4.0
+
+# 15. 'DESTACADO' events inside NonLinLoc zone using the correct earth model
+[[checks]]
+name = "DESTACADO event without NLL earth model"
+logic = "and"
+
+    # The event have a comment with the word "DESTACADO"
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "in"
+    values = ['DESTACADO']
+
+    # The event has not the correct earth model specified by the 'earthModelID' column with value 'Poveda_et_al_2018'
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "earthModelID"
+    mode = "not_in"
+    values = ['Poveda_et_al_2018']
+
+    # The creationInfo_agencyID should be "SGC"
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = ['SGC']
+
+    # The event is inside the NonLinLoc zone. However, it must not be inside the VMM zone
+    [[checks.groups]]
+    logic = "and"
+    description = "Event inside NonLinLoc zone but not inside VMM zone"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "nll"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "outside"
+        polygon = "vmm"
+
+# 16. Events outside the NonLinLoc zone using the NonLinLoc earth model
+[[checks]]
+name = "Event outside NLL zone with NLL earth model"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "earthModelID"
+    mode = "in"
+    values = ['Poveda_et_al_2018']
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "outside"
+    polygon = "nll"
+
+# 17. 'DESTACADO' event with M < 3 and outside network interest zone
+[[checks]]
+name = "DESTACADO event with M < 3 outside network interest zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "in"
+    values = ['DESTACADO']
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "magnitude_value"
+    mode = "lt"
+    threshold = 3.0
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "outside"
+    polygon = "local_area"
+
+# 18. Potentially locatable events
+[[checks]]
+name = "Potentially locatable event"
+logic = "or"
+event_type = ["not locatable"]
+
+    # Seiscomp3 criteria: quality_associatedPhaseCount <= 7
+    [[checks.groups]]
+    name = "Seiscomp3 criteria"
+    logic = "and"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "le"
+        threshold = 7
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "lt"
+        value = "2026-03-17 00:00:00"
+
+    # Seiscomp6 criteria
+    [[checks.groups]]
+    name = "Seiscomp6 criteria"
+    logic = "and"
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "ge"
+        value = "2026-03-17 00:00:00"
+
+        [[checks.groups.groups]]
+        description = "Seiscomp6 criteria for potentially locatable events"
+        logic = "or"
+
+            # 1. quality_usedStationCount == 3 and quality_associatedPhaseCount >= quality_usedStationCount + 2
+            [[checks.groups.groups.groups]]
+            name = "Condition 1: 3 p and at least 2 s phases"
+            logic = "and"
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "numeric"
+                column = "quality_usedStationCount"
+                mode = "eq"
+                threshold = 3
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "column_column"
+                left_col = "quality_associatedPhaseCount"
+                right_col = "quality_usedStationCount"
+                mode = "ge"
+                offset = 2
+
+            # 2. quality_usedStationCount >= 4 and quality_associatedPhaseCount >= quality_usedStationCount + 1
+            [[checks.groups.groups.groups]]
+            name = "Condition 2: 4 or more p phases and at least 1 s phase"
+            logic = "and"
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "numeric"
+                column = "quality_usedStationCount"
+                mode = "ge"
+                threshold = 4
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "column_column"
+                left_col = "quality_associatedPhaseCount"
+                right_col = "quality_usedStationCount"
+                mode = "ge"
+                offset = 1
