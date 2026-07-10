@@ -522,78 +522,78 @@ logic = "and"
     polygon = "local_area"
 
 # 18. Potentially locatable events
-[[checks]]
-name = "Potentially locatable event"
-logic = "or"
-event_type = ["not locatable"]
-
-    # Seiscomp3 criteria: quality_associatedPhaseCount <= 7
-    [[checks.groups]]
-    name = "Seiscomp3 criteria"
-    logic = "and"
-
-        [[checks.groups.conditions]]
-        rule_type = "numeric"
-        column = "quality_associatedPhaseCount"
-        mode = "le"
-        threshold = 7
-
-        [[checks.groups.conditions]]
-        rule_type = "temporal"
-        column = "time_value"
-        mode = "lt"
-        value = "2026-03-17 00:00:00"
-
-    # Seiscomp6 criteria
-    [[checks.groups]]
-    name = "Seiscomp6 criteria"
-    logic = "and"
-
-        [[checks.groups.conditions]]
-        rule_type = "temporal"
-        column = "time_value"
-        mode = "ge"
-        value = "2026-03-17 00:00:00"
-
-        [[checks.groups.groups]]
-        description = "Seiscomp6 criteria for potentially locatable events"
-        logic = "or"
-
-            # 1. quality_usedStationCount == 3 and quality_associatedPhaseCount >= quality_usedStationCount + 2
-            [[checks.groups.groups.groups]]
-            name = "Condition 1: 3 p and at least 2 s phases"
-            logic = "and"
-
-                [[checks.groups.groups.groups.conditions]]
-                rule_type = "numeric"
-                column = "quality_usedStationCount"
-                mode = "eq"
-                threshold = 3
-
-                [[checks.groups.groups.groups.conditions]]
-                rule_type = "column_column"
-                left_col = "quality_associatedPhaseCount"
-                right_col = "quality_usedStationCount"
-                mode = "ge"
-                offset = 2
-
-            # 2. quality_usedStationCount >= 4 and quality_associatedPhaseCount >= quality_usedStationCount + 1
-            [[checks.groups.groups.groups]]
-            name = "Condition 2: 4 or more p phases and at least 1 s phase"
-            logic = "and"
-
-                [[checks.groups.groups.groups.conditions]]
-                rule_type = "numeric"
-                column = "quality_usedStationCount"
-                mode = "ge"
-                threshold = 4
-
-                [[checks.groups.groups.groups.conditions]]
-                rule_type = "column_column"
-                left_col = "quality_associatedPhaseCount"
-                right_col = "quality_usedStationCount"
-                mode = "ge"
-                offset = 1
+#[[checks]]
+#name = "Potentially locatable event"
+#logic = "or"
+#event_type = ["not locatable"]
+#
+#    # Seiscomp3 criteria: quality_associatedPhaseCount <= 7
+#    [[checks.groups]]
+#    name = "Seiscomp3 criteria"
+#    logic = "and"
+#
+#        [[checks.groups.conditions]]
+#        rule_type = "numeric"
+#        column = "quality_associatedPhaseCount"
+#        mode = "le"
+#        threshold = 7
+#
+#        [[checks.groups.conditions]]
+#        rule_type = "temporal"
+#        column = "time_value"
+#        mode = "lt"
+#        value = "2026-03-17 00:00:00"
+#
+#    # Seiscomp6 criteria
+#    [[checks.groups]]
+#    name = "Seiscomp6 criteria"
+#    logic = "and"
+#
+#        [[checks.groups.conditions]]
+#        rule_type = "temporal"
+#        column = "time_value"
+#        mode = "ge"
+#        value = "2026-03-17 00:00:00"
+#
+#        [[checks.groups.groups]]
+#        description = "Seiscomp6 criteria for potentially locatable events"
+#        logic = "or"
+#
+#            # 1. quality_usedStationCount == 3 and quality_associatedPhaseCount >= quality_usedStationCount + 2
+#            [[checks.groups.groups.groups]]
+#            name = "Condition 1: 3 p and at least 2 s phases"
+#            logic = "and"
+#
+#                [[checks.groups.groups.groups.conditions]]
+#                rule_type = "numeric"
+#                column = "quality_usedStationCount"
+#                mode = "eq"
+#                threshold = 3
+#
+#                [[checks.groups.groups.groups.conditions]]
+#                rule_type = "column_column"
+#                left_col = "quality_associatedPhaseCount"
+#                right_col = "quality_usedStationCount"
+#                mode = "ge"
+#                offset = 2
+#
+#            # 2. quality_usedStationCount >= 4 and quality_associatedPhaseCount >= quality_usedStationCount + 1
+#            [[checks.groups.groups.groups]]
+#            name = "Condition 2: 4 or more p phases and at least 1 s phase"
+#            logic = "and"
+#
+#                [[checks.groups.groups.groups.conditions]]
+#                rule_type = "numeric"
+#                column = "quality_usedStationCount"
+#                mode = "ge"
+#                threshold = 4
+#
+#                [[checks.groups.groups.groups.conditions]]
+#                rule_type = "column_column"
+#                left_col = "quality_associatedPhaseCount"
+#                right_col = "quality_usedStationCount"
+#                mode = "ge"
+#                offset = 1
 
 # 19. Correspondence between zone3 and magnitude MLr_3
 [[checks]]
@@ -939,4 +939,125 @@ logic = "and"
         mode = "in"
         value = ["Mw"]
 
-# 26. Correspondence between CARMA zone and earth model CARMA
+# 26. Correspondence between CARMA zone and earth model CARMA (avoiding Cesar zone)
+[[checks]]
+name = "Incorrect earth model for CARMA zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between CARMA zone and earth model CARMA"
+
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Event inside CARMA zone and outside Cesar zone"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "inside"
+            polygon = "carma"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "outside"
+            polygon = "cesar"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = ["CARMA"]
+
+# 27. Correspondence between Cesar zone and earth model Cesar
+[[checks]]
+name = "Incorrect earth model for Cesar zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between Cesar zone and earth model Cesar"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "cesar"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = ["modelCesar2"]
+
+# 28. Correspondence between PtoGtn zone and earth model PtoGtn
+[[checks]]
+name = "Incorrect earth model for PtoGtn zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between PtoGtn zone and earth model PtoGtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "pto_gtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = ["Pto_Gaitan"]
+
+# 29. Correspondence between VMM zone and earth model VMM (ask about NLL earth model for deep VMM events)
+[[checks]]
+name = "Incorrect earth model for VMM zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between VMM zone and earth model VMM"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = ["VMM"]
