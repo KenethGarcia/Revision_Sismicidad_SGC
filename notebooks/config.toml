@@ -594,3 +594,349 @@ event_type = ["not locatable"]
                 right_col = "quality_usedStationCount"
                 mode = "ge"
                 offset = 1
+
+# 19. Correspondence between zone3 and magnitude MLr_3
+[[checks]]
+name = "Incorrect magnitude type for zone3"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone3 and magnitude MLr_3"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "zone3"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_3"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+
+# 20. Correspondence between zone4 and magnitude MLr_4
+[[checks]]
+name = "Incorrect magnitude type for zone4"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone4 and magnitude MLr_4"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "zone4"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_4"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+
+# 21. Correspondence between zone1 and magnitude MLr_1
+[[checks]]
+name = "Incorrect magnitude type for zone1"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone1 and magnitude MLr_1"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "zone1"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_1"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+
+# 22. Correspondence between zone2 and magnitude MLr_2 (avoiding VMM zone)
+[[checks]]
+name = "Incorrect magnitude type for zone2"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone2 and magnitude MLr_2"
+
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Event inside zone2 and outside VMM"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "inside"
+            polygon = "zone2"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "outside"
+            polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_2"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+
+# 23. Correspondence between zone5 and magnitude MLr_5 (avoiding PtoGtn zone)
+[[checks]]
+name = "Incorrect magnitude type for zone5"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone5 and magnitude MLr_5"
+
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Event inside zone5 and outside PtoGtn"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "inside"
+            polygon = "zone5"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "outside"
+            polygon = "pto_gtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_5"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+
+# 24. Correspondence between VMM zone and magnitude MLr_vmm
+[[checks]]
+name = "Incorrect magnitude type for VMM zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between VMM zone and magnitude MLr_vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_vmm"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+
+# 25. Correspondence between PtoGtn zone and magnitude MLr_PtoGtn
+[[checks]]
+name = "Incorrect magnitude type for PtoGtn zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between PtoGtn zone and magnitude MLr_PtoGtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "pto_gtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_PtoGtn"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = ["DESTACADO"]
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["Mw"]
+
+# 26. Correspondence between CARMA zone and earth model CARMA
