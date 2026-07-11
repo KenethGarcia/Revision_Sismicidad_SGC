@@ -147,7 +147,7 @@ description = "Observatorio Sismológico de Pasto - OVS9 region"
 # 1. Events with high RMS (1.50)
 [[checks]]
 name = "High RMS"
-event_type = ["earthquake"]
+event_type = "earthquake"
 
   [[checks.conditions]]
   rule_type = "numeric"
@@ -180,7 +180,7 @@ event_type = ["earthquake", "explosion", "volcanic eruption"]
 # 4. Events with high depth uncertainty (>12 km)
 [[checks]]
 name = "High Depth Uncertainty"
-event_type = ["earthquake"]
+event_type = "earthquake"
 
     [[checks.conditions]]
     rule_type = "numeric"
@@ -356,7 +356,7 @@ logic= "and"
     rule_type = "category"
     column = "event_type"
     mode = "in"
-    values = ["outside of network interest"]
+    values = "outside of network interest"
 
 # 13.The event is outside the local zone and event_type is NOT outside of network interest, not locatable or not existing
 [[checks]]
@@ -393,7 +393,7 @@ logic= "and"
     rule_type = "category"
     column = "comment"
     mode = "not_in"
-    values = ['DESTACADO']
+    values = 'DESTACADO'
 
     # The event have M > 4.0 or M > 5.0 depending on the longitude condition
     [[checks.groups]]
@@ -444,21 +444,21 @@ logic = "and"
     rule_type = "category"
     column = "comment"
     mode = "in"
-    values = ['DESTACADO']
+    values = 'DESTACADO'
 
     # The event has not the correct earth model specified by the 'earthModelID' column with value 'Poveda_et_al_2018'
     [[checks.conditions]]
     rule_type = "category"
     column = "earthModelID"
     mode = "not_in"
-    values = ['Poveda_et_al_2018']
+    values = 'Poveda_et_al_2018'
 
     # The creationInfo_agencyID should be "SGC"
     [[checks.conditions]]
     rule_type = "category"
     column = "creationInfo_agencyID"
     mode = "in"
-    values = ['SGC']
+    values = 'SGC'
 
     # The event is inside the NonLinLoc zone. However, it must not be inside the VMM zone
     [[checks.groups]]
@@ -488,7 +488,7 @@ logic = "and"
     rule_type = "category"
     column = "earthModelID"
     mode = "in"
-    values = ['Poveda_et_al_2018']
+    values = 'Poveda_et_al_2018'
 
     [[checks.conditions]]
     rule_type = "polygon"
@@ -506,7 +506,7 @@ logic = "and"
     rule_type = "category"
     column = "comment"
     mode = "in"
-    values = ['DESTACADO']
+    values = 'DESTACADO'
 
     [[checks.conditions]]
     rule_type = "numeric"
@@ -522,78 +522,78 @@ logic = "and"
     polygon = "local_area"
 
 # 18. Potentially locatable events
-#[[checks]]
-#name = "Potentially locatable event"
-#logic = "or"
-#event_type = ["not locatable"]
-#
-#    # Seiscomp3 criteria: quality_associatedPhaseCount <= 7
-#    [[checks.groups]]
-#    name = "Seiscomp3 criteria"
-#    logic = "and"
-#
-#        [[checks.groups.conditions]]
-#        rule_type = "numeric"
-#        column = "quality_associatedPhaseCount"
-#        mode = "le"
-#        threshold = 7
-#
-#        [[checks.groups.conditions]]
-#        rule_type = "temporal"
-#        column = "time_value"
-#        mode = "lt"
-#        value = "2026-03-17 00:00:00"
-#
-#    # Seiscomp6 criteria
-#    [[checks.groups]]
-#    name = "Seiscomp6 criteria"
-#    logic = "and"
-#
-#        [[checks.groups.conditions]]
-#        rule_type = "temporal"
-#        column = "time_value"
-#        mode = "ge"
-#        value = "2026-03-17 00:00:00"
-#
-#        [[checks.groups.groups]]
-#        description = "Seiscomp6 criteria for potentially locatable events"
-#        logic = "or"
-#
-#            # 1. quality_usedStationCount == 3 and quality_associatedPhaseCount >= quality_usedStationCount + 2
-#            [[checks.groups.groups.groups]]
-#            name = "Condition 1: 3 p and at least 2 s phases"
-#            logic = "and"
-#
-#                [[checks.groups.groups.groups.conditions]]
-#                rule_type = "numeric"
-#                column = "quality_usedStationCount"
-#                mode = "eq"
-#                threshold = 3
-#
-#                [[checks.groups.groups.groups.conditions]]
-#                rule_type = "column_column"
-#                left_col = "quality_associatedPhaseCount"
-#                right_col = "quality_usedStationCount"
-#                mode = "ge"
-#                offset = 2
-#
-#            # 2. quality_usedStationCount >= 4 and quality_associatedPhaseCount >= quality_usedStationCount + 1
-#            [[checks.groups.groups.groups]]
-#            name = "Condition 2: 4 or more p phases and at least 1 s phase"
-#            logic = "and"
-#
-#                [[checks.groups.groups.groups.conditions]]
-#                rule_type = "numeric"
-#                column = "quality_usedStationCount"
-#                mode = "ge"
-#                threshold = 4
-#
-#                [[checks.groups.groups.groups.conditions]]
-#                rule_type = "column_column"
-#                left_col = "quality_associatedPhaseCount"
-#                right_col = "quality_usedStationCount"
-#                mode = "ge"
-#                offset = 1
+[[checks]]
+name = "Potentially locatable event"
+logic = "or"
+event_type = "not locatable"
+
+    # Seiscomp3 criteria: quality_associatedPhaseCount <= 7
+    [[checks.groups]]
+    name = "Seiscomp3 criteria"
+    logic = "and"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "le"
+        threshold = 7
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "lt"
+        value = "2026-03-17 00:00:00"
+
+    # Seiscomp6 criteria
+    [[checks.groups]]
+    name = "Seiscomp6 criteria"
+    logic = "and"
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "ge"
+        value = "2026-03-17 00:00:00"
+
+        [[checks.groups.groups]]
+        description = "Seiscomp6 criteria for potentially locatable events"
+        logic = "or"
+
+            # 1. quality_usedStationCount == 3 and quality_associatedPhaseCount >= quality_usedStationCount + 2
+            [[checks.groups.groups.groups]]
+            name = "Condition 1: 3 p and at least 2 s phases"
+            logic = "and"
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "numeric"
+                column = "quality_usedStationCount"
+                mode = "eq"
+                threshold = 3
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "column_column"
+                left_col = "quality_associatedPhaseCount"
+                right_col = "quality_usedStationCount"
+                mode = "ge"
+                offset = 2
+
+            # 2. quality_usedStationCount >= 4 and quality_associatedPhaseCount >= quality_usedStationCount + 1
+            [[checks.groups.groups.groups]]
+            name = "Condition 2: 4 or more p phases and at least 1 s phase"
+            logic = "and"
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "numeric"
+                column = "quality_usedStationCount"
+                mode = "ge"
+                threshold = 4
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "column_column"
+                left_col = "quality_associatedPhaseCount"
+                right_col = "quality_usedStationCount"
+                mode = "ge"
+                offset = 1
 
 # 19. Correspondence between zone3 and magnitude MLr_3
 [[checks]]
@@ -621,7 +621,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["MLr_3"]
+        value = "MLr_3"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -633,13 +633,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = ["DESTACADO"]
+        value = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["Mw"]
+        value = "Mw"
 
 # 20. Correspondence between zone4 and magnitude MLr_4
 [[checks]]
@@ -667,7 +667,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["MLr_4"]
+        value = "MLr_4"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -679,13 +679,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = ["DESTACADO"]
+        value = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["Mw"]
+        value = "Mw"
 
 # 21. Correspondence between zone1 and magnitude MLr_1
 [[checks]]
@@ -713,7 +713,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["MLr_1"]
+        value = "MLr_1"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -725,13 +725,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = ["DESTACADO"]
+        value = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["Mw"]
+        value = "Mw"
 
 # 22. Correspondence between zone2 and magnitude MLr_2 (avoiding VMM zone)
 [[checks]]
@@ -770,7 +770,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["MLr_2"]
+        value = "MLr_2"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -782,13 +782,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = ["DESTACADO"]
+        value = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["Mw"]
+        value = "Mw"
 
 # 23. Correspondence between zone5 and magnitude MLr_5 (avoiding PtoGtn zone)
 [[checks]]
@@ -827,7 +827,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["MLr_5"]
+        value = "MLr_5"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -839,13 +839,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = ["DESTACADO"]
+        value = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["Mw"]
+        value = "Mw"
 
 # 24. Correspondence between VMM zone and magnitude MLr_vmm
 [[checks]]
@@ -885,13 +885,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = ["DESTACADO"]
+        value = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["Mw"]
+        value = "Mw"
 
 # 25. Correspondence between PtoGtn zone and magnitude MLr_PtoGtn
 [[checks]]
@@ -919,7 +919,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["MLr_PtoGtn"]
+        value = "MLr_PtoGtn"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -931,13 +931,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = ["DESTACADO"]
+        value = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["Mw"]
+        value = "Mw"
 
 # 26. Correspondence between CARMA zone and earth model CARMA (avoiding Cesar zone)
 [[checks]]
@@ -976,7 +976,7 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = ["CARMA"]
+        value = "CARMA"
 
 # 27. Correspondence between Cesar zone and earth model Cesar
 [[checks]]
@@ -1004,7 +1004,7 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = ["modelCesar2"]
+        value = "modelCesar2"
 
 # 28. Correspondence between PtoGtn zone and earth model PtoGtn
 [[checks]]
@@ -1032,7 +1032,7 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = ["Pto_Gaitan"]
+        value = "Pto_Gaitan"
 
 # 29. Correspondence between VMM zone and earth model VMM (ask about NLL earth model for deep VMM events)
 [[checks]]
@@ -1060,4 +1060,4 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = ["VMM"]
+        value = "VMM"

@@ -163,7 +163,7 @@ It is required to define:
 - `column`: the name of the column in the input data that the rule will be applied to.
 
 And if the mode is `in` or `not_in`, it is also required to define:
-- `values`: a list of categories that the column will be compared to.
+- `values`: a string or list of strings of categories that the column will be compared to.
 
 ### Polygon rules
 Defined as a check if the value of the column is inside or outside a polygon. The available modes are:
