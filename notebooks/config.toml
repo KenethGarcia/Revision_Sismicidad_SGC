@@ -1061,3 +1061,37 @@ logic = "and"
         column = "earthModelID"
         mode = "in"
         value = "VMM"
+
+# 30. Hypo71 events in seiscomp3 cannot have more than 101 phases used
+[[checks]]
+name = "Hypo71 events with more than 101 associated phases?"
+logic = "and"
+event_type = ["earthquake", "outside of network interest"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "methodID"
+    mode = "in"
+    values = ["Hypo71"]
+
+    [[checks.conditions]]
+    rule_type = "temporal"
+    column = "time_value"
+    mode = "lt"
+    value = "2026-03-17 00:00:00"
+
+    [[checks.groups]]
+    logic = "or"
+    description = "Events with more than 101 associated phases or RMS equal to 0.0"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_usedPhaseCount"
+        mode = "gt"
+        threshold = 101
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_standardError"
+        mode = "eq"
+        threshold = 0.0
