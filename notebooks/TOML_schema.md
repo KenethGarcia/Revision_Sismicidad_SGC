@@ -70,6 +70,39 @@ description = "Experimental zone — not yet validated"
 skip        = true
 ````
 
+## Duplicates Search
+
+You can define a list of duplicate search rules in the TOML file. Each rule should be defined as a table with the following keys:
+
+- `name`: label for the rule, used in the logs.
+- `description`: human-readable label for documentation/logs.
+- `method`: the method used to detect duplicates. Options are "adjacent" or "sswa". It defaults to adjacent if not specified. SSWA is a more robust method that uses a sliding window to detect duplicates, while adjacent only checks for duplicates in adjacent events.
+- `event_type`: the type of event that the rule applies to. If not defined, the rule will apply to all events. It should be a string or an array of strings. The event type is used to filter the input data before applying the rule.
+- `subset`: the columns that will be used to detect duplicates. If not defined, the rule will use the default columns: `["time_value", "latitude_value", "longitude_value", "publicID"]`. It should be an array of strings.
+- `time_window`: the time window in seconds that will be used to detect duplicates. It should be a positive integer.
+- `dist_threshold`: the distance threshold in kilometers that will be used to detect duplicates. It should be a positive number.
+
+As you can note, the only required keys are `time_window`, and `dist_threshold`. The rest of the keys are optional and can be used to customize the duplicate search rules. Consider for example the following TOML configuration:
+
+```toml
+[[duplicates]]
+name           = "General duplicate search"
+description    = "Detect near-identical events by time and distance proximity"
+method         = "sswa"                      # "adjacent" or "sswa"
+event_type     = ["earthquake", "explosion"]  # optional, defaults to the historical 4 types
+subset         = ["time_value", "latitude_value", "longitude_value", "publicID"]  # optional
+time_window    = 4
+dist_threshold = 100.0
+
+[[duplicates]]
+name           = "Strict duplicate search for volcanic events"
+description    = "Tighter window for volcanic eruption reports only"
+method         = "adjacent"
+event_type     = "volcanic eruption"
+time_window    = 2
+dist_threshold = 50.0
+```
+
 ## Conditions
 
 Probably one of the most important parts of the schema is the definition of conditions. Conditions are used to define rules that the input data must satisfy. Each condition will have a name, a description, and a set of rules that define the expected values for the fields in the input data.
