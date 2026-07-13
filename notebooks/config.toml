@@ -141,6 +141,20 @@ description = "Observatorio Sismológico de Pasto - OVS9 region"
 
 
 # ──────────────────────────────────────────────────────────────
+# Duplicates configuration
+# ──────────────────────────────────────────────────────────────
+
+[[duplicates]]
+name           = "General duplicate search"
+description    = "Detect near-identical events by time and distance proximity"
+method         = "sswa"                     # "adjacent" or "sswa"
+event_type     = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
+subset         = ["time_value", "latitude_value", "longitude_value", "publicID"]
+time_window    = 4
+dist_threshold = 100.0
+
+
+# ──────────────────────────────────────────────────────────────
 # Checks configuration
 # ──────────────────────────────────────────────────────────────
 
