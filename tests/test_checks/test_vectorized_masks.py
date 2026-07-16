@@ -17,6 +17,9 @@ from src.checks.vectorized_masks import (
 )
 
 def test_numeric_mask():
+    """
+    Test the numeric_mask function with various modes and thresholds.
+    """
     df = pd.DataFrame({'x': [0.0, 1.0, 2.0, -2.0]})
 
     # Test greater than comparison
@@ -65,6 +68,48 @@ def test_numeric_mask():
     with pytest.raises(ValueError):
         numeric_mask(df, "x", mode="unsupported_mode", threshold=1.0)
 
+
+def test_column_column_mask():
+    """
+    Test the column_column_mask function with various modes and thresholds.
+    """
+    df = pd.DataFrame({"a": [1.0, 2.0, 3.0], "b": [0.5, 2.0, 5.0]})
+
+    # Test a > b
+    gt_mask = column_column_mask(df, "a", mode="gt", right_col="b")
+    assert np.array_equal(gt_mask, np.array([True, False, False]))
+
+    # Test a >= b
+    ge_mask = column_column_mask(df, "a", mode="ge", right_col="b")
+    assert np.array_equal(ge_mask, np.array([True, True, False]))
+
+    # Test a < b
+    lt_mask = column_column_mask(df, "a", mode="lt", right_col="b")
+    assert np.array_equal(lt_mask, np.array([False, False, True]))
+
+    # Test a <= b
+    le_mask = column_column_mask(df, "a", mode="le", right_col="b")
+    assert np.array_equal(le_mask, np.array([False, True, True]))
+
+    # Test a == b
+    eq_mask = column_column_mask(df, "a", mode="eq", right_col="b")
+    assert np.array_equal(eq_mask, np.array([False, True, False]))
+
+    # Test a != b
+    ne_mask = column_column_mask(df, "a", mode="ne", right_col="b")
+    assert np.array_equal(ne_mask, np.array([True, False, True]))
+
+    # Test factor (a > 2b)
+    gt_2b_mask = column_column_mask(df, "a", mode="gt", right_col="b", factor=2.0)
+    assert np.array_equal(gt_2b_mask, np.array([False, False, False]))
+
+    # Test offset (a > b + 0.1)
+    gt_b_plus_1 = column_column_mask(df, "a", mode="lt", right_col="b", offset=0.1)
+    assert np.array_equal(gt_b_plus_1, np.array([False, True, True]))
+
+    # Test unsupported mode
+    with pytest.raises(KeyError):
+        column_column_mask(df, "a", mode="unsupported_mode", right_col="b")
 
 if __name__ == "__main__":
     pytest.main()
