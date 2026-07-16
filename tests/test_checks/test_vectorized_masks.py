@@ -111,5 +111,32 @@ def test_column_column_mask():
     with pytest.raises(KeyError):
         column_column_mask(df, "a", mode="unsupported_mode", right_col="b")
 
+
+def test_non_numeric_mask():
+    df = pd.DataFrame({"label": ["A", None, "B", pd.NA]})
+
+    # Test null values
+    is_null = non_numeric_mask(df, "label", mode="is_null")
+    assert np.array_equal(is_null, np.array([False, True, False, True]))
+
+    not_null = non_numeric_mask(df, "label", mode="not_null")
+    assert np.array_equal(not_null, ~is_null)
+
+    # Test in/not in normal and byte-strings
+    df = pd.DataFrame(
+        {"label": ["DESTACADO", b"DESTACADO", bytearray(b"OTHER"), "OTHER"]}
+    )
+    values = ["DESTACADO"]
+
+    in_mask = non_numeric_mask(df, "label", mode="in", values=values)
+    assert np.array_equal(in_mask, np.array([True, True, False, False]))
+
+    not_in_mask = non_numeric_mask(df, "label", mode="not_in", values=values)
+    assert np.array_equal(not_in_mask, np.array([False, False, True, True]))
+
+    with pytest.raises(ValueError):
+        non_numeric_mask(df, "label", mode="unsupported_mode")
+
+
 if __name__ == "__main__":
     pytest.main()
