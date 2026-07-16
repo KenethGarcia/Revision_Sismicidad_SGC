@@ -202,5 +202,37 @@ def test_temporal_mask():
         temporal_mask(df, "t", value=ref, mode="unsupported_mode")
 
 
+def test_combine_masks():
+    """
+    Test the combine_masks function with various modes and thresholds.
+    """
+    m1 = np.array([True, True, False, False])
+    m2 = np.array([True, False, True, False])
+
+    # Test and logic
+    and_mask = combine_masks([m1, m2], logic="and")
+    assert np.array_equal(and_mask, np.array([True, False, False, False]))
+
+    # Test or logic
+    or_mask = combine_masks([m1, m2], logic="or")
+    assert np.array_equal(or_mask, np.array([True, True, True, False]))
+
+    # Test xor logic
+    xor_mask = combine_masks([m1, m2], logic="xor")
+    assert np.array_equal(xor_mask, np.array([False, True, True, False]))
+
+    # Test invalid xor check
+    with pytest.raises(ValueError):
+        combine_masks([m1, m2, m1], logic="xor")
+
+    # Test no masks provided
+    with pytest.raises(ValueError):
+        combine_masks([], logic="and")
+
+    # Test unsupported mode
+    with pytest.raises(ValueError):
+        combine_masks([m1, m1, m1], logic="bad_logic")
+
+
 if __name__ == "__main__":
     pytest.main()
