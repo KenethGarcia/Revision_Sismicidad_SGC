@@ -17,9 +17,7 @@ from src.checks.vectorized_masks import (
 )
 
 def test_numeric_mask():
-    df = pd.DataFrame({
-        'x': [0.0, 1.0, 2.0, -2.0]
-    })
+    df = pd.DataFrame({'x': [0.0, 1.0, 2.0, -2.0]})
 
     # Test greater than comparison
     gt_mask = numeric_mask(df, "x", mode="gt", threshold=1.0)
