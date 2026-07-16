@@ -113,6 +113,9 @@ def test_column_column_mask():
 
 
 def test_non_numeric_mask():
+    """
+    Test the non_numeric_mask function with various modes and thresholds.
+    """
     df = pd.DataFrame({"label": ["A", None, "B", pd.NA]})
 
     # Test null values
@@ -136,6 +139,67 @@ def test_non_numeric_mask():
 
     with pytest.raises(ValueError):
         non_numeric_mask(df, "label", mode="unsupported_mode")
+
+
+def test_polygon_mask():
+    """
+    Test the polygon_mask function with various modes and thresholds.
+    """
+    # Square from (0, 0) to (1, 1)
+    poly = Polygon([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)])
+
+    # Points (0.5, 1.5), (0.5, 0.5), (0.5, -0.5)
+    df = pd.DataFrame({"x": [0.5, 0.5, 0.5], "y": [1.5, 0.5, -0.5]})
+
+    inside_mask = polygon_mask(df, "x", "y", polygon=poly, mode="inside")
+    assert np.array_equal(inside_mask, np.array([False, True, False]))
+
+    outside_mask = polygon_mask(df, "x", "y", polygon=poly, mode="outside")
+    assert np.array_equal(outside_mask, np.array([True, False, True]))
+
+    with pytest.raises(ValueError):
+        polygon_mask(df, "x", "y", polygon=poly, mode="unsupported_mode")
+
+
+def test_temporal_mask():
+    """
+    Test the temporal_mask function with various modes and thresholds.
+    """
+    # Dataframe with different formats used in pandas
+    df = pd.DataFrame(
+        {"t": ["2024-01-01 00:00:00",
+               "2024-01-02 00:00:00",
+               "2024-01-03 00:00:00"]}
+    )
+    ref = "2024-01-02T00:00:00"
+
+    # Test greater than
+    gt_mask = temporal_mask(df, "t", value=ref, mode="gt")
+    assert np.array_equal(gt_mask, np.array([False, False, True]))
+
+    # Test greater equal
+    ge_mask = temporal_mask(df, "t", value=ref, mode="ge")
+    assert np.array_equal(ge_mask, np.array([False, True, True]))
+
+    # Test less than
+    lt_mask = temporal_mask(df, "t", value=ref, mode="lt")
+    assert np.array_equal(lt_mask, np.array([True, False, False]))
+
+    # Test less equal
+    le_mask = temporal_mask(df, "t", value=ref, mode="le")
+    assert np.array_equal(le_mask, np.array([True, True, False]))
+
+    # Test equal
+    eq_mask = temporal_mask(df, "t", value=ref, mode="eq")
+    assert np.array_equal(eq_mask, np.array([False, True, False]))
+
+    # Test not equal
+    ne_mask = temporal_mask(df, "t", value=ref, mode="ne")
+    assert np.array_equal(ne_mask, np.array([True, False, True]))
+
+    # Test unsupported mode
+    with pytest.raises(KeyError):
+        temporal_mask(df, "t", value=ref, mode="unsupported_mode")
 
 
 if __name__ == "__main__":
