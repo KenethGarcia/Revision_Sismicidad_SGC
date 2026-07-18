@@ -236,7 +236,7 @@ def dispatch_column_column(subset: pd.DataFrame, cond: dict, polygons: dict | No
 
 CONDITION_DISPATCHERS = {
     "numeric": dispatch_numeric,
-    "category": dispatch_column_column,
+    "category": dispatch_non_numeric,
     "temporal": dispatch_temporal,
     "polygon": dispatch_polygon,
     "column_column": dispatch_column_column,
