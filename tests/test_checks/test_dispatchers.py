@@ -93,3 +93,80 @@ def test_dispatch_numeric():
     mask = dispatch_numeric(subset, cond)
     assert mask.dtype == bool
     assert np.array_equal(mask, np.array([True, False, True, True]))
+
+
+def test_dispatch_non_numeric():
+    """
+    Test the dispatch_non_numeric function with a sample DataFrame and condition.
+    """
+    subset = pd.DataFrame({"label": ["A", "B", "C"]})
+
+    # Test case 1: in condition
+    cond = {
+        "column": "label",
+        "mode": "in",
+        "values": ["A", "C"],
+    }
+    mask = dispatch_non_numeric(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([True, False, True]))
+
+    # Test case 2: not in condition
+    cond["mode"] = "not_in"
+    mask = dispatch_non_numeric(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([False, True, False]))
+
+    # Test case 3: is null condition
+    subset = pd.DataFrame({"label": ["A", None, "C"]})
+    cond = {
+        "column": "label",
+        "mode": "is_null",
+    }
+    mask = dispatch_non_numeric(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([False, True, False]))
+
+    # Test case 4: is not null condition
+    cond["mode"] = "not_null"
+    mask = dispatch_non_numeric(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([True, False, True]))
+
+    # Test case 5: in condition with single value in values arg
+    subset = pd.DataFrame({"label": ["DESTACADO", "OTHER"]})
+    cond = {
+        "column": "label",
+        "mode": "in",
+        "values": "DESTACADO",  # single string should be normalized to list
+    }
+    mask = dispatch_non_numeric(subset, cond)
+    assert np.array_equal(mask, np.array([True, False]))
+
+    # Test case 6: in condition with byte-strings
+    subset = pd.DataFrame({"label": [b"DESTACADO", "OTHER"]})
+    mask = dispatch_non_numeric(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([True, False]))
+
+    # Test case 7: in condition with single value in valur arg
+    cond = {
+        "column": "label",
+        "mode": "in",
+        "value": "DESTACADO",  # single string should be normalized to list
+    }
+    mask = dispatch_non_numeric(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([True, False]))
+
+    # Test case 8: not in condition with multiple values in value arg
+    subset = pd.DataFrame({"label": ["A", "B", "C"]})
+    cond = {
+        "column": "label",
+        "mode": "not_in",
+        "value": ["A", "C"],  # list under 'value' must be handled
+    }
+    mask = dispatch_non_numeric(subset, cond)
+    assert np.array_equal(mask, np.array([False, True, False]))
+
+
