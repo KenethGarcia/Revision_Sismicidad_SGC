@@ -289,8 +289,8 @@ def temporal_mask(
         Boolean mask with one entry per row in events. True indicates
         that the row satisfies the requested temporal condition.
     """
-    left = pd.to_datetime(events[column], utc=False)
-    right = pd.Timestamp(value)
+    left = pd.to_datetime(events[column], format="mixed", utc=True, errors="raise")
+    right = pd.to_datetime(value, format="mixed", utc=True, errors="raise")
 
     ops = {
         "gt": np.greater,
@@ -300,7 +300,7 @@ def temporal_mask(
         "eq": np.equal,
         "ne": np.not_equal,
     }
-    return ops[mode](left.to_numpy(), right.to_datetime64())
+    return ops[mode](left.to_numpy(dtype="datetime64[ns]"), right.to_datetime64())
 
 
 def combine_masks(
