@@ -316,3 +316,68 @@ def test_dispatch_polygon():
     }
     with pytest.raises(TypeError):
         dispatch_polygon(subset, cond, polygons)
+
+
+def test_dispatch_column_column():
+    """
+    Test the dispatch_column_column function with a sample DataFrame and condition.
+    """
+    # Test case 1: Loop over each possible case
+    subset = pd.DataFrame({"a": [1.0, 3.0, 5.0], "b": [1.0, 1.0, 1.0]})
+    cond = {
+        "left_col": "a",
+        "right_col": "b",
+        "mode": "gt"
+    }
+    options = ("gt", "ge", "lt", "le", "eq", "ne")
+    solutions = (  # a <mode> b
+        [False, True, True],  # gt
+        [True, True, True],  # ge
+        [False, False, False],  # lt
+        [True, False, False],  # le
+        [True, False, False],  # eq
+        [False, True, True]   # ne
+    )
+    for i in range(len(options)):
+        cond["mode"] = options[i]
+        mask = dispatch_column_column(subset, cond)
+        assert mask.dtype == bool
+        assert np.array_equal(mask, np.array(solutions[i]))
+
+    # Test case 2: Testing offset and factor
+    cond = {
+        "left_col": "a",
+        "right_col": "b",
+        "mode": "gt",
+        "factor": 2.0,
+        "offset": 0.0,
+    }
+    mask = dispatch_column_column(subset, cond)
+    # compare a > 2 * b: [1 > 2, 3 > 2, 5 > 2]
+    assert np.array_equal(mask, np.array([False, True, True]))
+
+
+def test_condition_dispatchers():
+    """
+    Test the condition_dispatchers function with examples
+    """
+    # Test case 1: Check that all expected keys are present
+    expected_keys = {
+        "numeric",
+        "category",
+        "column_column",
+        "polygon",
+        "temporal",
+    }
+    assert set(CONDITION_DISPATCHERS.keys()) == expected_keys
+
+    # Test case 2: Check that each dispatcher is callable
+    for key, dispatcher in CONDITION_DISPATCHERS.items():
+        assert callable(dispatcher)
+
+    # Test case 3: Check if the functions are correctly correlated
+    assert CONDITION_DISPATCHERS["numeric"] is dispatch_numeric
+    assert CONDITION_DISPATCHERS["category"] is dispatch_non_numeric
+    assert CONDITION_DISPATCHERS["column_column"] is dispatch_column_column
+    assert CONDITION_DISPATCHERS["polygon"] is dispatch_polygon
+    assert CONDITION_DISPATCHERS["temporal"] is dispatch_temporal
