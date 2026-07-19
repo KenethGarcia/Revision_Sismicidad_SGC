@@ -6,7 +6,6 @@
 from __future__ import annotations
 from typing import Dict
 from shapely.geometry import Polygon
-from shapely.geometry.base import BaseGeometry
 import numpy as np
 import pandas as pd
 
@@ -122,7 +121,7 @@ def dispatch_temporal(
 def dispatch_polygon(
         subset: pd.DataFrame,
         cond: dict,
-        polygons: Dict[str, Polygon, BaseGeometry],
+        polygons: Dict[str, Polygon],
 ) -> np.ndarray:
     """
     Dispatcher for polygon ruletype.
