@@ -170,3 +170,149 @@ def test_dispatch_non_numeric():
     assert np.array_equal(mask, np.array([False, True, False]))
 
 
+def test_dispatch_temporal():
+    """
+    Test the dispatch_temporal function with a sample DataFrame and condition.
+    """
+    # Test case 1: greater equal
+    subset = pd.DataFrame(
+        {"t": ["2024-01-01 00:00:00", "2024-01-02 00:00:00", "2024-01-03 00:00:00"]}
+    )
+    cond = {
+        "column": "t",
+        "mode": "ge",
+        "value": "2024-01-02 00:00:00",
+    }
+    mask = dispatch_temporal(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([False, True, True]))
+
+    # Test case 2: greater than
+    cond["mode"] = "gt"
+    mask = dispatch_temporal(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([False, False, True]))
+
+    # Test case 3: less equal
+    cond["mode"] = "le"
+    mask = dispatch_temporal(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([True, True, False]))
+
+    # Test case 4: less than
+    cond["mode"] = "lt"
+    mask = dispatch_temporal(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([True, False, False]))
+
+    # Test case 5: equal (changing format)
+    cond["mode"] = "eq"
+    cond["value"] = "2024-01-02T00:00:00"
+    mask = dispatch_temporal(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([False, True, False]))
+
+    # Test case 6: not equal
+    cond["mode"] = "ne"
+    mask = dispatch_temporal(subset, cond)
+    assert mask.dtype == bool
+    assert np.array_equal(mask, np.array([True, False, True]))
+
+    # Test case 7: Different valid time formats on left column
+    right_formats = [
+        "2024-01-01",
+        "2024-01-01 00:00:00",
+        "2024-01-01T00:00:00",
+        "2024-01-01 00:00:00.000",
+        "2024/01/01",
+        "20240101",
+        "2024-01-01 00:00:00+00:00",
+        "2024-01-01T00:00:00Z",
+    ]
+    subset = pd.DataFrame(
+        {"t": right_formats
+         })
+    cond["mode"] = "eq"
+    cond["value"] = "2024-01-01 00:00:00"
+    mask = dispatch_temporal(subset, cond)
+    assert mask.dtype == bool
+    assert mask.all()  # All should be True since all formats represent the same time
+
+    # Test case 8: Different valid time formats on right column
+    # Loop over subset and change dynamically the cond["value"] to match each row,
+    # and check that the comparison always is true
+    for value in right_formats:
+        cond["value"] = value
+        mask = dispatch_temporal(subset, cond)
+        assert mask.dtype == bool
+        assert mask.all()
+
+
+def test_dispatch_polygon():
+    """
+    Test the dispatch_polygon function with a sample DataFrame and condition.
+    """
+    # Test case 1: Inside
+    square = Polygon([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)])
+    polygons = {"zone1": square}
+    subset = pd.DataFrame({"lon": [0.5, 1.5], "lat": [0.5, 0.5]})
+
+    cond = {
+        "lat_col": "lat",
+        "lon_col": "lon",
+        "mode": "inside",
+        "polygon": "zone1",  # bare string
+    }
+    mask = dispatch_polygon(subset, cond, polygons)
+    assert np.array_equal(mask, np.array([True, False]))
+
+    # Test case 2: Outside with multiple polygons/points
+    poly2 = Polygon([(1.0, 0.0), (2.0, 0.0), (2.0, 1.0), (1.0, 1.0)])
+    polygons = {"zone1": square, "zone2": poly2}
+
+    subset = pd.DataFrame(
+        {"lon": [0.5, 1.5, 2.5], "lat": [0.5, 0.5, 0.5],}
+    )
+
+    cond = {
+        "lat_col": "lat",
+        "lon_col": "lon",
+        "mode": "outside",
+        "polygon": ["zone1", "zone2"],  # list of names
+    }
+
+    mask = dispatch_polygon(subset, cond, polygons)
+    # first point inside zone1, second inside zone2, third outside both
+    assert np.array_equal(mask, np.array([False, False, True]))
+
+    # Test case 3: KeyError raises when missing polygon
+    subset = pd.DataFrame({"lon": [0.5], "lat": [0.5]})
+    cond = {
+        "lat_col": "lat",
+        "lon_col": "lon",
+        "mode": "inside",
+        "polygon": ["zone1", "zoneX"],  # zoneX missing
+    }
+    with pytest.raises(KeyError):
+        dispatch_polygon(subset, cond, polygons)
+
+    # Test case 4: ValueError raises when empty polygon list
+    cond = {
+        "lat_col": "lat",
+        "lon_col": "lon",
+        "mode": "inside",
+        "polygon": [],  # empty
+    }
+
+    with pytest.raises(ValueError):
+        dispatch_polygon(subset, cond, polygons)
+
+    # Test case 5: TypeError raises when polygon is not a shapely Polygon or a list of shapely Polygons
+    cond = {
+        "lat_col": "lat",
+        "lon_col": "lon",
+        "mode": "inside",
+        "polygon": 123,  # not str or list
+    }
+    with pytest.raises(TypeError):
+        dispatch_polygon(subset, cond, polygons)
