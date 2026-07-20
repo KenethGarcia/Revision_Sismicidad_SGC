@@ -381,3 +381,7 @@ def test_condition_dispatchers():
     assert CONDITION_DISPATCHERS["column_column"] is dispatch_column_column
     assert CONDITION_DISPATCHERS["polygon"] is dispatch_polygon
     assert CONDITION_DISPATCHERS["temporal"] is dispatch_temporal
+
+
+if __name__ == "__main__":
+    pytest.main()
