@@ -1,0 +1,1111 @@
+# ============================================================
+# seismic_config.toml — RSNC Seismic Revision Configuration
+# ============================================================
+
+
+# ── Database connection ───────────────────────────────────────
+[database]
+env_file = ".env"
+
+
+# ── SQL query ────────────────────────────────────────────────
+[query]
+sql_file = "./queries/revision.sql"
+
+
+# ── Polygon files ────────────────────────────────────────────
+[[polygons]]
+name        = "zone1"
+path        = "../polygons/SGC/RSNC/zona1.txt"
+description = "Magnitude zone 1 — MLr_1 region"
+
+[[polygons]]
+name        = "zone2"
+path        = "../polygons/SGC/RSNC/zona2.txt"
+description = "Magnitude zone 2 — MLr_2 region"
+
+[[polygons]]
+name        = "zone3"
+path        = "../polygons/SGC/RSNC/zona3.txt"
+description = "Magnitude zone 3 — MLr_3 region"
+
+[[polygons]]
+name        = "zone4"
+path        = "../polygons/SGC/RSNC/zona4.txt"
+description = "Magnitude zone 4 — MLr_4 region"
+
+[[polygons]]
+name        = "zone5"
+path        = "../polygons/SGC/RSNC/zona5.txt"
+description = "Magnitude zone 5 — MLr_5 region"
+
+[[polygons]]
+name        = "nll"
+path        = "../polygons/SGC/RSNC/NLL.txt"
+description = "NonLinLoc region - NLL"
+
+[[polygons]]
+name        = "caribe"
+path        = "../polygons/SGC/RSNC/caribe.txt"
+description = "Caribbean region - Caribe (Created by dcreina)"
+
+[[polygons]]
+name        = "pacifico"
+path        = "../polygons/SGC/RSNC/nazca.txt"
+description = "Pacific region - Pacifico (Created by dcreina)"
+
+[[polygons]]
+name        = "vmm"
+path        = "../polygons/SGC/RSNC/VMM.txt"
+description = "VMM region - MLr_vmm"
+
+[[polygons]]
+name        = "pto_gtn"
+path        = "../polygons/SGC/RSNC/ptogaitan.txt"
+description = "Pto Gaitan region - MLr_PtoGtn"
+
+[[polygons]]
+name        = "local_area"
+path        = "../polygons/SGC/RSNC/arealocal.txt"
+description = "Local area region from Colombia"
+
+[[polygons]]
+name        = "carma"
+path        = "../polygons/SGC/RSNC/carma.txt"
+description = "CARMA region - Model CARMA"
+
+[[polygons]]
+name        = "cesar"
+path        = "../polygons/SGC/RSNC/cesar.txt"
+description = "Cesar region - Model Cesar"
+
+[[polygons]]
+name        = "ovsm"
+path        = "../polygons/SGC/volcanological_observatories/obsman.txt"
+description = "Observatorio Sismológico de Manizales - OVSM region"
+
+[[polygons]]
+name        = "ovspop"
+path        = "../polygons/SGC/volcanological_observatories/obspop.txt"
+description = "Observatorio Sismológico de Popayán - OVSPOP region"
+
+[[polygons]]
+name        = "ovspopvnh"
+path        = "../polygons/SGC/volcanological_observatories/obspopvnh.txt"
+description = "Observatorio Sismológico de Popayán - VNH region"
+
+[[polygons]]
+name        = "ovsp1"
+path        = "../polygons/SGC/volcanological_observatories/obspas1.txt"
+description = "Observatorio Sismológico de Pasto - OVS1 region"
+
+[[polygons]]
+name        = "ovsp2"
+path        = "../polygons/SGC/volcanological_observatories/obspas2.txt"
+description = "Observatorio Sismológico de Pasto - OVS2 region"
+
+[[polygons]]
+name        = "ovsp3"
+path        = "../polygons/SGC/volcanological_observatories/obspas3.txt"
+description = "Observatorio Sismológico de Pasto - OVS3 region"
+
+[[polygons]]
+name        = "ovsp4"
+path        = "../polygons/SGC/volcanological_observatories/obspas4.txt"
+description = "Observatorio Sismológico de Pasto - OVS4 region"
+
+[[polygons]]
+name        = "ovsp5"
+path        = "../polygons/SGC/volcanological_observatories/obspas5.txt"
+description = "Observatorio Sismológico de Pasto - OVS5 region"
+
+[[polygons]]
+name        = "ovsp6"
+path        = "../polygons/SGC/volcanological_observatories/obspas6.txt"
+description = "Observatorio Sismológico de Pasto - OVS6 region"
+
+[[polygons]]
+name        = "ovsp7"
+path        = "../polygons/SGC/volcanological_observatories/obspas7.txt"
+description = "Observatorio Sismológico de Pasto - OVS7 region"
+
+[[polygons]]
+name        = "ovsp8"
+path        = "../polygons/SGC/volcanological_observatories/obspas8.txt"
+description = "Observatorio Sismológico de Pasto - OVS8 region"
+
+[[polygons]]
+name        = "ovsp9"
+path        = "../polygons/SGC/volcanological_observatories/obspas9.txt"
+description = "Observatorio Sismológico de Pasto - OVS9 region"
+
+
+# ──────────────────────────────────────────────────────────────
+# Duplicates configuration
+# ──────────────────────────────────────────────────────────────
+
+[[duplicates]]
+name           = "General duplicate search"
+description    = "Detect near-identical events by time and distance proximity"
+method         = "sswa"                     # "adjacent" or "sswa"
+event_type     = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
+subset         = ["time_value", "latitude_value", "longitude_value", "publicID"]
+time_window    = 4
+dist_threshold = 100.0
+
+
+# ──────────────────────────────────────────────────────────────
+# Checks configuration
+# ──────────────────────────────────────────────────────────────
+
+# 1. Events with high RMS (1.50)
+[[checks]]
+name = "High RMS"
+event_type = "earthquake"
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "quality_standardError"
+  mode = "gt"
+  threshold = 1.50
+
+# 2. Events with high latitude uncertainty (>12 km)
+[[checks]]
+name = "High Latitude Uncertainty"
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "latitude_uncertainty"
+    mode = "gt"
+    threshold = 12
+
+# 3. Events with high longitude uncertainty (>12 km)
+[[checks]]
+name = "High Longitude Uncertainty"
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "longitude_uncertainty"
+    mode = "gt"
+    threshold = 12
+
+# 4. Events with high depth uncertainty (>12 km)
+[[checks]]
+name = "High Depth Uncertainty"
+event_type = "earthquake"
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_uncertainty"
+    mode = "gt"
+    threshold = 12
+
+# 5. Locatable events with anomalous labeling
+[[checks]]
+name = "Locatable event"
+event_type = "not locatable"
+logic = "or"
+
+    # Group 1: Conditions for events with time_value >= 2026-03-17 00:00:00
+    [[checks.groups]]
+    logic = "and"
+    description = "Locatable events in sc6 (time_value >= 2026-03-17 00:00:00)"
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "ge"
+        value = "2026-03-17 00:00:00"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_usedStationCount"
+        mode = "ge"
+        threshold = 4.0
+
+        [[checks.groups.conditions]]
+        rule_type = "column_column"
+        left_col = "quality_associatedPhaseCount"
+        right_col = "quality_usedStationCount"
+        mode = "ge"
+        offset = 2.0
+
+    # Group 2: Conditions for events with time_value < 2026-03-17 00:00:00
+    [[checks.groups]]
+    logic = "and"
+    description = "Conditions for events with time_value < 2026-03-17 00:00:00"
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "lt"
+        value = "2026-03-17 00:00:00"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "ge"
+        threshold = 8.0
+
+# 6. Events with invalid labeling
+[[checks]]
+name = "Invalid label"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["earthquake", "not locatable", "volcanic eruption", "explosion", "not existing", "outside of network interest"]
+
+# 7. Events with negative depth values
+[[checks]]
+name = "Negative Depth"
+event_type = ["earthquake", "explosion", "volcanic eruption", "not locatable", "outside of network interest"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_value"
+    mode = "lt"
+    threshold = 0
+
+# 8. Events with unreal high depth values (>=200 km)
+[[checks]]
+name = "Noncommon High Depth"
+event_type = ["earthquake", "explosion", "volcanic eruption"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_value"
+    mode = "ge"
+    threshold = 200
+
+# 9. Events with less than 3 stations used or associated (only works at SC6)
+[[checks]]
+name = "Earthquake with 3 or fewer stations (sc6)"
+event_type = ["earthquake", "volcanic eruption", "outside of network interest"]
+logic = "and"
+
+    # 9.1. Temporal condition for events in SC6
+    [[checks.conditions]]
+    rule_type = "temporal"
+    column = "time_value"
+    mode = "ge"
+    value = "2026-03-17T00:00:00Z"
+
+    [[checks.groups]]
+    logic = "or"
+    description = "Conditions for earthquakes with 3 or less stations picked/associated"
+
+        # 9.2. Condition for earthquakes with 3 or fewer stations picked
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_usedStationCount"
+        mode = "le"
+        threshold = 3
+
+        # 9.3. Condition for earthquakes with 3 or fewer associated phases
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "le"
+        threshold = 3
+
+# 10. Events not processed by the network
+[[checks]]
+name = "Unprocessed or unassociated event"
+logic= "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["not existing"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = ["SGC"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_author"
+    mode = "in"
+    values = ["scanloc", "scautoloc_reg", "scanlocbay", "AI_picker", "scautoloc2@sc-principal", "scanloc_b", "scanlocbay"]
+
+# 11. Pacific or Caribbean events with high depth (> 30 km)
+[[checks]]
+name = "Pacific/Caribbean event with high depth"
+logic = "and"
+event_type = ["earthquake", "outside of network interest"]
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "depth_value"
+    mode = "gt"
+    threshold = 30
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "inside"
+    polygon = ["pacifico", "caribe"]
+
+# 12. The event is inside the local zone and event_type is "outside of network interest".
+[[checks]]
+name = "Event inside local zone with outside label"
+logic= "and"
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "inside"
+    polygon = "local_area"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "in"
+    values = "outside of network interest"
+
+# 13.The event is outside the local zone and event_type is NOT outside of network interest, not locatable or not existing
+[[checks]]
+name = "Event outside local zone with incorrect label"
+logic= "and"
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "outside"
+    polygon = "local_area"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["outside of network interest", "not locatable", "not existing"]
+
+# 14. 'DESTACADO' events with incorrect labeling
+[[checks]]
+name = "Event without DESTACADO comment"
+logic= "and"
+
+    # The event is NOT ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["not locatable", "outside of network interest", "volcanic eruption", "explosion", "not existing"]
+
+    # The event have NOT a comment with the word "DESTACADO"
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "not_in"
+    values = 'DESTACADO'
+
+    # The event have M > 4.0 or M > 5.0 depending on the longitude condition
+    [[checks.groups]]
+    logic = "or"
+    description = "Magnitude conditions based on longitude"
+
+        # Group 1: Events with longitude <= -82.5 and magnitude > 5.0
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Longitude <= -82.5 and Magnitude > 5.0"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "longitude_value"
+            mode = "le"
+            threshold = -82.5
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "magnitude_value"
+            mode = "gt"
+            threshold = 5.0
+
+        # Group 2: Events with longitude > -82.5 and magnitude > 4.0
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Longitude > -82.5 and Magnitude > 4.0"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "longitude_value"
+            mode = "gt"
+            threshold = -82.5
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "magnitude_value"
+            mode = "gt"
+            threshold = 4.0
+
+# 15. 'DESTACADO' events inside NonLinLoc zone using the correct earth model
+[[checks]]
+name = "DESTACADO event without NLL earth model"
+logic = "and"
+
+    # The event have a comment with the word "DESTACADO"
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "in"
+    values = 'DESTACADO'
+
+    # The event has not the correct earth model specified by the 'earthModelID' column with value 'Poveda_et_al_2018'
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "earthModelID"
+    mode = "not_in"
+    values = 'Poveda_et_al_2018'
+
+    # The creationInfo_agencyID should be "SGC"
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = 'SGC'
+
+    # The event is inside the NonLinLoc zone. However, it must not be inside the VMM zone
+    [[checks.groups]]
+    logic = "and"
+    description = "Event inside NonLinLoc zone but not inside VMM zone"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "nll"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "outside"
+        polygon = "vmm"
+
+# 16. Events outside the NonLinLoc zone using the NonLinLoc earth model
+[[checks]]
+name = "Event outside NLL zone with NLL earth model"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "earthModelID"
+    mode = "in"
+    values = 'Poveda_et_al_2018'
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "outside"
+    polygon = "nll"
+
+# 17. 'DESTACADO' event with M < 3 and outside network interest zone
+[[checks]]
+name = "DESTACADO event with M < 3 outside network interest zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "in"
+    values = 'DESTACADO'
+
+    [[checks.conditions]]
+    rule_type = "numeric"
+    column = "magnitude_value"
+    mode = "lt"
+    threshold = 3.0
+
+    [[checks.conditions]]
+    rule_type = "polygon"
+    lat_col = "latitude_value"
+    lon_col = "longitude_value"
+    mode = "outside"
+    polygon = "local_area"
+
+# 18. Potentially locatable events
+[[checks]]
+name = "Potentially locatable event"
+logic = "or"
+event_type = "not locatable"
+
+    # Seiscomp3 criteria: quality_associatedPhaseCount <= 7
+    [[checks.groups]]
+    name = "Seiscomp3 criteria"
+    logic = "and"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_associatedPhaseCount"
+        mode = "le"
+        threshold = 7
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "lt"
+        value = "2026-03-17 00:00:00"
+
+    # Seiscomp6 criteria
+    [[checks.groups]]
+    name = "Seiscomp6 criteria"
+    logic = "and"
+
+        [[checks.groups.conditions]]
+        rule_type = "temporal"
+        column = "time_value"
+        mode = "ge"
+        value = "2026-03-17 00:00:00"
+
+        [[checks.groups.groups]]
+        description = "Seiscomp6 criteria for potentially locatable events"
+        logic = "or"
+
+            # 1. quality_usedStationCount == 3 and quality_associatedPhaseCount >= quality_usedStationCount + 2
+            [[checks.groups.groups.groups]]
+            name = "Condition 1: 3 p and at least 2 s phases"
+            logic = "and"
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "numeric"
+                column = "quality_usedStationCount"
+                mode = "eq"
+                threshold = 3
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "column_column"
+                left_col = "quality_associatedPhaseCount"
+                right_col = "quality_usedStationCount"
+                mode = "ge"
+                offset = 2
+
+            # 2. quality_usedStationCount >= 4 and quality_associatedPhaseCount >= quality_usedStationCount + 1
+            [[checks.groups.groups.groups]]
+            name = "Condition 2: 4 or more p phases and at least 1 s phase"
+            logic = "and"
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "numeric"
+                column = "quality_usedStationCount"
+                mode = "ge"
+                threshold = 4
+
+                [[checks.groups.groups.groups.conditions]]
+                rule_type = "column_column"
+                left_col = "quality_associatedPhaseCount"
+                right_col = "quality_usedStationCount"
+                mode = "ge"
+                offset = 1
+
+# 19. Correspondence between zone3 and magnitude MLr_3
+[[checks]]
+name = "Incorrect magnitude type for zone3"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone3 and magnitude MLr_3"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "zone3"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "MLr_3"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "Mw"
+
+# 20. Correspondence between zone4 and magnitude MLr_4
+[[checks]]
+name = "Incorrect magnitude type for zone4"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone4 and magnitude MLr_4"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "zone4"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "MLr_4"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "Mw"
+
+# 21. Correspondence between zone1 and magnitude MLr_1
+[[checks]]
+name = "Incorrect magnitude type for zone1"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone1 and magnitude MLr_1"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "zone1"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "MLr_1"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "Mw"
+
+# 22. Correspondence between zone2 and magnitude MLr_2 (avoiding VMM zone)
+[[checks]]
+name = "Incorrect magnitude type for zone2"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone2 and magnitude MLr_2"
+
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Event inside zone2 and outside VMM"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "inside"
+            polygon = "zone2"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "outside"
+            polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "MLr_2"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "Mw"
+
+# 23. Correspondence between zone5 and magnitude MLr_5 (avoiding PtoGtn zone)
+[[checks]]
+name = "Incorrect magnitude type for zone5"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone5 and magnitude MLr_5"
+
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Event inside zone5 and outside PtoGtn"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "inside"
+            polygon = "zone5"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "outside"
+            polygon = "pto_gtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "MLr_5"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "Mw"
+
+# 24. Correspondence between VMM zone and magnitude MLr_vmm
+[[checks]]
+name = "Incorrect magnitude type for VMM zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between VMM zone and magnitude MLr_vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = ["MLr_vmm"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "Mw"
+
+# 25. Correspondence between PtoGtn zone and magnitude MLr_PtoGtn
+[[checks]]
+name = "Incorrect magnitude type for PtoGtn zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between PtoGtn zone and magnitude MLr_PtoGtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "pto_gtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "MLr_PtoGtn"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        value = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        value = "Mw"
+
+# 26. Correspondence between CARMA zone and earth model CARMA (avoiding Cesar zone)
+[[checks]]
+name = "Incorrect earth model for CARMA zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between CARMA zone and earth model CARMA"
+
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Event inside CARMA zone and outside Cesar zone"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "inside"
+            polygon = "carma"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "outside"
+            polygon = "cesar"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = "CARMA"
+
+# 27. Correspondence between Cesar zone and earth model Cesar
+[[checks]]
+name = "Incorrect earth model for Cesar zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between Cesar zone and earth model Cesar"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "cesar"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = "modelCesar2"
+
+# 28. Correspondence between PtoGtn zone and earth model PtoGtn
+[[checks]]
+name = "Incorrect earth model for PtoGtn zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between PtoGtn zone and earth model PtoGtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "pto_gtn"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = "Pto_Gaitan"
+
+# 29. Correspondence between VMM zone and earth model VMM (ask about NLL earth model for deep VMM events)
+[[checks]]
+name = "Incorrect earth model for VMM zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    value = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between VMM zone and earth model VMM"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "earthModelID"
+        mode = "in"
+        value = "VMM"
+
+# 30. Hypo71 events in seiscomp3 cannot have more than 101 phases used
+[[checks]]
+name = "Hypo71 events with more than 101 associated phases?"
+logic = "and"
+event_type = ["earthquake", "outside of network interest"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "methodID"
+    mode = "in"
+    values = ["Hypo71"]
+
+    [[checks.conditions]]
+    rule_type = "temporal"
+    column = "time_value"
+    mode = "lt"
+    value = "2026-03-17 00:00:00"
+
+    [[checks.groups]]
+    logic = "or"
+    description = "Events with more than 101 associated phases or RMS equal to 0.0"
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_usedPhaseCount"
+        mode = "gt"
+        threshold = 101
+
+        [[checks.groups.conditions]]
+        rule_type = "numeric"
+        column = "quality_standardError"
+        mode = "eq"
+        threshold = 0.0
