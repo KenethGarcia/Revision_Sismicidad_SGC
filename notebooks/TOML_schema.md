@@ -36,13 +36,29 @@ sql_file = "PATH_TO_YOUR_SQL_FILE.sql"
 
 ## Polygons
 
-You can define a list of polygons in the TOML file. Each polygon should be stored in a file with structure:
+You can define a list of polygons in the TOML file. Each polygon can be stored in a file with BNA structure:
 
 ```text
-# ... header ...
+"name","rank",type/length
 -86.0022144623824,1.45673466814881
 -84.7666682,3.049999
 -84.3166713,3.5333309
+```
+
+or can be defined in a file with GeoJSON structure:
+
+```json
+{
+  "type": "Polygon",
+  "coordinates": [
+    [
+      [-86.0022144623824, 1.45673466814881],
+      [-84.7666682, 3.049999],
+      [-84.3166713, 3.5333309],
+      [-86.0022144623824, 1.45673466814881]
+    ]
+  ]
+}
 ```
 
 And can be referenced in the TOML file like this:
@@ -55,19 +71,22 @@ And can be referenced in the TOML file like this:
 #   path – absolute or relative path to the .txt file
 #            (relative paths are resolved from this TOML's directory)
 # Optional keys:
+#   polygon_type – type of the polygon file (BNA by default or GeoJSON)
 #   description – human-readable label for documentation/logs
 #   skip        – set to true to temporarily disable without deleting the entry
 
 [[polygons]]
-name        = "zona1"
-path        = "polygons/zona1.txt"
-description = "Magnitude zone 1 — MLr_1 region"
+name         = "zona1"
+path         = "polygons/zona1.txt"
+polygon_type = "BNA"
+description  = "Magnitude zone 1 — MLr_1 region"
 
 [[polygons]]
-name        = "zona_experimental"
-path        = "polygons/zona_experimental.txt"
-description = "Experimental zone — not yet validated"
-skip        = true
+name         = "zona_experimental"
+path         = "polygons/zona_experimental.txt"
+polygon_type = "GeoJSON"
+description  = "Experimental zone — not yet validated"
+skip         = true
 ````
 
 ## Duplicates Search
@@ -138,7 +157,7 @@ and it is optional to define:
 ### Condition node: `[[checks.conditions]]`
 In the condition node, it is required to define:
 
-- `rule_type`: the type of rule that will be applied. Options are `numeric`, `category`, `temporal`, `polygon`, `column_column`.
+- `rule_type`: the type of rule that will be applied. Options are `numeric`, `category`, `temporal`, `polygons.py`, `column_column`.
 - `column`: the name of the column in the input data that the rule will be applied to.
 - `mode`: operator for the rule. It depends on the `rule_type`. See below for more details.
 - Additional parameters that depend on the `rule_type` and `mode`. See below for more details.
@@ -206,7 +225,7 @@ Defined as a check if the value of the column is inside or outside a polygon. Th
 It is required to define:
 - `lat_col`: the name of the column in the input data that contains the latitude values.
 - `lon_col`: the name of the column in the input data that contains the longitude values.
-- `polygon`: the name or list of names of the polygons that will be used for the check. The polygon must be defined in the `[[polygons]]` section of the TOML file.
+- `polygons.py`: the name or list of names of the polygons that will be used for the check. The polygon must be defined in the `[[polygons]]` section of the TOML file.
 
 ### Temporal rules
 Defined as a numeric comparison between the value of the column and a threshold, but the value is expected to be a timestamp. The available modes are:
