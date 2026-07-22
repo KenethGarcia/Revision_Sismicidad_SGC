@@ -146,6 +146,16 @@ def _load_bna_polygon(
     """
     Load a polygon from a BNA-like text file with 'lon,lat' per line
     (header in the first line, optional comments starting with '#').
+
+    Parameters
+    ----------
+    p_path : Path
+        Path to BNA-like text file.
+
+    Returns
+    -------
+    shapely.geometry.Polygon
+        Prepared Shapely Polygon.
     """
     coords = np.loadtxt(
         str(p_path),
@@ -168,7 +178,15 @@ def _load_geojson_polygon(
     - A single Feature.
     - A bare Geometry object.
 
-    Returns a Shapely geometry (Polygon or MultiPolygon).
+    Parameters
+    ----------
+    p_path : Path
+        Path to BNA-like text file.
+
+    Returns
+    -------
+    shapely.geometry.Polygon
+        Prepared Shapely Polygon.
     """
     text = p_path.read_text(encoding="utf-8")
     data = json.loads(text)
