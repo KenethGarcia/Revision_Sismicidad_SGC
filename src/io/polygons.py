@@ -181,7 +181,7 @@ def _load_geojson_polygon(
     Parameters
     ----------
     p_path : Path
-        Path to BNA-like text file.
+        Path to GeoJSON file.
 
     Returns
     -------
