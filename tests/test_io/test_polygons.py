@@ -3,10 +3,8 @@
 # --------------------------------------------------------------------------------------------------------
 # This file contains functions to test polygons.py I/O file
 # --------------------------------------------------------------------------------------------------------
-import json
 import pytest
 import shapely
-import numpy as np
 from pathlib import Path
 from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
@@ -109,3 +107,80 @@ def test_load_polygons_mixed_types():
     assert shapely.is_prepared(z_geo)
     assert z_bna.equals(z_geo)
 
+
+def test_load_polygons_skip_flag():
+    """
+    Use the real BNA file but mark it skip=true and check it is not loaded.
+    """
+    base_dir = REPO_ROOT
+
+    polygon_entries = [
+        {
+            "name": "zona_skip",
+            "path": str(BNA_FILE.relative_to(base_dir)),
+            "polygon_type": "BNA",
+            "skip": True,
+        }
+    ]
+
+    cache = load_polygons(polygon_entries, base_dir)
+    assert cache == {}
+
+
+def test_load_polygons_duplicate_name_raises():
+    """
+    Use the real BNA and GeoJSON files but give them the same name and check that a ValueError is raised.
+    """
+    base_dir = REPO_ROOT
+
+    polygon_entries = [
+        {
+            "name": "zona_duplicate",
+            "path": str(BNA_FILE.relative_to(base_dir)),
+        },
+        {
+            "name": "zona_duplicate",  # duplicate
+            "path": str(GEOJSON_FILE.relative_to(base_dir)),
+        },
+    ]
+
+    with pytest.raises(ValueError):
+        load_polygons(polygon_entries, base_dir)
+
+def test_load_polygons_missing_file_raises():
+    """
+    Test raises if the polygon file does not exist.
+    """
+    base_dir = REPO_ROOT
+
+    polygon_entries = [
+        {
+            "name": "zona_missing",
+            "path": "nonexistent_dir/nonexistent.txt",
+        }
+    ]
+
+    with pytest.raises(FileNotFoundError):
+        load_polygons(polygon_entries, base_dir)
+
+
+def test_load_polygons_unsupported_type_raises():
+    """
+    Test unsupported polygon type raises.
+    """
+    base_dir = REPO_ROOT
+
+    polygon_entries = [
+        {
+            "name": "zona_unsupported",
+            "path": str(BNA_FILE.relative_to(base_dir)),
+            "polygon_type": "KML",  # unsupported
+        }
+    ]
+
+    with pytest.raises(ValueError):
+        load_polygons(polygon_entries, base_dir)
+
+
+if __name__ == "__main__":
+    pytest.main()
