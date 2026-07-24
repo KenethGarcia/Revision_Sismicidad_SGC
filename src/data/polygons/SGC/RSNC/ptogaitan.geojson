@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "PtoGaitan"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-71.7, 4.1],
+            [-71.7, 3.7],
+            [-71.2, 3.7],
+            [-71.2, 4.1],
+            [-71.7, 4.1]
+          ]
+        ]
+      }
+    }
+  ]
+}
