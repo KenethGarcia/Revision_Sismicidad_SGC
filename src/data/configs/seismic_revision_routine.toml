@@ -4,8 +4,15 @@
 
 
 # ── Database connection ───────────────────────────────────────
-[database]
-env_file = ".env"
+[[databases]]
+name       = "sc3"
+env_file   = ".env"
+env_prefix = "SERVER_SC3"
+
+[[databases]]
+name       = "sc6"
+env_file   = ".env"
+env_prefix = "SERVER_SC6"
 
 
 # ── SQL query ────────────────────────────────────────────────
