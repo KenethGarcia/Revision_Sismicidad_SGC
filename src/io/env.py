@@ -19,9 +19,9 @@ def load_credentials(
     """
     Resolve database credentials for a single database profile from
     (in priority order):
-    1. Live os.environ variables (with optional env_prefix)
-    2. The declared env_file
-    3. Inline values in the TOML [[databases]] entry
+    1. The declared env_file
+    2. Inline values in the TOML [[databases]] entry
+    3. Live os.environ variables (with optional env_prefix)
 
     This function assumes db_cfg comes from one [[databases]] table:
 
@@ -235,9 +235,9 @@ def _resolve(
     Any
         The resolved value from the first available source in the following
         priority order:
-        1. process environment variables,
-        2. values from the `.env` file,
-        3. inline TOML configuration entry.
+        1. values from the `.env` file,
+        2. inline TOML configuration entry.
+        3. process environment variables,
         If no value is found and `required` is False, returns `default`.
 
     Raises
@@ -252,22 +252,22 @@ def _resolve(
     env_keys.append(key.upper())
     env_keys.append(key)
 
-    # 1. Live process environment
-    for ek in env_keys:
-        value = os.environ.get(ek)
-        if value is not None:
-            return value
-
-    # 2. .env file
+    # 1. .env file
     for ek in env_keys:
         value = env_values.get(ek)
         if value is not None:
             return value
 
-    # 3. Inline TOML entry (direct key)
+    # 2. Inline TOML entry (direct key)
     value = db_cfg.get(key)
     if value is not None:
         return value
+
+    # 3. Live process environment
+    for ek in env_keys:
+        value = os.environ.get(ek)
+        if value is not None:
+            return value
 
     # 4. Fallback or error
     if required:
