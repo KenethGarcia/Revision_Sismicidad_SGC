@@ -8,14 +8,33 @@ The new implementation of the seismic revision routine works around a simple ide
 Simple and easy: Define a .env file with the connection content (host, user, password, database) and the code will read it. The .env file should be in the same directory as the main code.
 
 ````toml
-[database]
+[[database]]
 env_file = ".env"
 ````
+
+If you are familiar with `os.environ` and `dotenv`, you can also define the database connection using environment variables. The code will read the environment variables and use them to connect to the database.
+
+````toml
+[[database]]
+name       = "sc6"  # Optional, used to identify the connection in the logs
+env_prefix = "SERVERSC6"
+````
+ 
+Following this schema, in your shell (or in a systemd unit, Docker env, etc.), you must set the environment variables like this:
+
+```bash
+# Format is <env_prefix>_<key>, where <key> is one of the following: HOST, USER, PASSWORD, DATABASE, PORT
+export SERVERSC6_HOST="localhost"
+export SERVERSC6_USER="your_username"
+export SERVERSC6_PASSWORD="your_password"
+export SERVERSC6_DATABASE="your_database"
+export SERVERSC6_PORT=5432
+```
 
 You can also define the database connection directly in the TOML file using the following keys:
 
 ````toml
-[database]
+[[database]]
 host = "localhost"
 user = "your_username"
 password = "your_password"
@@ -23,16 +42,67 @@ database = "your_database"
 port = 5432
 ````
 
-However, it is recommended to use the .env file for security reasons, as it allows you to keep sensitive information out of the codebase.
+> **NOTE:** It is highly recommended to use the .env file or environment variables for security reasons, as it allows you to keep sensitive information out of the codebase.
 
-## Query configuration
+### Setting multiple database connections
 
-You can define a .sql file with the query content and the code will read it. The TOML file only needs to receive the full path to the .sql file using the `sql_file` key.
+It is also possible to define multiple database connections in the TOML file. Each connection should be defined as a separate table:
 
-````toml
-[query]
-sql_file = "PATH_TO_YOUR_SQL_FILE.sql"
+```toml
+[[database]]
+name = "connection1"
+env_file = ".env"
+
+[[database]]
+name = "connection2"
+host = "localhost"
+user = "your_username"
+password = "your_password"
+database = "your_database"
+port = 5432
+```
+
+or you can define a single .env file with multiple connections and reference them in the TOML file using the `env_prefix` key:
+
+```toml
+[[database]]
+name = "connection1"
+env_file = ".env"
+env_prefix = "CONNECTION1_"
+
+[[database]]
+name = "connection2"
+env_file = ".env"
+env_prefix = "CONNECTION2_"
 ````
+
+where the .env file should contain the same fixed variables for each connection, but with different prefixes:
+
+```dotenv
+CONNECTION1_HOST=localhost
+CONNECTION1_USER=your_username
+CONNECTION1_PASSWORD=your_password
+CONNECTION1_DATABASE=your_database
+CONNECTION1_PORT=5432
+
+CONNECTION2_HOST=localhost
+CONNECTION2_USER=your_username
+CONNECTION2_PASSWORD=your_password
+CONNECTION2_DATABASE=your_database
+CONNECTION2_PORT=5432
+```
+
+or following the env_prefix convention, you can define the environment variables like this:
+
+```toml
+[[database]]
+name = "connection1"
+env_prefix = "EXAMPLE1_"
+
+[[database]]
+name = "connection2"
+env_prefix = "EXAMPLE2_"
+```
 
 ## Polygons
 
