@@ -104,6 +104,34 @@ name = "connection2"
 env_prefix = "EXAMPLE2_"
 ```
 
+## Queries
+
+It is possible to define a list of queries in the TOML file. Each query should be defined as a table with the following keys:
+
+- `name`: label for the query, used in the logs.
+- `sql_file`: path to the SQL file that contains the query. The path can be absolute or relative to the TOML file's directory.
+- `description`: human-readable label for documentation/logs.
+- `database`: name of the database connection to use for this query. If not defined, the first database connection in the TOML file will be used.
+- `skip`: set to true to temporarily disable the query without deleting the entry.
+
+> **NOTE:** If you are using more than one database connection, it is assumed that every query will return the same columns. Adjust the queries based on that, even if they are not used in the checks. The code will use the first query to determine the columns and their types.
+
+```toml
+[[queries]]
+name        = "query1"
+sql_file    = "queries/query1.sql"
+description = "Query 1 — Get all events from the last 24 hours"
+database    = "connection1"  # Required if you have more than one database connection
+
+[[queries]]
+name        = "query2"
+sql_file    = "queries/query2.sql"
+description = "Query 2 — Get all events from the last 7 days"
+database    = "connection2"  # Required if you have more than one database connection
+```
+
+
+
 ## Polygons
 
 You can define a list of polygons in the TOML file. Each polygon can be stored in a file with BNA structure:
