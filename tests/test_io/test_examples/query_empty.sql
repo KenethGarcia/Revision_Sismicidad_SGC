@@ -1,0 +1,2 @@
+-- Only comments, no actual SQL
+-- Second comment line
