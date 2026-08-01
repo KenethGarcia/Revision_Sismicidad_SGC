@@ -16,8 +16,17 @@ env_prefix = "SERVER_SC6"
 
 
 # ── SQL query ────────────────────────────────────────────────
-[query]
-sql_file = "./queries/revision.sql"
+[[query]]
+name       = "sc3"
+sql_file   = "./queries/revision.sql"
+description= "Query to retrieve events from SeisComP3 database"
+database   = "sc3"
+
+[[query]]
+name       = "sc6"
+sql_file   = "./queries/revision.sql"
+description= "Query to retrieve events from SeisComP6 database"
+database   = "sc6"
 
 
 # ── Polygon files ────────────────────────────────────────────
