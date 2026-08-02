@@ -94,7 +94,6 @@ def connect2mysql(
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         codex = f'{queries[name]}"{year1}/{mes1}/{dia1} {hora1}:{min1}:{sec1}" and "{year2}/{mes2}/{dia2} {hora2}:{min2}:{sec2}"'
-        db = pymysql.connect(host="172.25.3.135", user="consulta", passwd="consulta", db="seiscomp3")
 
         # Add a message to show query progress
         with tqdm(total=1, desc="Querying database...", unit="query", leave=False, bar_format="{desc}") as pbar:
