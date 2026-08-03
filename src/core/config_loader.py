@@ -1,7 +1,7 @@
 # Author: Garcia-Cifuentes, K. <ORCID:0009-0001-2607-6359>
 
 # --------------------------------------------------------------------------------------------------------
-# This file contains a helper class to parse and expose structured views of [[databases]], [[queries]],
+# This file contains a helper class to parse and expose structured views of [[database]], [[queries]],
 # [[polygons]], and [[checks]]
 # --------------------------------------------------------------------------------------------------------
 from __future__ import annotations
@@ -18,7 +18,7 @@ class ConfigManager:
     This class is responsible for:
     - Reading the TOML file once.
     - Tracking the base directory (for resolving relative paths).
-    - Providing accessors for [[databases]], [[queries]], [[polygons]] and [[checks]].
+    - Providing accessors for [[database]], [[queries]], [[polygons]] and [[checks]].
     - Selecting a single query entry based on name and skip flags.
     """
     def __init__(self, config_path: Path):
@@ -65,22 +65,22 @@ class ConfigManager:
 
 
     # Getter methods
-    def get_databases(self) -> list[dict]:
+    def get_database(self) -> list[dict]:
         """
-        Return the list of database profiles defined in [[databases]].
+        Return the list of database profiles defined in [[database]].
 
         Returns
         -------
         list[dict]
-            Each dict is one [[databases]] entry. Returns an empty list
+            Each dict is one [[database]] entry. Returns an empty list
             if no databases are defined.
         """
-        dbs = self._config_data.get("databases", [])
+        dbs = self._config_data.get("database", [])
         if dbs is None:
             return []
         if not isinstance(dbs, list):
             raise TypeError(
-                "Expected 'databases' to be an array of tables ([[databases]]), "
+                "Expected 'database' to be an array of tables ([[database]]), "
                 f"got {type(dbs).__name__!r}."
             )
         return dbs
@@ -214,7 +214,7 @@ class ConfigManager:
         Return the default database profile name if unambiguous.
 
         Rules:
-        - If exactly one [[databases]] entry exists, and it has a 'name'
+        - If exactly one [[database]] entry exists, and it has a 'name'
           key, that name is returned.
         - If no databases or more than one database exist, returns None.
 
@@ -222,7 +222,7 @@ class ConfigManager:
         -------
         str or None
         """
-        dbs = self.get_databases()
+        dbs = self.get_database()
         if len(dbs) != 1:
             return None
         return str(dbs[0].get("name")) if "name" in dbs[0] else None
