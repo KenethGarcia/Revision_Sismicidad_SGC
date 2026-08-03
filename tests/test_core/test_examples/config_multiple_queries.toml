@@ -1,0 +1,19 @@
+[[database]]
+name       = "sc6"
+env_prefix = "SERVERSC6"
+
+[[queries]]
+name        = "q1"
+sql_file    = "sql/q1.sql"
+description = "First query"
+
+[[queries]]
+name        = "q2"
+sql_file    = "sql/q2.sql"
+description = "Second query"
+
+[[queries]]
+name        = "q3_skipped"
+sql_file    = "sql/q3.sql"
+description = "Skipped query"
+skip        = true

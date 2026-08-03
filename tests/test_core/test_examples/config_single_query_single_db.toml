@@ -1,0 +1,16 @@
+[[database]]
+name       = "sc6"
+env_prefix = "SERVERSC6"
+
+[[queries]]
+name        = "origin_standard"
+sql_file    = "sql/origin_standard_sc6.sql"
+description = "Origin query for SC6"
+database    = "sc6"
+
+[[checks]]
+name = "High RMS"
+
+[[polygons]]
+name = "zona1"
+path = "polygons/zona1.txt"

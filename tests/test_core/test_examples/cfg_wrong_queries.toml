@@ -1,0 +1,5 @@
+[queries]
+name = "q1"
+
+[[database]]
+env_prefix = "SERVERSC6"

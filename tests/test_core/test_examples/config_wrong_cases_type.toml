@@ -1,0 +1,8 @@
+[database]
+name = "sc6"
+
+[checks]
+name = "check1"
+
+[polygons]
+name = "zona1"
