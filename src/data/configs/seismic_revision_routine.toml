@@ -4,25 +4,25 @@
 
 
 # ── Database connection ───────────────────────────────────────
-[[databases]]
+[[database]]
 name       = "sc3"
 env_file   = ".env"
 env_prefix = "SERVER_SC3"
 
-[[databases]]
+[[database]]
 name       = "sc6"
 env_file   = ".env"
 env_prefix = "SERVER_SC6"
 
 
 # ── SQL query ────────────────────────────────────────────────
-[[query]]
+[[queries]]
 name       = "sc3"
 sql_file   = "./queries/revision.sql"
 description= "Query to retrieve events from SeisComP3 database"
 database   = "sc3"
 
-[[query]]
+[[queries]]
 name       = "sc6"
 sql_file   = "./queries/revision.sql"
 description= "Query to retrieve events from SeisComP6 database"
