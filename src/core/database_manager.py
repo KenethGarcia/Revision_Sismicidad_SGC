@@ -8,6 +8,10 @@
 # --------------------------------------------------------------------------------------------------------
 from __future__ import annotations
 
+import pymysql
+import warnings
+import pandas as pd
+from tqdm import tqdm
 from pathlib import Path
 from typing import Any, Mapping
 from src.io.env import load_credentials
@@ -118,15 +122,83 @@ class DatabaseManager:
             raise ValueError(f"Default database '{default_db_name!r}' is not defined in {self._config_name!r}")
         return default_db_name
 
-
     def fetch_events(
-        self,
-        query_cfg: dict,
-        start,
-        end,
-        routing_cfg: dict | None = None,
-    ): ...
-        # 1. Decide which DB(s) to use (routing_cfg or query_cfg['database'])
-        # 2. Load SQL via io.sql.load_sql
-        # 3. Apply time filters (e.g., WHERE time BETWEEN start/end) if needed
-        # 4. Run query via pandas.read_sql and return a DataFrame   g
+            self,
+            query_cfg: Mapping[str, Any],
+            sql_text: str,
+            params: Mapping[str, Any] | None = None,
+            read_sql_kwargs: Mapping[str, Any] | None = None,
+    ) -> pd.DataFrame:
+        """
+        Execute the given SQL query against the database selected for this query and return the resulting event table.
+
+        This method assumes that any filtering (time range, author, etc.) has already been applied to `sql_text` by
+        the caller (core pipeline, CLI wrapper, or frontend). It does not modify the SQL.
+
+        Parameters
+        ----------
+        query_cfg : Mapping[str, Any]
+            Parsed contents of one [[queries]] entry from the TOML file.
+            Used only to determine which database profile to use and for error messages / logging.
+        sql_text : str
+            Final SQL string to execute. May be a base query or a wrapped query with WHERE clauses and ORDER BY.
+        params : Mapping[str, Any] or None, default=None
+            Optional parameter dict to pass to pandas.read_sql for safe value substitution
+            (e.g., {"start": "...", "end": "...", "author": "..."}).
+        read_sql_kwargs : Mapping[str, Any] or None, default=None
+            Additional keyword arguments forwarded to pandas.read_sql, such as chunksize or dtype hints.
+
+        Returns
+        -------
+        pd.DataFrame
+            Table containing the fetched events.
+
+        Raises
+        ------
+        ConnectionError
+            If the database connection cannot be established.
+        pymysql.MySQLError
+            If the underlying MySQL driver raises an error during execution.
+        """
+        if read_sql_kwargs is None:
+            read_sql_kwargs = {}
+
+        # Determine which DB profile to use
+        db_name = self.get_db_name_for_query(query_cfg)
+        credentials = self.get_credentials(db_name)
+
+        # Connect and execute query
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            try:
+                conn = pymysql.connect(
+                    host=credentials["host"],
+                    user=credentials["user"],
+                    password=credentials["password"],
+                    database=credentials["database"],
+                    port=int(credentials.get("port", 3306)),
+                )
+            except pymysql.MySQLError as ce:
+                raise ConnectionError(
+                    f"Failed to connect to database profile {db_name!r} with the provided credentials: {ce}"
+                )
+            try:
+                # Simple progress bar: one step representing the whole query
+                with tqdm(
+                        total=1,
+                        desc=f"Querying database '{db_name}' for {query_cfg.get('name', '<unnamed>')}",
+                        unit="query",
+                        leave=False,
+                        bar_format="{desc}",
+                ) as pbar:
+                    df = pd.read_sql(
+                        sql_text,
+                        conn,
+                        params=params,
+                        **read_sql_kwargs,
+                    )
+                    pbar.update(1)
+            finally:
+                conn.close()
+
+        return df
