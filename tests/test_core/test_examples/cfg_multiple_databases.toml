@@ -1,5 +1,12 @@
 [[database]]
-name = "sc6"
+name       = "sc6"
+env_prefix = "SERVERSC6"
 
 [[database]]
-name = "sc3"
+name       = "sc3"
+env_prefix = "SERVERSC3"
+
+[[queries]]
+name        = "origin_standard"
+sql_file    = "sql/query.sql"
+description = "Test query without explicit database"
