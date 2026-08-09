@@ -2,6 +2,61 @@
 # seismic_config.toml — RSNC Seismic Revision Configuration
 # ============================================================
 
+# Configuration file for seismic checks at RSNC (Red Sismológica Nacional de Colombia) - SGC
+
+# List of comparison modes:
+#    'gt'       -> values > threshold
+#    'ge'       -> values >= threshold
+#    'lt'       -> values < threshold
+#    'le'       -> values <= threshold
+#    'between'  -> lower <= values <= upper
+#    'outside'  -> values < lower or values > upper
+#    'abs_gt'   -> abs(values) > threshold
+#    'abs_ge'   -> abs(values) >= threshold
+
+# Columns available at the table (up to 2026-06-08)
+#   'time_value': Origin time of the events
+#   'publicID': Unique identifier for the events
+#   'depth_value': Depth of the events
+#   'magnitude_value': Magnitude of the events
+#   'quality_standardError': Standard error of the events (RMS)
+#   'depth_uncertainty': Uncertainty of the depth of the events
+#   'latitude_uncertainty': Uncertainty of the latitude of the events
+#   'longitude_uncertainty': Uncertainty of the longitude of the events
+#   'quality_associatedPhaseCount': Number of associated phases for the events
+#   'quality_usedPhaseCount': Number of used phases for the events
+#   'creationInfo_author': Author of the events
+#   'quality_usedStationCount': Number of used stations for the events
+#   'quality_associatedStationCount': Number of associated stations for the events
+#   'event_type': Type of the events (e.g., earthquake, explosion, volcanic eruption)
+#   'creationInfo_agencyID': Agency ID of the events
+#   'text': Text description of the events (i.e., Los Santos - Santander, Colombia)
+#   'latitude_value': Latitude of the events
+#   'longitude_value': Longitude of the events
+#   'magnitude_type': Type of magnitude of the events (e.g., ML, Mw, mb)
+#   'methodID': Method ID of the events
+#   'earthModelID': Earth model ID of the events
+#   'comment': Comment of the events, used to set DESTACADO flag for the events
+
+
+# ── Returned table columns ────────────────────────────────────
+[output]
+columns = ["time_value",
+    "publicID",
+    "text",
+    "depth_value",
+    "magnitude_value",
+    "magnitude_type",
+    "quality_standardError",
+    "depth_uncertainty",
+    "latitude_uncertainty",
+    "longitude_uncertainty",
+    "quality_associatedPhaseCount",
+    "quality_associatedStationCount",
+    "creationInfo_author",
+    "event_type",
+    "creationInfo_agencyID"]
+
 
 # ── Database connection ───────────────────────────────────────
 [[database]]
