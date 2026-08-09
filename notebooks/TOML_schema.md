@@ -616,3 +616,19 @@ logic = "or"
         mode = "ge"
         threshold = 8
 ````
+
+# Output format
+
+It is possible to define the columns to be returned in the output dataframe/file. The output format is defined in the `[output]` section of the TOML file. The available keys are:
+- `columns`: a list of columns to be returned in the output dataframe/file. If not defined, all columns will be returned.
+- `file_format`: the format of the output file. Options are `csv`, `parquet`, `json`, `excel`, or `feather`. Default is `csv`.
+- `file_path`: the path to the output file. If not defined, the output will be saved to the current working directory with the name `output.<file_format>`. The path can be absolute or relative to the TOML file's directory.
+
+Take as an example the following TOML configuration:
+
+````toml
+[output]
+columns = ["publicID", "time_value", "latitude_value", "longitude_value", "depth_value", "magnitude_value", "magnitude_type", "event_type"]
+file_format = "csv"
+file_path = "output/filtered_events.csv"
+````
