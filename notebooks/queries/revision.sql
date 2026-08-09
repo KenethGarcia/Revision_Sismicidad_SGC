@@ -31,4 +31,4 @@ FROM Event AS EvMF
     LEFT JOIN Event ON Event._oid= POEv._oid
     LEFT JOIN EventDescription ON EvMF._oid = EventDescription._parent_oid
     LEFT JOIN Comment ON Comment._parent_oid = EvMF._oid
-WHERE Origin.time_value BETWEEN
+-- WHERE Origin.time_value BETWEEN
