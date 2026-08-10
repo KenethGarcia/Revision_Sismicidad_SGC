@@ -8,10 +8,10 @@ import pandas as pd
 
 
 def haversine_np(
-        lat1: float | np.ndarray,
-        lon1: float | np.ndarray,
-        lat2: float | np.ndarray,
-        lon2: float | np.ndarray
+    lat1: float | np.ndarray,
+    lon1: float | np.ndarray,
+    lat2: float | np.ndarray,
+    lon2: float | np.ndarray
 ) -> np.ndarray:
     """
     Fully vectorized haversine distance (km) between paired lat/lon arrays.
@@ -39,12 +39,11 @@ def haversine_np(
     a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1r) * np.cos(lat2r) * np.sin(dlon / 2.0) ** 2
     return 2 * R * np.arcsin(np.sqrt(a))
 
-
 def check_duplicates_adjacent(
-        events: pd.DataFrame,
-        columns: list[str],
-        time_window: int,
-        dist_threshold: float,
+    events: pd.DataFrame,
+    columns: list[str],
+    time_window: int,
+    dist_threshold: float,
 ) -> pd.DataFrame:
     """
     Identifies duplicate events based on time proximity and geographical
@@ -110,10 +109,10 @@ def check_duplicates_adjacent(
 
 
 def check_duplicates_sswa(
-        events: pd.DataFrame,
-        columns: list[str],
-        time_window: int,
-        dist_threshold: float,
+    events: pd.DataFrame,
+    columns: list[str],
+    time_window: int,
+    dist_threshold: float,
 ) -> pd.DataFrame:
     """
     Identifies duplicate events based on time proximity and geographical
@@ -192,3 +191,54 @@ def check_duplicates_sswa(
     flagged['Observations'] = ['; '.join(obs_map[p]) for p in flagged_positions]
 
     return flagged.reset_index(drop=True)
+
+
+def check_duplicates(
+    events: pd.DataFrame,
+    subset: list[str] | None = None,
+    method: str = "adjacent",
+    time_window: int = 4,
+    dist_threshold: float = 100.0,
+) -> pd.DataFrame:
+    """
+    Vectorized duplicate search for seismic quality checks.
+
+    Parameters
+    ----------
+    events : pd.DataFrame
+        Input seismic dataframe.
+    subset : list[str]
+        List of columns to consider for identifying duplicates.
+        If not specified, defaults to ['time_value', 'latitude_value', 'longitude_value', 'publicID'].
+    method : str
+        Determines the method for identifying duplicates:
+            'adjacent' -> Adjacent-only method.
+            Flags a row as a duplicate if it has the same values in the specified subset as the previous row.
+            This method is faster but only detects duplicates that are next to each other in the DataFrame. Recommended
+            if the events are time-ordered and the usual time difference between two events is similar to the time window.
+            'sswa'      -> Sorted Sliding Window Approach. Flags a row as a duplicate if it has the same values in the
+            specified subset as any of the previous rows within a sliding window of specified size.
+            This method is slower but can detect duplicates that are not adjacent. Recommended if the events are not
+            time-ordered or if the usual time difference between two events is shorter than the time window.
+    time_window : int
+        Time window in seconds to detect duplicates. Defaults to 4.
+    dist_threshold : float
+        Distance threshold in kilometers to detect duplicates. Defaults to 100.0.
+
+    Returns
+    -------
+    pd.DataFrame
+        Subset of `events` (all original columns preserved) with an added
+        'Observations' column, one row per flagged duplicate event —
+        chains of 3+ nearby events are merged into a single row per event
+        rather than duplicated across multiple pair-rows.
+    """
+    if subset is None:
+        subset = ['time_value', 'latitude_value', 'longitude_value', 'publicID']
+
+    if method == "adjacent":
+        return check_duplicates_adjacent(events, subset, time_window, dist_threshold)
+    elif method == "sswa":
+        return check_duplicates_sswa(events, subset, time_window, dist_threshold)
+    else:
+        raise ValueError(f"Unsupported method: {method!r}. Supported methods are 'adjacent' and 'sswa'.")
