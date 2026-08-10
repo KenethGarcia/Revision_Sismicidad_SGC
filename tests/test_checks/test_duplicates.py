@@ -10,7 +10,8 @@ import pandas as pd
 from src.checks.duplicates import (
     haversine_np,
     check_duplicates_adjacent,
-    check_duplicates_sswa
+    check_duplicates_sswa,
+    check_duplicates
 )
 
 def test_haversine_formulae():
@@ -208,6 +209,104 @@ def test_check_duplicates_sswa():
     # Index reset
     assert list(result.index) == [0, 1, 2]
 
+
+def test_check_duplicates_default_and_custom_subsets_and_method_adjacent():
+    """
+    Check_duplicates must default to the standard subset and 'adjacent' method.
+    """
+    # Build a tiny DataFrame with default-like column names
+    df = pd.DataFrame(
+        {
+            "time_value": pd.to_datetime(
+                ["2024-01-01T00:00:00", "2024-01-01T00:00:01", "2024-01-01T00:10:00"]
+            ),
+            "latitude_value": [4.0, 4.00005, 5.0],
+            "longitude_value": [-74.0, -74.00005, -75.0],
+            "publicID": ["E1", "E2", "E3"],
+        }
+    )
+
+    # With time_window and dist_threshold small enough, E1/E2 should be duplicates
+    result = check_duplicates(
+        events=df,
+        # subset=None and method='adjacent' are defaults
+        time_window=4,
+        dist_threshold=50.0,
+    )
+
+    # Only E1 and E2 should be flagged
+    assert isinstance(result, pd.DataFrame)
+    assert list(result.columns) == list(df.columns) + ["Observations"]
+    assert len(result) == 2
+    ids = result["publicID"].tolist()
+    assert set(ids) == {"E1", "E2"}
+    # Observations mention the other ID
+    obs = result["Observations"].tolist()
+    assert any("E2" in o for o in obs)
+    assert any("E1" in o for o in obs)
+    # Index reset
+    assert list(result.index) == [0, 1]
+
+
+def test_check_duplicates_method_sswa_with_custom_subset():
+    """
+    Check_duplicates must delegate to check_duplicates_sswa when method='sswa' and use the provided subset.
+    """
+    # Here we use generic column names 'time', 'lat', 'lon', 'id'
+    df = pd.DataFrame(
+        {
+            "time": pd.to_datetime(
+                [
+                    "2024-01-01T00:00:10",  # E2
+                    "2024-01-01T00:00:00",  # E1
+                    "2024-01-01T00:00:15",  # E3
+                ]
+            ),
+            "lat": [4.0, 4.00005, 4.0001],
+            "lon": [-74.0, -74.00005, -74.0001],
+            "id": ["E2", "E1", "E3"],
+        }
+    )
+
+    subset = ["time", "lat", "lon", "id"]
+
+    result = check_duplicates(
+        events=df,
+        subset=subset,
+        method="sswa",
+        time_window=20,
+        dist_threshold=50.0,
+    )
+
+    # All three events should be flagged once
+    assert isinstance(result, pd.DataFrame)
+    assert list(result.columns) == list(df.columns) + ["Observations"]
+    assert len(result) == 3
+    ids = result["id"].tolist()
+    assert set(ids) == {"E1", "E2", "E3"}
+    # Index reset
+    assert list(result.index) == [0, 1, 2]
+
+
+def test_check_duplicates_unsupported_method_raises():
+    """
+    Check_duplicates must raise ValueError when an unsupported method is passed.
+    """
+    df = pd.DataFrame(
+        {
+            "time_value": [pd.Timestamp("2024-01-01T00:00:00")],
+            "latitude_value": [4.0],
+            "longitude_value": [-74.0],
+            "publicID": ["E1"],
+        }
+    )
+
+    with pytest.raises(ValueError) as excinfo:
+        check_duplicates(events=df, method="unknown")
+
+    msg = str(excinfo.value)
+    assert "Unsupported method" in msg
+    assert "unknown" in msg
 
 if __name__ == "__main__":
     pytest.main()
