@@ -1,0 +1,4 @@
+[settings]
+event_type_column = 123   # wrong type
+time_column       = "time_value"
+author_column     = "creationInfo_author"

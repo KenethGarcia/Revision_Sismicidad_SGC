@@ -14,3 +14,8 @@ name = "High RMS"
 [[polygons]]
 name = "zona1"
 path = "polygons/zona1.txt"
+
+[settings]
+event_type_column = "event_type"
+time_column       = "time_value"
+author_column     = "creationInfo_author"
