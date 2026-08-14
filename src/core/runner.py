@@ -116,6 +116,11 @@ class Runner:
         pd.DataFrame
             Final output table after checks and [output] column selection.
         """
+        # 0. Load settings from the TOML configuration file
+        event_type_col = self._cm.get_event_type_column()
+        time_col = self._cm.get_time_column()
+        author_col = self._cm.get_author_column()
+
         # 1. Load polygons (cached polygons for spatial checks)
         polygons_cfg = self._cm.get_polygons()
         polygon_cache = load_polygons(polygons_cfg, base_dir=self._cm.base_dir)
@@ -149,7 +154,7 @@ class Runner:
                     events=events_df,
                     checks=checks_cfg,
                     polygon_cache=polygon_cache,
-                    event_type_col="event_type"  # Check the event_type filtering
+                    event_type_col=event_type_col
                 )
             else:
                 flagged_df = events_df.iloc[0:0].copy()
