@@ -133,7 +133,13 @@ class Runner:
 
         # 3. Check for duplicates, if requested
         if perform_duplicates:  # Check this for multiple [[duplicates]] settings
-            ...
+            duplicates_cfg = self._cm.config_data.get("duplicates", [])
+            if isinstance(duplicates_cfg, list) and duplicates_cfg:
+                dup_df = run_duplicates(events_df, duplicates_cfg)
+            else:
+                dup_df = events_df.iloc[0:0].copy()
+        else:
+            dup_df = events_df.iloc[0:0].copy()
 
         # 4. Perform checks, if configured and enabled
         if perform_checks:
