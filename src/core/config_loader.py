@@ -2,7 +2,7 @@
 
 # --------------------------------------------------------------------------------------------------------
 # This file contains a helper class to parse and expose structured views of [[database]], [[queries]],
-# [[polygons]], and [[checks]]
+# [[polygons]], [[checks]] and [settings]
 # --------------------------------------------------------------------------------------------------------
 from __future__ import annotations
 import tomllib
@@ -226,3 +226,68 @@ class ConfigManager:
         if len(dbs) != 1:
             return None
         return str(dbs[0].get("name")) if "name" in dbs[0] else None
+
+
+    def get_event_type_column(self) -> str:
+        """
+        Return the column name used for event type classification.
+
+        Source:
+        [settings]
+        event_type_column = "event_type"
+
+        If missing, defaults to "event_type".
+        """
+        settings = self._config_data.get("settings", {})
+        if settings is None:
+            settings = {}
+        value = settings.get("event_type_column", "event_type")
+        if not isinstance(value, str):
+            raise TypeError(
+                f"Expected [settings].event_type_column to be a string, "
+                f"got {type(value).__name__!r}."
+            )
+        return value
+
+
+    def get_time_column(self) -> str:
+        """
+        Return the column name representing the event origin time.
+
+        Source:
+        [settings]
+        time_column = "time_value"
+
+        If missing, defaults to "time_value".
+        """
+        settings = self._config_data.get("settings", {})
+        if settings is None:
+            settings = {}
+        value = settings.get("time_column", "time_value")
+        if not isinstance(value, str):
+            raise TypeError(
+                f"Expected [settings].time_column to be a string, "
+                f"got {type(value).__name__!r}."
+            )
+        return value
+
+    def get_author_column(self) -> str:
+        """
+        Return the column name representing the event author.
+
+        Source:
+        [settings]
+        author_column = "creationInfo_author"
+
+        If missing, defaults to "creationInfo_author".
+        """
+        settings = self._config_data.get("settings", {})
+        if settings is None:
+            settings = {}
+        value = settings.get("author_column", "creationInfo_author")
+        if not isinstance(value, str):
+            raise TypeError(
+                f"Expected [settings].author_column to be a string, "
+                f"got {type(value).__name__!r}."
+            )
+        return value
