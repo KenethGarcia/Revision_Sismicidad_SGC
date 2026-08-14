@@ -213,6 +213,40 @@ class TestConfigManager:
 
         assert cm.default_database_name() is None
 
+    # Tests for [settings] helpers
+    def test_settings_columns_explicit_values(self):
+        """
+        When [settings] is defined, getters should return those explicit values.
+        """
+        cfg_path = EXAMPLE_CFG_DIR / "config_single_query_single_db.toml"
+        cm = ConfigManager(cfg_path)
+
+        assert cm.get_event_type_column() == "event_type"
+        assert cm.get_time_column() == "time_value"
+        assert cm.get_author_column() == "creationInfo_author"
+
+    def test_settings_columns_defaults_when_missing(self):
+        """
+        When [settings] is missing, getters should fall back to defaults.
+        """
+        cfg_path = EXAMPLE_CFG_DIR / "config_no_queries.toml"
+        cm = ConfigManager(cfg_path)
+
+        # These defaults must match what you coded in ConfigManager
+        assert cm.get_event_type_column() == "event_type"
+        assert cm.get_time_column() == "time_value"
+        assert cm.get_author_column() == "creationInfo_author"
+
+    def test_settings_event_type_wrong_type_raises(self):
+        """
+        If [settings].event_type_column is not a string, get_event_type_column must raise TypeError.
+        """
+        cfg_path = EXAMPLE_CFG_DIR / "config_wrong_settings_type.toml"
+        cm = ConfigManager(cfg_path)
+
+        with pytest.raises(TypeError):
+            cm.get_event_type_column()
+
 
 if __name__ == "__main__":
     pytest.main()
