@@ -3,6 +3,25 @@
 
 The new implementation of the seismic revision routine works around a simple idea: The main code will remain untouchable, and the user will be able to define a schema for the input data. The schema will be defined in a TOML file, which is a simple and human-readable format for configuration files. The schema will define the expected structure of the input data, including the required fields, their types, and any constraints on their values. By doing this, the revision routine will be only a TOML file for the future Python package.
 
+
+## Settings
+It is optional to add a settings configuration to overwrite the names of commonly used columns in the DataFrame returned by the SQL query. It provides a single place to adapt the package to database schemas that use different aliases for event type, origin time, or author information. Defined as:
+
+```toml
+[settings]  # Default values sketched here (If not defined, the program will use these columns)
+event_type_column = "event_type"
+time_column       = "time_value"
+author_column     = "creationInfo_author"
+```
+
+where:
+- `event_type_column`  identifies the DataFrame column that contains an event’s classification, such as "earthquake", "explosion", "not locatable", or another catalog-specific type.
+- `time_column` identifies the output column containing the event or origin times.
+- `author_column` identifies the column containing author or processing-source information.
+
+> **NOTE:** `time_column` and `author_column` settings are experimental in the current version. They establish shared column conventions now, but they are not yet automatically used to filter events in the core Runner workflow. Future CLI and frontend versions are expected to use them
+
+
 ## Database configuration
 
 Simple and easy: Define a .env file with the connection content (host, user, password, database) and the code will read it. The .env file should be in the same directory as the main code.
