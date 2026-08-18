@@ -12,16 +12,25 @@
 # --------------------------------------------------------------------------------------------------------
 from __future__ import annotations
 
+import warnings
 import pandas as pd
 from pathlib import Path
 from typing import Any, Mapping
+from dataclasses import dataclass
 
 from src.io.sql import load_sql
 from src.io.polygons import load_polygons
-from src.checks.duplicates import check_duplicates
 from src.checks.engine import run_checks, run_duplicates
 from src.core.config_loader import ConfigManager
 from src.core.database_manager import DatabaseManager
+
+
+@dataclass(frozen=True)
+class RunResult:
+    total_events: pd.DataFrame
+    duplicates: pd.DataFrame
+    flagged: pd.DataFrame
+    output: pd.DataFrame
 
 
 class Runner:
@@ -72,10 +81,11 @@ class Runner:
         perform_checks: bool = True,
         sql_text_override: str | None = None,
         sql_params: Mapping[str, Any] | None = None,
-    ) -> pd.DataFrame:
+    ) -> RunResult:
         """
         Run the full pipeline:
 
+        0. Load settings (via ConfigManager)
         1. Load credentials (via DatabaseManager)
         2. Load SQL (via io.sql.load_sql) or override with a wrapped SQL string
         3. Load cached polygons
@@ -113,13 +123,17 @@ class Runner:
 
         Returns
         -------
-        pd.DataFrame
-            Final output table after checks and [output] column selection.
+        RunResult
+            A dataclass containing:
+            - total_events: pd.DataFrame of all fetched events (before duplicates/checks)
+            - duplicates: pd.DataFrame of detected duplicates (if perform_duplicates is True)
+            - flagged: pd.DataFrame of events after checks (if perform_checks is True)
+            - output: pd.DataFrame of final output after [output] column selection
         """
         # 0. Load settings from the TOML configuration file
         event_type_col = self._cm.get_event_type_column()
-        time_col = self._cm.get_time_column()
-        author_col = self._cm.get_author_column()
+        # time_col = self._cm.get_time_column()
+        # author_col = self._cm.get_author_column()
 
         # 1. Load polygons (cached polygons for spatial checks)
         polygons_cfg = self._cm.get_polygons()
@@ -159,12 +173,17 @@ class Runner:
             else:
                 flagged_df = events_df.iloc[0:0].copy()
         else:
-            flagged_df = events_df
+            flagged_df = events_df.iloc[0:0].copy()
 
         # 5. Apply [output] column selection and return final table
         output_df = self._apply_output_selection(flagged_df)
 
-        return output_df
+        return RunResult(
+            total_events=events_df,
+            duplicates=dup_df,
+            flagged=flagged_df,
+            output=output_df,
+        )
 
 
     # Internal helpers
@@ -230,14 +249,35 @@ class Runner:
                 read_sql_kwargs={},
             )
 
-            # Optionally tag origin DB / query name for debugging
-            df = df.copy()
-            df["_source_query"] = query_cfg.get("name", "")
             frames.append(df)
 
         # Concatenate all frames; ignore indices (reindex after concat)
         combined = pd.concat(frames, axis=0, ignore_index=True)
-        return combined
+
+        # Try to sort by time-column
+        try:
+            time_col = self._cm.get_time_column()
+
+            if time_col not in combined.columns:
+                raise ValueError(
+                    f"Configured [settings].time_column {time_col!r} is missing from the combined query result. "
+                    f"Ensure every active SQL query returns this column with the same alias."
+                )
+
+            combined[time_col] = pd.to_datetime(
+                combined[time_col],
+                errors="raise",
+                utc=True,
+            )
+
+            return combined.sort_values(
+                by=time_col,
+                kind="stable",
+                ignore_index=True,
+            )
+        except Exception as e:
+            warnings.warn(f"Error occurred while sorting by time column: {e}. Returning unsorted DataFrame.")
+            return combined
 
     def _apply_output_selection(self, df: pd.DataFrame) -> pd.DataFrame:
         """
