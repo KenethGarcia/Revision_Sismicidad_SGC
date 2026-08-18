@@ -16,10 +16,10 @@ author_column     = "creationInfo_author"
 
 where:
 - `event_type_column`  identifies the DataFrame column that contains an event’s classification, such as "earthquake", "explosion", "not locatable", or another catalog-specific type.
-- `time_column` identifies the output column containing the event or origin times.
+- `time_column` identifies the output column containing the event or origin times. It will be used to sort the queried and resulting arrays.
 - `author_column` identifies the column containing author or processing-source information.
 
-> **NOTE:** `time_column` and `author_column` settings are experimental in the current version. They establish shared column conventions now, but they are not yet automatically used to filter events in the core Runner workflow. Future CLI and frontend versions are expected to use them
+> **NOTE:** `author_column` setting are experimental in the current version. It establishes shared column conventions now, but they are not yet automatically used to filter events in the core Runner workflow. Future CLI and frontend versions are expected to use them
 
 
 ## Database configuration
