@@ -16,5 +16,12 @@ from src.core.config_loader import ConfigManager
 class ConfigValidator:
     """Validate cross-section rules in a TOML configuration."""
 
+    _VALID_LOGIC = {"and", "or", "xor"}
+    _VALID_DUPLICATE_METHODS = {"adjacent", "sswa"}
+
     def __init__(self, config_manager: ConfigManager) -> None:
         self._cm = config_manager
+
+    def validate(self) -> None:
+    """Run every static validation and raise on the first error found."""
+
