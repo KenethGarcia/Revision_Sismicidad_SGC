@@ -15,7 +15,7 @@ from tqdm import tqdm
 from pathlib import Path
 from typing import Any, Mapping
 from src.io.env import load_credentials
-from src.core.config_loader import ConfigManager
+from src.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
 
 
 class DatabaseManager:
@@ -29,7 +29,9 @@ class DatabaseManager:
     """
     def __init__(self, config_manager: ConfigManager):
         """
-        Initialize the DatabaseManager from a ConfigManager.
+        Initialize the DatabaseManager from a ConfigManager. A single [[database]] entry may omit `name`
+        It is stored internally under DEFAULT_DATABASE_NAME. Multiple profiles must each have a unique,
+        nonempty name.
 
         Parameters
         ----------
@@ -44,18 +46,72 @@ class DatabaseManager:
         self._credentials_named: dict[str, dict[str, Any]] = {}
 
         db_cfgs = config_manager.get_database()
-        for db_cfg in db_cfgs:
-            profile_name = db_cfg.get("name")
-            if not profile_name:
-                raise ValueError("A [[database]] entry in {self._config_name} is missing a 'name' field")
 
-            credentials = load_credentials(
-                db_cfg = db_cfg,
-                base_dir = self._base_dir,
-                config_name = self._config_name
+        if not db_cfgs:
+            raise ValueError(f"No [[database]] entries found in {self._config_name!r}")
+
+        multiple_databases = len(db_cfgs) > 1
+
+        for index, db_cfg in enumerate(db_cfgs, start=1):
+            profile_name = self._resolve_profile_name(
+                db_cfg=db_cfg,
+                index=index,
+                multiple_databases=multiple_databases,
             )
 
-            self._credentials_named[str(profile_name)] = credentials
+            if profile_name in self._credentials_named:
+                raise ValueError(
+                    f"[[database]] entry #{index} in {self._config_name!r} "
+                    f"has duplicate name {profile_name!r}. Database names must be unique."
+                )
+
+            credentials = load_credentials(
+                db_cfg=db_cfg,
+                base_dir=self._base_dir,
+                config_name=self._config_name,
+            )
+
+            self._credentials_named[profile_name] = credentials
+
+
+    def _resolve_profile_name(
+            self,
+            *,
+            db_cfg: Mapping[str, Any],
+            index: int,
+            multiple_databases: bool,
+    ) -> str:
+        """
+        Return the internal routing name for one [[database]] entry.
+
+        With one database, an omitted name is represented internally by DEFAULT_DATABASE_NAME. With multiple databases,
+        every entry needs an explicit name so queries can select a database unambiguously.
+        """
+        raw_name = db_cfg.get("name")
+
+        if raw_name is None:
+            if multiple_databases:
+                raise ValueError(
+                    f"[[database]] entry #{index} in {self._config_name!r} is missing a 'name' field. A name is "
+                    f"required when multiple database profiles are configured."
+                )
+
+            return DEFAULT_DATABASE_NAME
+
+        if not isinstance(raw_name, str) or not raw_name.strip():
+            raise ValueError(
+                f"[[database]] entry #{index} in {self._config_name!r} must have a nonempty string 'name' field."
+            )
+
+        profile_name = raw_name.strip()
+
+        if profile_name == DEFAULT_DATABASE_NAME:
+            raise ValueError(
+                f"[[database]] entry #{index} in {self._config_name!r} "
+                f"cannot use reserved name {DEFAULT_DATABASE_NAME!r}."
+            )
+
+        return profile_name
 
     # Getter methods
     def get_credentials(self, db_name: str) -> dict[str, Any]:
@@ -106,21 +162,29 @@ class DatabaseManager:
         ValueError
             If the query configuration does not specify a valid database.
         """
-        db_name = query_cfg.get("database")
-        # Prefer explicit field in TOML
-        if db_name:
-            db_name = str(db_name)
+        configured_name = query_cfg.get("database")
+        if configured_name is not None:
+            if not isinstance(configured_name, str) or not configured_name.strip():
+                raise ValueError(
+                    f"Query configuration {query_cfg.get('name', '<unnamed>')!r} has an invalid 'database' field. "
+                    "It must be a nonempty string."
+                )
+            db_name = configured_name.strip()
             if db_name not in self._credentials_named:
-                raise ValueError(f"Query configuration specifies database '{db_name!r}', but no such profile exists in {self._config_name!r}")
+                raise ValueError(
+                    f"Query configuration {query_cfg.get('name', '<unnamed>')!r} specifies database profile "
+                    f"{db_name!r}, but no such profile exists in {self._config_name!r}."
+                )
             return db_name
 
-        # Try to fall back to default database if no database name specified
-        default_db_name = self._config_manager.default_database_name()
-        if default_db_name is None:
-            raise ValueError(f"Query configuration does not specify a database, and no default database is set in {self._config_name!r}")
-        if default_db_name not in self._credentials_named:
-            raise ValueError(f"Default database '{default_db_name!r}' is not defined in {self._config_name!r}")
-        return default_db_name
+        if len(self._credentials_named) == 1:
+            return next(iter(self._credentials_named))
+
+        raise ValueError(
+            f"Query configuration {query_cfg.get('name', '<unnamed>')!r} does not specify a database, "
+            f"and there are multiple database profiles available in {self._config_name!r}. "
+            f"Please specify a database explicitly."
+        )
 
     def fetch_events(
             self,
