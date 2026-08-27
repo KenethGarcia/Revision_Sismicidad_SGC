@@ -1,0 +1,6 @@
+[[database]]
+env_file = ".env"
+
+[[queries]]
+name = "events"
+sql_file = "query.sql"

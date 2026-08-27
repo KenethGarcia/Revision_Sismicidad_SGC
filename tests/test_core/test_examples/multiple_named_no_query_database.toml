@@ -1,0 +1,11 @@
+[[database]]
+name = "sc6"
+env_prefix = "SC6"
+
+[[database]]
+name = "sc3"
+env_prefix = "SC3"
+
+[[queries]]
+name = "events_without_database"
+sql_file = "query.sql"

@@ -1,0 +1,7 @@
+[[database]]
+name = "sc6"
+env_prefix = "SC6_A"
+
+[[database]]
+name = "sc6"
+env_prefix = "SC6_B"

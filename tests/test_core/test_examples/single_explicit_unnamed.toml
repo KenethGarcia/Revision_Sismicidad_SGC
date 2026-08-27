@@ -1,0 +1,10 @@
+[[database]]
+host = "localhost"
+user = "demo_user"
+password = "demo_password"
+database = "demo_database"
+port = 3306
+
+[[queries]]
+name = "events"
+sql_file = "query.sql"
