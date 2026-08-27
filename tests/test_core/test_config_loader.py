@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------------------------------------
 from pathlib import Path
 import pytest
-from src.core.config_loader import ConfigManager
+from src.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
 
 THIS_DIR = Path(__file__).resolve().parent
 EXAMPLE_CFG_DIR = THIS_DIR / "test_examples"
@@ -204,14 +204,14 @@ class TestConfigManager:
 
         assert cm.default_database_name() is None
 
-    def test_default_database_none_when_missing_name(self):
+    def test_default_database_unnamed_single_entry(self):
         """
-        If a database profile exists without a name, the default database name is None.
+        A sole unnamed database profile gets the internal default name.
         """
-        cfg_path = EXAMPLE_CFG_DIR / "cfg_wrong_queries.toml"
+        cfg_path = EXAMPLE_CFG_DIR / "single_env_file_unnamed.toml"
         cm = ConfigManager(cfg_path)
 
-        assert cm.default_database_name() is None
+        assert cm.default_database_name() == DEFAULT_DATABASE_NAME
 
     # Tests for [settings] helpers
     def test_settings_columns_explicit_values(self):
@@ -246,6 +246,40 @@ class TestConfigManager:
 
         with pytest.raises(TypeError):
             cm.get_event_type_column()
+
+    def test_default_database_name_is_stripped(self, tmp_path: Path):
+        """If a database name has leading/trailing whitespace, default_database_name should return the stripped version"""
+        cfg_path = EXAMPLE_CFG_DIR / "whitespace_name.toml"
+
+        cm = ConfigManager(cfg_path)
+
+        assert cm.default_database_name() == "sc6"
+
+    @pytest.mark.parametrize(
+        "name_value",
+        [
+            'name = ""',
+            'name = "   "',
+            "name = 42",
+        ],
+    )
+    def test_default_database_invalid_single_name_returns_none(
+            self,
+            tmp_path: Path,
+            name_value: str,
+    ):
+        """If a database name is invalid, default_database_name should return None."""
+        cfg_path = tmp_path / "invalid_name.toml"
+        cfg_path.write_text(
+            f"""[[database]]
+    {name_value}
+    """,
+            encoding="utf-8",
+        )
+
+        cm = ConfigManager(cfg_path)
+
+        assert cm.default_database_name() is None
 
 
 if __name__ == "__main__":
