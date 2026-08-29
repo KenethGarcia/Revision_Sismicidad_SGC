@@ -23,5 +23,55 @@ class ConfigValidator:
         self._cm = config_manager
 
     def validate(self) -> None:
-    """Run every static validation and raise on the first error found."""
+        """Run every static validation and raise on the first error."""
+        self._validate_database_names()
 
+
+    # [[database]]
+    def _validate_database_names(self) -> None:
+        """
+        Require at least one uniquely named database profile.
+
+        DatabaseManager builds a name-to-credentials mapping and routes
+        queries by these names, so missing or duplicate names are invalid.
+        """
+        databases = self._cm.get_database()
+
+        if not databases:
+            raise ValueError(
+                f"No [[database]] entries found in {self._cm.config_path.name!r}."
+            )
+
+        seen: set[str] = set()
+
+        for index, database in enumerate(databases, start=1):
+            context = f"[[database]] entry #{index}"
+
+            name = self._require_nonempty_string(
+                database.get("name"),
+                field="name",
+                context=context,
+            )
+
+            if name in seen:
+                raise ValueError(
+                    f"{context}: duplicate database name {name!r}. "
+                    "Database names must be unique."
+                )
+
+            seen.add(name)
+
+    # Helpers
+    @staticmethod
+    def _require_nonempty_string(
+            value: Any,
+            *,
+            field: str,
+            context: str,
+    ) -> str:
+        """Return a stripped nonempty string or raise ValueError."""
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(
+                f"{context}: {field} must be a nonempty string."
+            )
+        return value.strip()
