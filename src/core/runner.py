@@ -107,9 +107,9 @@ class Runner:
             specific query.
         multi_query : bool, default=True
             Bool variable to set whether to run all non-skipped queries or a single query. Defaults to True
-            If True, the pipeline will run all non-skipped queries and concatenate results based on columns.
-            If False, run a single query. It assumes the same schema across queries (e.g., tables mapped to
-            canonical columns).
+            If True, run every non-skipped query and concatenate the results. When more than one [[database]] profile
+            is configured, every active [[queries]] entry must include a nonempty `database` field matching a configured
+            profile name. With exactly one database profile, `database` is optional.
         perform_duplicates : bool, default=True
             If True, run duplicate detection and annotate the events table. If False, skip duplicate detection.
         perform_checks : bool, default=True
@@ -218,11 +218,12 @@ class Runner:
 
     def _fetch_all_queries(self) -> pd.DataFrame:
         """
-        Fetch events for ALL non-skipped [[queries]] entries and concatenate.
+        Fetch events for all non-skipped [[queries]] entries and concatenate them.
 
-        Assumes:
-        - All queries share the same canonical schema (same columns).
-        - Each query may use a different database profile (via 'database' field).
+        Requirements:
+        - Every active query must return the same canonical output columns.
+        - With multiple database profiles, every active query must explicitly declare `database`.
+        - With one database profile, `database` is optional; an unnamed sole profile resolves to DEFAULT_DATABASE_NAME.
         """
         query_cfgs = self._cm.get_queries()
         active_queries: list[Mapping[str, Any]] = [
