@@ -256,7 +256,66 @@ class ConfigValidator:
                 )
 
     # Duplicates
+    def _validate_duplicates(self) -> None:
+        """Validate duplicate-rule structure without running detection."""
+        duplicates = self._cm.config_data.get("duplicates", [])
 
+        if duplicates is None:
+            return
+
+        if not isinstance(duplicates, list):
+            raise TypeError(
+                "Expected 'duplicates' to be an array of tables ([[duplicates]])."
+            )
+
+        for index, rule in enumerate(duplicates, start=1):
+            if not isinstance(rule, dict):
+                raise TypeError(
+                    f"[[duplicates]] entry #{index} must be a TOML table."
+                )
+
+            context = f"[[duplicates]] entry #{index}"
+
+            if "name" in rule:
+                self._require_nonempty_string(
+                    rule["name"],
+                    field="name",
+                    context=context,
+                )
+
+            method = rule.get("method", "adjacent")
+
+            if method not in self._VALID_DUPLICATE_METHODS:
+                allowed = ", ".join(sorted(self._VALID_DUPLICATE_METHODS))
+                raise ValueError(
+                    f"{context}: method must be one of {allowed}; got {method!r}."
+                )
+
+            self._require_positive_number(
+                rule.get("time_window"),
+                field="time_window",
+                context=context,
+            )
+
+            self._require_positive_number(
+                rule.get("dist_threshold"),
+                field="dist_threshold",
+                context=context,
+            )
+
+            if "subset" in rule:
+                self._require_list_of_nonempty_strings(
+                    rule["subset"],
+                    field="subset",
+                    context=context,
+                )
+
+            if "event_type" in rule:
+                self._validate_string_or_string_list(
+                    rule["event_type"],
+                    field="event_type",
+                    context=context,
+                )
 
 
     # Helpers
