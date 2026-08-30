@@ -213,6 +213,51 @@ class ConfigValidator:
 
         return names
 
+    # Polygons
+
+    def _validate_polygons(self) -> None:
+        """Validate polygon metadata without opening polygon files."""
+        polygons = self._cm.get_polygons()
+        seen_names: set[str] = set()
+
+        for index, polygon in enumerate(polygons, start=1):
+            context = f"[[polygons]] entry #{index}"
+
+            name = self._require_nonempty_string(
+                polygon.get("name"),
+                field="name",
+                context=context,
+            )
+
+            if name in seen_names:
+                raise ValueError(
+                    f"{context}: duplicate polygon name {name!r}. "
+                    "Polygon names must be unique."
+                )
+
+            seen_names.add(name)
+
+            self._require_nonempty_string(
+                polygon.get("path"),
+                field="path",
+                context=context,
+            )
+
+            if "skip" in polygon and not isinstance(polygon["skip"], bool):
+                raise ValueError(
+                    f"{context}: skip must be a boolean."
+                )
+
+            if "polygon_type" in polygon:
+                self._require_nonempty_string(
+                    polygon["polygon_type"],
+                    field="polygon_type",
+                    context=context,
+                )
+
+    # Duplicates
+
+
 
     # Helpers
     @staticmethod
