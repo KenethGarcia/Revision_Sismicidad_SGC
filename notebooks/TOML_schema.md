@@ -130,7 +130,7 @@ It is possible to define a list of queries in the TOML file. Each query should b
 - `name`: label for the query, used in the logs.
 - `sql_file`: path to the SQL file that contains the query. The path can be absolute or relative to the TOML file's directory.
 - `description`: human-readable label for documentation/logs.
-- `database`: name of the database connection to use for this query. If not defined, the first database connection in the TOML file will be used.
+- `database`: name of the database connection used by this query. It is optional only when exactly one `[[database]]` profile is configured. When two or more profiles exist, every active query must declare a valid profile name.
 - `skip`: set to true to temporarily disable the query without deleting the entry.
 
 > **NOTE:** If you are using more than one database connection, it is assumed that every query will return the same columns. Adjust the queries based on that, even if they are not used in the checks. The code will use the first query to determine the columns and their types.
