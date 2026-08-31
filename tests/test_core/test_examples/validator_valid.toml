@@ -1,0 +1,50 @@
+[settings]
+event_type_column = "event_type"
+time_column = "time_value"
+author_column = "creationInfo_author"
+
+[[database]]
+name = "sc6"
+env_prefix = "SC6"
+port = 3306
+
+[[database]]
+name = "sc3"
+env_prefix = "SC3"
+port = 3306
+
+[[queries]]
+name = "events_sc6"
+sql_file = "sql/events_sc6.sql"
+database = "sc6"
+
+[[queries]]
+name = "events_sc3"
+sql_file = "sql/events_sc3.sql"
+database = "sc3"
+
+[[polygons]]
+name = "zone_a"
+path = "polygons/zone_a.bna"
+polygon_type = "BNA"
+
+[[duplicates]]
+name = "nearby_events"
+method = "adjacent"
+event_type = ["earthquake", "explosion"]
+subset = ["time_value", "latitude", "longitude", "publicID"]
+time_window = 5
+dist_threshold = 25.0
+
+[[checks]]
+name = "high_magnitude"
+logic = "and"
+
+[[checks.conditions]]
+rule_type = "numeric"
+column = "magnitude"
+mode = "gt"
+threshold = 4.0
+
+[output]
+columns = ["publicID", "time_value", "event_type", "magnitude"]
