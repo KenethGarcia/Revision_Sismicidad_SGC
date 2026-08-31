@@ -5,9 +5,7 @@
 # ensures that all required parameters are present and correctly formatted.
 # --------------------------------------------------------------------------------------------------------
 from __future__ import annotations
-
-from typing import Any
-from pathlib import Path
+from typing import Any, Mapping
 
 from src.checks.dispatchers import CONDITION_DISPATCHERS
 from src.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
@@ -213,8 +211,8 @@ class ConfigValidator:
 
         return names
 
-    # Polygons
 
+    # Polygons
     def _validate_polygons(self) -> None:
         """Validate polygon metadata without opening polygon files."""
         polygons = self._cm.get_polygons()
@@ -317,6 +315,311 @@ class ConfigValidator:
                     context=context,
                 )
 
+    # [checks]
+    def _validate_checks(self) -> None:
+        """
+        Validate static check-tree structure and dispatcher names.
+
+        It does not validate DataFrame column existence or evaluate conditions.
+        """
+        checks = self._cm.get_checks()
+        polygon_names = {
+            polygon.get("name")
+            for polygon in self._cm.get_polygons()
+            if isinstance(polygon.get("name"), str)
+        }
+
+        for index, check in enumerate(checks, start=1):
+            context = f"[[checks]] entry #{index}"
+
+            self._require_nonempty_string(
+                check.get("name"),
+                field="name",
+                context=context,
+            )
+
+            self._validate_optional_logic(
+                check,
+                context=context,
+            )
+
+            if "event_type" in check:
+                self._validate_string_or_string_list(
+                    check["event_type"],
+                    field="event_type",
+                    context=context,
+                )
+
+            groups = check.get("groups", [])
+            conditions = check.get("conditions", [])
+
+            if not isinstance(groups, list):
+                raise TypeError(
+                    f"{context}: groups must be an array of tables."
+                )
+
+            if not isinstance(conditions, list):
+                raise TypeError(
+                    f"{context}: conditions must be an array of tables."
+                )
+
+            if not groups and not conditions:
+                raise ValueError(
+                    f"{context}: define at least one condition or group."
+                )
+
+            if len(groups) + len(conditions) > 1 and "logic" not in check:
+                raise ValueError(
+                    f"{context}: logic is required when it has more than "
+                    "one direct child."
+                )
+
+            for group_index, group in enumerate(groups, start=1):
+                group_context = f"{context}.groups entry #{group_index}"
+
+                if not isinstance(group, dict):
+                    raise TypeError(
+                        f"{group_context} must be a TOML table."
+                    )
+
+                self._validate_logic_value(
+                    group.get("logic"),
+                    context=group_context,
+                    required=True,
+                )
+
+                group_conditions = group.get("conditions", [])
+
+                if not isinstance(group_conditions, list):
+                    raise TypeError(
+                        f"{group_context}: conditions must be an array "
+                        "of tables."
+                    )
+
+                if not group_conditions:
+                    raise ValueError(
+                        f"{group_context}: define at least one condition."
+                    )
+
+                for condition_index, condition in enumerate(
+                        group_conditions,
+                        start=1,
+                ):
+                    self._validate_condition(
+                        condition,
+                        context=(
+                            f"{group_context}.conditions "
+                            f"entry #{condition_index}"
+                        ),
+                        polygon_names=polygon_names,
+                    )
+
+            for condition_index, condition in enumerate(conditions, start=1):
+                self._validate_condition(
+                    condition,
+                    context=f"{context}.conditions entry #{condition_index}",
+                    polygon_names=polygon_names,
+                )
+
+    def _validate_optional_logic(
+            self,
+            node: Mapping[str, Any],
+            *,
+            context: str,
+    ) -> None:
+        """Validate a logic key only when the node supplies one."""
+        if "logic" in node:
+            self._validate_logic_value(
+                node["logic"],
+                context=context,
+                required=True,
+            )
+
+    def _validate_logic_value(
+            self,
+            value: Any,
+            *,
+            context: str,
+            required: bool,
+    ) -> None:
+        """Validate one and/or/xor logic value."""
+        if value is None and not required:
+            return
+
+        logic = self._require_nonempty_string(
+            value,
+            field="logic",
+            context=context,
+        ).lower()
+
+        if logic not in self._VALID_LOGIC:
+            allowed = ", ".join(sorted(self._VALID_LOGIC))
+            raise ValueError(
+                f"{context}: logic must be one of {allowed}; got {logic!r}."
+            )
+
+    def _validate_condition(
+            self,
+            condition: Any,
+            *,
+            context: str,
+            polygon_names: set[str],
+    ) -> None:
+        """Validate one static condition declaration."""
+        if not isinstance(condition, dict):
+            raise TypeError(f"{context} must be a TOML table.")
+
+        rule_type = self._require_nonempty_string(
+            condition.get("rule_type"),
+            field="rule_type",
+            context=context,
+        )
+
+        if rule_type not in CONDITION_DISPATCHERS:
+            available = ", ".join(sorted(CONDITION_DISPATCHERS))
+            raise ValueError(
+                f"{context}: unsupported rule_type {rule_type!r}. Available rule types: {available}."
+            )
+
+        self._require_nonempty_string(
+            condition.get("mode"),
+            field="mode",
+            context=context,
+        )
+
+        if rule_type == "polygon":
+            self._require_nonempty_string(
+                condition.get("lat_col"),
+                field="lat_col",
+                context=context,
+            )
+
+            self._require_nonempty_string(
+                condition.get("lon_col"),
+                field="lon_col",
+                context=context,
+            )
+
+            raw_polygon = condition.get("polygon")
+
+            if raw_polygon is None:
+                raise ValueError(
+                    f"{context}: polygon rules require 'polygon'."
+                )
+
+            requested_polygons = self._as_nonempty_string_list(
+                raw_polygon,
+                field="polygon",
+                context=context,
+            )
+
+            missing = [name for name in requested_polygons if name not in polygon_names]
+
+            if missing:
+                raise ValueError(
+                    f"{context}: unknown polygon name(s): {', '.join(repr(name) for name in missing)}."
+                )
+
+            return
+
+        if rule_type == "column_column":
+            self._require_nonempty_string(
+                condition.get("left_col"),
+                field="left_col",
+                context=context,
+            )
+
+            self._require_nonempty_string(
+                condition.get("right_col"),
+                field="right_col",
+                context=context,
+            )
+
+            return
+
+        self._require_nonempty_string(
+            condition.get("column"),
+            field="column",
+            context=context,
+        )
+
+        if rule_type == "numeric":
+            self._validate_numeric_condition(condition, context=context)
+
+        elif rule_type == "category":
+            self._validate_category_condition(condition, context=context)
+
+        elif rule_type == "temporal":
+            self._require_nonempty_string(
+                condition.get("value"),
+                field="value",
+                context=context,
+            )
+
+    def _validate_numeric_condition(
+            self,
+            condition: Mapping[str, Any],
+            *,
+            context: str,
+    ) -> None:
+        """Validate static numeric-rule parameters."""
+        mode = condition["mode"]
+
+        if mode in {"between", "outside"}:
+            self._require_number(
+                condition.get("lower"),
+                field="lower",
+                context=context,
+            )
+            self._require_number(
+                condition.get("upper"),
+                field="upper",
+                context=context,
+            )
+            return
+
+        self._require_number(
+            condition.get("threshold"),
+            field="threshold",
+            context=context,
+        )
+
+    def _validate_category_condition(
+            self,
+            condition: Mapping[str, Any],
+            *,
+            context: str,
+    ) -> None:
+        """Validate static category-rule parameters."""
+        mode = condition["mode"]
+
+        if mode in {"in", "not_in"}:
+            self._validate_string_or_string_list(
+                condition.get("values", condition.get("value")),
+                field="values",
+                context=context,
+            )
+
+    # [output]
+
+    def _validate_output(self) -> None:
+        """Validate [output] structure without comparing DataFrame columns."""
+        output = self._cm.config_data.get("output")
+
+        if output is None:
+            return
+
+        if not isinstance(output, dict):
+            raise TypeError(
+                "Expected [output] to be a TOML table."
+            )
+
+        if "columns" in output:
+            self._require_list_of_nonempty_strings(
+                output["columns"],
+                field="columns",
+                context="[output]",
+            )
 
     # Helpers
     @staticmethod
