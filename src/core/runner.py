@@ -23,6 +23,7 @@ from src.io.polygons import load_polygons
 from src.checks.engine import run_checks, run_duplicates
 from src.core.config_loader import ConfigManager
 from src.core.database_manager import DatabaseManager
+from src.core.config_validator import ConfigValidator
 
 
 @dataclass(frozen=True)
@@ -56,6 +57,7 @@ class Runner:
             Path to the TOML configuration file.
         """
         self._cm = ConfigManager(Path(config_path))
+        ConfigValidator(self._cm).validate()
         self._dbm = DatabaseManager(self._cm)
 
     # Helpers
