@@ -23,6 +23,11 @@ class ConfigValidator:
     def validate(self) -> None:
         """Run every static validation and raise on the first error."""
         self._validate_databases()
+        self._validate_queries()
+        self._validate_polygons()
+        self._validate_duplicates()
+        self._validate_checks()
+        self._validate_output()
 
 
     # [[database]]
