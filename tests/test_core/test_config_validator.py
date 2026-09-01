@@ -227,6 +227,45 @@ class TestConfigValidator:
             make_validator(valid_config_data).validate()
 
 
+    # Check [[duplicates]] entries
+    @pytest.mark.parametrize("method", ["invalid", "", 42])
+    def test_invalid_duplicate_method_raises(self, valid_config_data: dict[str, Any], method: Any):
+        """Test that a config with a [[duplicates]] entry that has an invalid method raises a ValueError."""
+        valid_config_data["duplicates"][0]["method"] = method
+
+        with pytest.raises(ValueError, match="method must be one of"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("time_window", [None, 0, -1, True, "5"])
+    def test_invalid_duplicate_time_window_raises(self, valid_config_data: dict[str, Any], time_window: Any):
+        """Test that a config with a [[duplicates]] entry that has an invalid time_window raises a ValueError."""
+        valid_config_data["duplicates"][0]["time_window"] = time_window
+
+        with pytest.raises(ValueError, match="time_window"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("dist_threshold", [None, 0, -1.0, False, "10"])
+    def test_invalid_duplicate_distance_threshold_raises(self, valid_config_data: dict[str, Any], dist_threshold: Any):
+        valid_config_data["duplicates"][0]["dist_threshold"] = dist_threshold
+
+        with pytest.raises(ValueError, match="dist_threshold"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("subset", [[], "publicID", ["publicID", ""]])
+    def test_invalid_duplicate_subset_raises( self, valid_config_data: dict[str, Any], subset: Any):
+        """Test that a config with a [[duplicates]] entry that has an invalid subset raises a ValueError."""
+        valid_config_data["duplicates"][0]["subset"] = subset
+
+        with pytest.raises(ValueError, match="subset"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("event_type", ["", [], ["earthquake", ""]])
+    def test_invalid_duplicate_event_type_raises(self, valid_config_data: dict[str, Any], event_type: Any):
+        """Test that a config with a [[duplicates]] entry that has an invalid event_type raises a ValueError."""
+        valid_config_data["duplicates"][0]["event_type"] = event_type
+
+        with pytest.raises(ValueError, match="event_type"):
+            make_validator(valid_config_data).validate()
 
 
     # Check [[checks]] entries
