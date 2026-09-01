@@ -125,3 +125,96 @@ class TestConfigValidator:
 
 
     # Check [[queries]] entries
+    def test_no_queries_raise(self, valid_config_data: dict[str, Any]):
+        """Test that a config with no [[queries]] entries raises a ValueError."""
+        valid_config_data["queries"] = []
+
+        with pytest.raises(ValueError, match=r"No \[\[queries\]\] entries"):
+            make_validator(valid_config_data).validate()
+
+    def test_missing_query_name_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[queries]] entry that has no query name raises a ValueError."""
+        valid_config_data["queries"][0].pop("name")
+
+        with pytest.raises(ValueError, match="name must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_duplicate_query_name_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with duplicate [[queries]] names raises a ValueError."""
+        valid_config_data["queries"][1]["name"] = "events_sc6"
+
+        with pytest.raises(ValueError, match="duplicate query name 'events_sc6'"):
+            make_validator(valid_config_data).validate()
+
+    def test_missing_sql_file_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[queries]] entry that has no sql_file raises a ValueError."""
+        valid_config_data["queries"][0].pop("sql_file")
+
+        with pytest.raises(ValueError, match="sql_file must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("skip", ["false", 0, 1, None])
+    def test_non_boolean_query_skip_raises(self, valid_config_data: dict[str, Any], skip: Any):
+        """Test that a config with a [[queries]] entry that has a non-boolean skip value raises a ValueError."""
+        valid_config_data["queries"][0]["skip"] = skip
+
+        with pytest.raises(ValueError, match="skip must be a boolean"):
+            make_validator(valid_config_data).validate()
+
+    def test_active_query_requires_database_with_multiple_profiles(self, valid_config_data: dict[str, Any]):
+        """Test that a config with an active [[queries]] entry requires a database."""
+        valid_config_data["queries"][0].pop("database")
+
+        with pytest.raises(ValueError, match="database is required"):
+            make_validator(valid_config_data).validate()
+
+    def test_skipped_query_may_omit_database_with_multiple_profiles(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a skipped [[queries]] entry may omit a database."""
+        valid_config_data["queries"][0].pop("database")
+        valid_config_data["queries"][0]["skip"] = True
+
+        make_validator(valid_config_data).validate()
+
+    def test_unknown_query_database_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[queries]] entry that has an unknown database raises a ValueError."""
+        valid_config_data["queries"][0]["database"] = "unknown"
+
+        with pytest.raises(ValueError, match="database 'unknown' is not defined"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("database_name", ["", "   ", 42, True])
+    def test_invalid_query_database_name_raises(self, valid_config_data: dict[str, Any], database_name: Any):
+        """Test that a config with a [[queries]] entry that has an invalid database name raises a ValueError."""
+        valid_config_data["queries"][0]["database"] = database_name
+
+        with pytest.raises(ValueError, match="database must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+
+    # Check [[polygons]] entries
+
+
+    # Check [[checks]] entries
+    def test_missing_check_name_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has no check name raises a ValueError."""
+        valid_config_data["checks"][0].pop("name")
+
+        with pytest.raises(ValueError, match="name must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("logic", ["not", "", 42])
+    def test_invalid_check_logic_raises(self, valid_config_data: dict[str, Any], logic: Any):
+        """Test that a config with a [[checks]] entry that has an invalid check logic raises a ValueError."""
+        valid_config_data["checks"][0]["logic"] = logic
+
+        with pytest.raises(ValueError, match="logic"):
+            make_validator(valid_config_data).validate()
+
+    def test_empty_check_raises(self,  valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has no conditions or groups raises a ValueError."""
+        valid_config_data["checks"][0].pop("conditions")
+        valid_config_data["checks"][0].pop("groups", None)
+        valid_config_data["checks"][0].pop("logic", None)
+
+        with pytest.raises(ValueError, match="define at least one condition or group"):
+            make_validator(valid_config_data).validate()
