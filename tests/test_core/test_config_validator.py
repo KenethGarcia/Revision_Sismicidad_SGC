@@ -292,3 +292,163 @@ class TestConfigValidator:
 
         with pytest.raises(ValueError, match="define at least one condition or group"):
             make_validator(valid_config_data).validate()
+
+    def test_multiple_direct_children_require_logic(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has multiple direct children requires a logic."""
+        valid_config_data["checks"][0].pop("logic")
+        valid_config_data["checks"][0]["conditions"].append(
+            {
+                "rule_type": "category",
+                "column": "event_type",
+                "mode": "in",
+                "values": ["earthquake"],
+            }
+        )
+
+        with pytest.raises(ValueError, match="logic is required"):
+            make_validator(valid_config_data).validate()
+
+    def test_unsupported_condition_rule_type_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has an unsupported condition rule_type raises a ValueError."""
+        valid_config_data["checks"][0]["conditions"][0]["rule_type"] = "unknown"
+
+        with pytest.raises(ValueError, match="unsupported rule_type"):
+            make_validator(valid_config_data).validate()
+
+    def test_missing_condition_mode_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a condition with no mode raises a ValueError."""
+        valid_config_data["checks"][0]["conditions"][0].pop("mode")
+
+        with pytest.raises(ValueError, match="mode must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_numeric_rule_requires_threshold_for_one_sided_modes(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a numeric condition with a one-sided mode
+        requires a threshold."""
+        condition = valid_config_data["checks"][0]["conditions"][0]
+        condition["rule_type"] = "numeric"
+        condition["column"] = "magnitude"
+        condition["mode"] = "gt"
+        condition.pop("threshold", None)
+
+        with pytest.raises(ValueError, match="threshold must be a number"):
+            make_validator(valid_config_data).validate()
+
+    def test_numeric_between_rule_requires_lower_and_upper(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a numeric condition with a between mode
+        requires both a lower and an upper threshold."""
+        condition = valid_config_data["checks"][0]["conditions"][0]
+        condition["rule_type"] = "numeric"
+        condition["column"] = "magnitude"
+        condition["mode"] = "between"
+        condition.pop("threshold", None)
+        condition["upper"] = 5.0
+        condition.pop("lower", None)
+
+        with pytest.raises(ValueError, match="lower must be a number"):
+            make_validator(valid_config_data).validate()
+
+    def test_category_in_rule_requires_values(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a category condition with an in mode
+        requires a non-empty list of values."""
+        condition = valid_config_data["checks"][0]["conditions"][0]
+        condition["rule_type"] = "category"
+        condition["column"] = "event_type"
+        condition["mode"] = "in"
+        condition.pop("values", None)
+        condition.pop("value", None)
+
+        with pytest.raises(ValueError, match="values"):
+            make_validator(valid_config_data).validate()
+
+    def test_temporal_rule_requires_value(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a temporal condition requires a value."""
+        condition = valid_config_data["checks"][0]["conditions"][0]
+        condition["rule_type"] = "temporal"
+        condition["column"] = "time_value"
+        condition["mode"] = "gt"
+        condition.pop("value", None)
+
+        with pytest.raises(ValueError, match="value must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_column_column_rule_requires_left_and_right_columns(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a column_column condition requires both left_col
+        and right_col."""
+        condition = valid_config_data["checks"][0]["conditions"][0]
+        condition.clear()
+        condition.update(
+            {
+                "rule_type": "column_column",
+                "mode": "gt",
+                "right_col": "reference_magnitude",
+            }
+        )
+
+        with pytest.raises(ValueError, match="left_col must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_polygon_rule_requires_known_polygon_reference(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a polygon condition requires a known polygon reference."""
+        condition = valid_config_data["checks"][0]["conditions"][0]
+        condition.clear()
+        condition.update(
+            {
+                "rule_type": "polygon",
+                "lat_col": "latitude",
+                "lon_col": "longitude",
+                "mode": "inside",
+                "polygon": "missing_zone",
+            }
+        )
+
+        with pytest.raises(ValueError, match="unknown polygon name"):
+            make_validator(valid_config_data).validate()
+
+    def test_polygon_rule_requires_latitude_column(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a polygon condition requires a latitude column."""
+        condition = valid_config_data["checks"][0]["conditions"][0]
+        condition.clear()
+        condition.update(
+            {
+                "rule_type": "polygon",
+                "lon_col": "longitude",
+                "mode": "inside",
+                "polygon": "zone_a",
+            }
+        )
+
+        with pytest.raises(ValueError, match="lat_col must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_group_requires_logic(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a group requires a logic."""
+        valid_config_data["checks"][0] = {
+            "name": "grouped_check",
+            "groups": [
+                {
+                    "conditions": [
+                        {
+                            "rule_type": "numeric",
+                            "column": "magnitude",
+                            "mode": "gt",
+                            "threshold": 3.0,
+                        }
+                    ]
+                }
+            ],
+        }
+
+        with pytest.raises(ValueError, match="logic must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_group_requires_at_least_one_condition(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a group requires at least one condition."""
+        valid_config_data["checks"][0] = {
+            "name": "empty_group_check",
+            "groups": [{"logic": "and"}],
+        }
+
+        with pytest.raises(ValueError, match="define at least one condition"):
+            make_validator(valid_config_data).validate()
+
