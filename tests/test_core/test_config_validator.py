@@ -452,3 +452,20 @@ class TestConfigValidator:
         with pytest.raises(ValueError, match="define at least one condition"):
             make_validator(valid_config_data).validate()
 
+
+    # Checks for output
+    @pytest.mark.parametrize(
+        "columns",
+        [
+            "publicID",
+            [],
+            ["publicID", ""],
+            ["publicID", 42],
+        ],
+    )
+    def test_invalid_output_columns_raise(self, valid_config_data: dict[str, Any], columns: Any):
+        """Test that a config with invalid output columns raises a ValueError."""
+        valid_config_data["output"]["columns"] = columns
+
+        with pytest.raises(ValueError, match="columns"):
+            make_validator(valid_config_data).validate()
