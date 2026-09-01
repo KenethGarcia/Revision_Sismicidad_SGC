@@ -192,6 +192,41 @@ class TestConfigValidator:
 
 
     # Check [[polygons]] entries
+    def test_missing_polygon_name_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[polygons]] entry that has no polygon name raises a ValueError."""
+        valid_config_data["polygons"][0].pop("name")
+
+        with pytest.raises(ValueError, match="name must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_duplicate_polygon_names_raise(self, valid_config_data: dict[str, Any]):
+        """Test that a config with duplicate [[polygons]] names raises a ValueError."""
+        valid_config_data["polygons"].append(
+            {
+                "name": "zone_a",
+                "path": "polygons/zone_b.bna",
+            }
+        )
+
+        with pytest.raises(ValueError, match="duplicate polygon name 'zone_a'"):
+            make_validator(valid_config_data).validate()
+
+    def test_missing_polygon_path_raises(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[polygons]] entry that has no polygon path raises a ValueError."""
+        valid_config_data["polygons"][0].pop("path")
+
+        with pytest.raises(ValueError, match="path must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("skip", ["true", 0, None])
+    def test_non_boolean_polygon_skip_raises(self, valid_config_data: dict[str, Any], skip: Any):
+        """Test that a config with a [[polygons]] entry that has a non-boolean skip value raises a ValueError."""
+        valid_config_data["polygons"][0]["skip"] = skip
+
+        with pytest.raises(ValueError, match="skip must be a boolean"):
+            make_validator(valid_config_data).validate()
+
+
 
 
     # Check [[checks]] entries
