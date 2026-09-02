@@ -259,7 +259,7 @@ def temporal_mask(
     events: pd.DataFrame,
     column: str,
     mode: str,
-    value: str,
+    threshold: str,
 ) -> np.ndarray:
     """
     Vectorized temporal comparator for seismic quality checks.
@@ -278,7 +278,7 @@ def temporal_mask(
             'le'       -> values <= Timestamp
             'eq'       -> values == Timestamp
             'ne'       -> values != Timestamp
-    value : str
+    threshold : str
         Reference timestamp used for the comparison. Any string accepted by
         :class:`pandas.Timestamp` can be supplied, for example
         '2024-01-01T00:00:00Z' or '2024-01-01 00:00:00'.
@@ -290,7 +290,7 @@ def temporal_mask(
         that the row satisfies the requested temporal condition.
     """
     left = pd.to_datetime(events[column], format="mixed", utc=True, errors="raise")
-    right = pd.to_datetime(value, format="mixed", utc=True, errors="raise")
+    right = pd.to_datetime(threshold, format="mixed", utc=True, errors="raise")
 
     ops = {
         "gt": np.greater,

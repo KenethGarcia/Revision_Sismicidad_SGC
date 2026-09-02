@@ -114,7 +114,7 @@ def dispatch_temporal(
         events=subset,
         column=cond['column'],
         mode=cond['mode'],
-        value=cond['value']
+        threshold=cond['value']
     )
 
 

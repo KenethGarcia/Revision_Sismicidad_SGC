@@ -174,32 +174,32 @@ def test_temporal_mask():
     ref = "2024-01-02T00:00:00"
 
     # Test greater than
-    gt_mask = temporal_mask(df, "t", value=ref, mode="gt")
+    gt_mask = temporal_mask(df, "t", threshold=ref, mode="gt")
     assert np.array_equal(gt_mask, np.array([False, False, True]))
 
     # Test greater equal
-    ge_mask = temporal_mask(df, "t", value=ref, mode="ge")
+    ge_mask = temporal_mask(df, "t", threshold=ref, mode="ge")
     assert np.array_equal(ge_mask, np.array([False, True, True]))
 
     # Test less than
-    lt_mask = temporal_mask(df, "t", value=ref, mode="lt")
+    lt_mask = temporal_mask(df, "t", threshold=ref, mode="lt")
     assert np.array_equal(lt_mask, np.array([True, False, False]))
 
     # Test less equal
-    le_mask = temporal_mask(df, "t", value=ref, mode="le")
+    le_mask = temporal_mask(df, "t", threshold=ref, mode="le")
     assert np.array_equal(le_mask, np.array([True, True, False]))
 
     # Test equal
-    eq_mask = temporal_mask(df, "t", value=ref, mode="eq")
+    eq_mask = temporal_mask(df, "t", threshold=ref, mode="eq")
     assert np.array_equal(eq_mask, np.array([False, True, False]))
 
     # Test not equal
-    ne_mask = temporal_mask(df, "t", value=ref, mode="ne")
+    ne_mask = temporal_mask(df, "t", threshold=ref, mode="ne")
     assert np.array_equal(ne_mask, np.array([True, False, True]))
 
     # Test unsupported mode
     with pytest.raises(KeyError):
-        temporal_mask(df, "t", value=ref, mode="unsupported_mode")
+        temporal_mask(df, "t", threshold=ref, mode="unsupported_mode")
 
 
 def test_combine_masks():
