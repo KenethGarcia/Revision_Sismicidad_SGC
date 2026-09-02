@@ -290,7 +290,7 @@ class TestConfigValidator:
         valid_config_data["checks"][0].pop("groups", None)
         valid_config_data["checks"][0].pop("logic", None)
 
-        with pytest.raises(ValueError, match="define at least one condition or group"):
+        with pytest.raises(ValueError, match=r"define at least one direct condition or group"):
             make_validator(valid_config_data).validate()
 
     def test_multiple_direct_children_require_logic(self, valid_config_data: dict[str, Any]):
@@ -305,7 +305,7 @@ class TestConfigValidator:
             }
         )
 
-        with pytest.raises(ValueError, match="logic is required"):
+        with pytest.raises(ValueError, match=r"logic must be a nonempty string"):
             make_validator(valid_config_data).validate()
 
     def test_unsupported_condition_rule_type_raises(self, valid_config_data: dict[str, Any]):
@@ -349,27 +349,33 @@ class TestConfigValidator:
             make_validator(valid_config_data).validate()
 
     def test_category_in_rule_requires_values(self, valid_config_data: dict[str, Any]):
-        """Test that a config with a [[checks]] entry that has a category condition with an in mode
-        requires a non-empty list of values."""
+        """A category 'in' condition requires a nonempty values declaration."""
         condition = valid_config_data["checks"][0]["conditions"][0]
-        condition["rule_type"] = "category"
-        condition["column"] = "event_type"
-        condition["mode"] = "in"
-        condition.pop("values", None)
-        condition.pop("value", None)
 
-        with pytest.raises(ValueError, match="values"):
+        condition.clear()
+        condition.update({
+            "rule_type": "category",
+            "column": "event_type",
+            "mode": "in",
+        })
+
+        with pytest.raises(
+                ValueError,
+                match=r"values",
+        ):
             make_validator(valid_config_data).validate()
 
-    def test_temporal_rule_requires_value(self, valid_config_data: dict[str, Any]):
-        """Test that a config with a [[checks]] entry that has a temporal condition requires a value."""
+    def test_temporal_rule_requires_threshold(self, valid_config_data: dict[str, Any]):
+        """Test that a config with a [[checks]] entry that has a temporal condition requires a threshold."""
         condition = valid_config_data["checks"][0]["conditions"][0]
-        condition["rule_type"] = "temporal"
-        condition["column"] = "time_value"
-        condition["mode"] = "gt"
-        condition.pop("value", None)
+        condition.clear()
+        condition.update({
+            "rule_type": "temporal",
+            "column": "time_value",
+            "mode": "gt",
+        })
 
-        with pytest.raises(ValueError, match="value must be a nonempty string"):
+        with pytest.raises(ValueError, match="threshold must be a nonempty string"):
             make_validator(valid_config_data).validate()
 
     def test_column_column_rule_requires_left_and_right_columns(self, valid_config_data: dict[str, Any]):
@@ -421,8 +427,8 @@ class TestConfigValidator:
         with pytest.raises(ValueError, match="lat_col must be a nonempty string"):
             make_validator(valid_config_data).validate()
 
-    def test_group_requires_logic(self, valid_config_data: dict[str, Any]):
-        """Test that a config with a [[checks]] entry that has a group requires a logic."""
+    def test_single_child_group_may_omit_logic(self, valid_config_data: dict[str, Any]):
+        """A node with exactly one direct child may omit logic."""
         valid_config_data["checks"][0] = {
             "name": "grouped_check",
             "groups": [
@@ -439,17 +445,218 @@ class TestConfigValidator:
             ],
         }
 
-        with pytest.raises(ValueError, match="logic must be a nonempty string"):
+        make_validator(valid_config_data).validate()
+
+    def test_group_with_multiple_children_requires_logic(self, valid_config_data: dict[str, Any]):
+        """A node with multiple direct children requires logic."""
+        valid_config_data["checks"][0] = {
+            "name": "grouped_check",
+            "groups": [
+                {
+                    "conditions": [
+                        {
+                            "rule_type": "numeric",
+                            "column": "magnitude",
+                            "mode": "gt",
+                            "threshold": 3.0,
+                        },
+                        {
+                            "rule_type": "numeric",
+                            "column": "depth",
+                            "mode": "lt",
+                            "threshold": 50.0,
+                        },
+                    ]
+                }
+            ],
+        }
+
+        with pytest.raises(
+                ValueError,
+                match=r"logic must be a nonempty string",
+        ):
             make_validator(valid_config_data).validate()
 
-    def test_group_requires_at_least_one_condition(self, valid_config_data: dict[str, Any]):
-        """Test that a config with a [[checks]] entry that has a group requires at least one condition."""
+    def test_empty_group_requires_at_least_one_direct_child(self, valid_config_data: dict[str, Any]):
+        """An empty group must contain a direct condition or nested group."""
         valid_config_data["checks"][0] = {
             "name": "empty_group_check",
             "groups": [{"logic": "and"}],
         }
 
-        with pytest.raises(ValueError, match="define at least one condition"):
+        with pytest.raises(
+                ValueError,
+                match=r"define at least one direct condition or group",
+        ):
+            make_validator(valid_config_data).validate()
+
+    def test_nested_group_is_valid(self, valid_config_data):
+        """Test that a config with a [[checks]] entry that has a nested group is valid."""
+        valid_config_data["checks"][0] = {
+            "name": "nested_groups",
+            "groups": [{
+                "groups": [{
+                    "conditions": [{
+                        "rule_type": "numeric",
+                        "column": "magnitude",
+                        "mode": "gt",
+                        "threshold": 3.0,
+                    }],
+                }],
+            }],
+        }
+
+        make_validator(valid_config_data).validate()
+
+    def test_deep_empty_group_raises_with_path(self, valid_config_data):
+        """Test that a config with a [[checks]] entry that has a deeply nested empty group raises a ValueError
+        with a path to the offending group."""
+        valid_config_data["checks"][0] = {
+            "name": "bad_nested_groups",
+            "groups": [{
+                "groups": [{
+                    "groups": [{}],
+                }],
+            }],
+        }
+
+        with pytest.raises(
+                ValueError,
+                match=r"groups entry #1\.groups entry #1\.groups entry #1.*"
+                      r"define at least one direct condition or group",
+        ):
+            make_validator(valid_config_data).validate()
+
+    def test_node_with_condition_and_group_requires_logic(self, valid_config_data):
+        """Test that a config with a [[checks]] entry that has both a condition and a group requires a logic."""
+        valid_config_data["checks"][0] = {
+            "name": "mixed_children",
+            "conditions": [{
+                "rule_type": "numeric",
+                "column": "magnitude",
+                "mode": "gt",
+                "threshold": 3.0,
+            }],
+            "groups": [{
+                "conditions": [{
+                    "rule_type": "numeric",
+                    "column": "depth",
+                    "mode": "gt",
+                    "threshold": 10.0,
+                }],
+            }],
+        }
+
+        with pytest.raises(ValueError, match="logic must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize(
+        ("condition", "expected_key"),
+        [
+            (
+                    {
+                        "rule_type": "numeric",
+                        "column": "magnitude",
+                        "mode": "gt",
+                        "threshold": 4.0,
+                        "polygon": "zone_a",
+                    },
+                    "polygon",
+            ),
+            (
+                    {
+                        "rule_type": "temporal",
+                        "column": "time_value",
+                        "mode": "ge",
+                        "threshold": "2026-01-01T00:00:00Z",
+                        "lower": 1,
+                    },
+                    "lower",
+            ),
+            (
+                    {
+                        "rule_type": "category",
+                        "column": "event_type",
+                        "mode": "in",
+                        "values": "earthquake",
+                        "value": "earthquake",
+                    },
+                    "value",
+            ),
+            (
+                    {
+                        "rule_type": "polygon",
+                        "lat_col": "latitude",
+                        "lon_col": "longitude",
+                        "mode": "inside",
+                        "polygon": "zone_a",
+                        "threshold": 10,
+                    },
+                    "threshold",
+            ),
+            (
+                    {
+                        "rule_type": "column_column",
+                        "left_col": "magnitude",
+                        "right_col": "reference_magnitude",
+                        "mode": "gt",
+                        "column": "magnitude",
+                    },
+                    "column",
+            ),
+        ],
+    )
+    def test_condition_rejects_keys_not_allowed_for_rule_type(
+            self,
+            valid_config_data,
+            condition,
+            expected_key,
+    ):
+        """Test that a condition with keys not allowed for its rule type raises a ValueError."""
+        valid_config_data["checks"][0]["conditions"] = [condition]
+
+        with pytest.raises(
+                ValueError,
+                match=rf"unsupported key\(s\).*{expected_key}",
+        ):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("mode", ["is_null", "is_not_null"])
+    def test_category_null_modes_reject_values(self, valid_config_data, mode):
+        """Test that a category rule with null modes rejects values."""
+        valid_config_data["checks"][0]["conditions"] = [{
+            "rule_type": "category",
+            "column": "comment",
+            "mode": mode,
+            "values": ["DESTACADO"],
+        }]
+
+        with pytest.raises(ValueError, match="values"):
+            make_validator(valid_config_data).validate()
+
+    def test_group_rejects_root_only_event_type(self, valid_config_data):
+        valid_config_data["checks"][0] = {
+            "name": "invalid_group_key",
+            "groups": [{
+                "event_type": "earthquake",
+                "conditions": [{
+                    "rule_type": "numeric",
+                    "column": "magnitude",
+                    "mode": "gt",
+                    "threshold": 3.0,
+                }],
+            }],
+        }
+
+        with pytest.raises(ValueError, match="unsupported key.*event_type"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("negate", ["true", 1, None])
+    def test_node_rejects_non_boolean_negate(self, valid_config_data, negate):
+        """Test that a config with a [[checks]] entry that has a non-boolean negate value raises a ValueError."""
+        valid_config_data["checks"][0]["negate"] = negate
+
+        with pytest.raises(ValueError, match="negate must be a boolean"):
             make_validator(valid_config_data).validate()
 
 
