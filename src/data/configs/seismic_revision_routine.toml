@@ -294,7 +294,7 @@ logic = "or"
         rule_type = "temporal"
         column = "time_value"
         mode = "ge"
-        value = "2026-03-17 00:00:00"
+        threshold = "2026-03-17 00:00:00"
 
         [[checks.groups.conditions]]
         rule_type = "numeric"
@@ -318,7 +318,7 @@ logic = "or"
         rule_type = "temporal"
         column = "time_value"
         mode = "lt"
-        value = "2026-03-17 00:00:00"
+        threshold = "2026-03-17 00:00:00"
 
         [[checks.groups.conditions]]
         rule_type = "numeric"
@@ -369,7 +369,7 @@ logic = "and"
     rule_type = "temporal"
     column = "time_value"
     mode = "ge"
-    value = "2026-03-17T00:00:00Z"
+    threshold = "2026-03-17T00:00:00Z"
 
     [[checks.groups]]
     logic = "or"
@@ -633,7 +633,7 @@ event_type = "not locatable"
         rule_type = "temporal"
         column = "time_value"
         mode = "lt"
-        value = "2026-03-17 00:00:00"
+        threshold = "2026-03-17 00:00:00"
 
     # Seiscomp6 criteria
     [[checks.groups]]
@@ -644,7 +644,7 @@ event_type = "not locatable"
         rule_type = "temporal"
         column = "time_value"
         mode = "ge"
-        value = "2026-03-17 00:00:00"
+        threshold = "2026-03-17 00:00:00"
 
         [[checks.groups.groups]]
         description = "Seiscomp6 criteria for potentially locatable events"
@@ -695,7 +695,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -712,7 +712,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "MLr_3"
+        values = ["MLr_3"]
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -724,13 +724,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = "DESTACADO"
+        values = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "Mw"
+        values = "Mw"
 
 # 20. Correspondence between zone4 and magnitude MLr_4
 [[checks]]
@@ -741,7 +741,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -758,7 +758,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "MLr_4"
+        values = "MLr_4"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -770,13 +770,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = "DESTACADO"
+        values = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "Mw"
+        values = "Mw"
 
 # 21. Correspondence between zone1 and magnitude MLr_1
 [[checks]]
@@ -787,7 +787,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -804,7 +804,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "MLr_1"
+        values = "MLr_1"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -816,13 +816,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = "DESTACADO"
+        values = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "Mw"
+        values = "Mw"
 
 # 22. Correspondence between zone2 and magnitude MLr_2 (avoiding VMM zone)
 [[checks]]
@@ -833,7 +833,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -861,7 +861,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "MLr_2"
+        values = "MLr_2"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -873,13 +873,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = "DESTACADO"
+        values = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "Mw"
+        values = "Mw"
 
 # 23. Correspondence between zone5 and magnitude MLr_5 (avoiding PtoGtn zone)
 [[checks]]
@@ -890,7 +890,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -918,7 +918,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "MLr_5"
+        values = "MLr_5"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -930,13 +930,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = "DESTACADO"
+        values = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "Mw"
+        values = "Mw"
 
 # 24. Correspondence between VMM zone and magnitude MLr_vmm
 [[checks]]
@@ -947,7 +947,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -964,7 +964,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = ["MLr_vmm"]
+        values = ["MLr_vmm"]
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -976,13 +976,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = "DESTACADO"
+        values = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "Mw"
+        values = "Mw"
 
 # 25. Correspondence between PtoGtn zone and magnitude MLr_PtoGtn
 [[checks]]
@@ -993,7 +993,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -1010,7 +1010,7 @@ logic = "and"
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "MLr_PtoGtn"
+        values = "MLr_PtoGtn"
 
     # Part 3: Not a DESTACADO event with magnitude Mw
     [[checks.groups]]
@@ -1022,13 +1022,13 @@ logic = "and"
         rule_type = "category"
         column = "comment"
         mode = "in"
-        value = "DESTACADO"
+        values = "DESTACADO"
 
         [[checks.groups.conditions]]
         rule_type = "category"
         column = "magnitude_type"
         mode = "in"
-        value = "Mw"
+        values = "Mw"
 
 # 26. Correspondence between CARMA zone and earth model CARMA (avoiding Cesar zone)
 [[checks]]
@@ -1039,7 +1039,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -1067,7 +1067,7 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = "CARMA"
+        values = "CARMA"
 
 # 27. Correspondence between Cesar zone and earth model Cesar
 [[checks]]
@@ -1078,7 +1078,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -1095,7 +1095,7 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = "modelCesar2"
+        values = "modelCesar2"
 
 # 28. Correspondence between PtoGtn zone and earth model PtoGtn
 [[checks]]
@@ -1106,7 +1106,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -1123,7 +1123,7 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = "Pto_Gaitan"
+        values = "Pto_Gaitan"
 
 # 29. Correspondence between VMM zone and earth model VMM (ask about NLL earth model for deep VMM events)
 [[checks]]
@@ -1134,7 +1134,7 @@ logic = "and"
     rule_type = "category"
     column = "event_type"
     mode = "not_in"
-    value = ["not existing", "not locatable"]
+    values = ["not existing", "not locatable"]
 
     [[checks.groups]]
     logic = "xor"
@@ -1151,7 +1151,7 @@ logic = "and"
         rule_type = "category"
         column = "earthModelID"
         mode = "in"
-        value = "VMM"
+        values = "VMM"
 
 # 30. Hypo71 events in seiscomp3 cannot have more than 101 phases used
 [[checks]]
@@ -1169,7 +1169,7 @@ event_type = ["earthquake", "outside of network interest"]
     rule_type = "temporal"
     column = "time_value"
     mode = "lt"
-    value = "2026-03-17 00:00:00"
+    threshold = "2026-03-17 00:00:00"
 
     [[checks.groups]]
     logic = "or"
