@@ -483,6 +483,12 @@ class ConfigValidator:
             context=context,
         )
 
+        if rule_type not in CONDITION_DISPATCHERS:
+            available = ", ".join(sorted(CONDITION_DISPATCHERS))
+            raise ValueError(
+                f"{context}: unsupported rule_type {rule_type!r}. Available rule types: {available}."
+            )
+
         allowed_by_rule_type = {
             "numeric": {
                 "rule_type", "column", "mode", "threshold", "lower", "upper",
@@ -506,12 +512,6 @@ class ConfigValidator:
             raise ValueError(
                 f"{context}: unsupported key(s) for {rule_type!r}: "
                 f"{', '.join(sorted(unknown_keys))}."
-            )
-
-        if rule_type not in CONDITION_DISPATCHERS:
-            available = ", ".join(sorted(CONDITION_DISPATCHERS))
-            raise ValueError(
-                f"{context}: unsupported rule_type {rule_type!r}. Available rule types: {available}."
             )
 
         self._require_nonempty_string(
@@ -631,6 +631,12 @@ class ConfigValidator:
                 condition.get("values"),
                 field="values",
                 context=context,
+            )
+            return
+
+        if mode in {"is_null", "is_not_null"} and "values" in condition:
+            raise ValueError(
+                f"{context}: values is not allowed for category mode {mode!r}."
             )
 
     # [output]
