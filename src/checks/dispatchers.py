@@ -56,12 +56,12 @@ def dispatch_non_numeric(
         polygons: dict | None = None
 ) -> np.ndarray:
     """
-    Dispatcher for non-numeric (categoric) ruletype.
+    Dispatcher for non-numeric (categoric) rule_type.
 
     Expects cond to contain:
     - 'column' (str)
     - 'mode'   (str): 'is_null', 'not_null', 'in', 'not_in'
-    - optional 'values' or 'value'
+    - optional 'values'
 
     Example TOML:
     checks.conditions
@@ -69,18 +69,11 @@ def dispatch_non_numeric(
       column = "event_type"
       mode = "not_in"
       values = ["earthquake", "outside of network interest"]
-
-    TOML flexibility:
-    - values = "DESTACADO"
-    - values = ["DESTACADO", "OTHER"]
-    - value  = "DESTACADO"  (single)
     """
-    values = cond.get('values')
+    values = cond.get("values")
+
     if isinstance(values, str):
         values = [values]
-    elif values is None and "value" in cond:
-        raw_value = cond["value"]
-        values = raw_value if isinstance(raw_value, list) else [raw_value]
 
     return non_numeric_mask(
         events=subset,
