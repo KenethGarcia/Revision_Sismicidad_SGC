@@ -328,103 +328,106 @@ class ConfigValidator:
         It does not validate DataFrame column existence or evaluate conditions.
         """
         checks = self._cm.get_checks()
+
         polygon_names = {
-            polygon.get("name")
+            polygon["name"]
             for polygon in self._cm.get_polygons()
             if isinstance(polygon.get("name"), str)
         }
 
         for index, check in enumerate(checks, start=1):
-            context = f"[[checks]] entry #{index}"
+            self._validate_check_node(
+                check,
+                context=f"[[checks]] entry #{index}",
+                polygon_names=polygon_names,
+                is_root=True,
+            )
 
+    def _validate_check_node(
+            self,
+            node: Any,
+            *,
+            context: str,
+            polygon_names: set[str],
+            is_root: bool,
+    ) -> None:
+        """Validate one check group or root node."""
+        if not isinstance(node, dict):
+            raise TypeError(f"{context} must be a TOML table.")
+
+        allowed_keys = (
+            {"name", "description", "event_type", "logic", "negate", "groups", "conditions"}
+            if is_root
+            else {"name", "description", "logic", "negate", "groups", "conditions"}
+        )
+        unknown_keys = set(node) - allowed_keys
+        if unknown_keys:
+            raise ValueError(
+                f"{context}: unsupported key(s): {', '.join(sorted(unknown_keys))}."
+            )
+
+        if is_root:
             self._require_nonempty_string(
-                check.get("name"),
+                node.get("name"),
                 field="name",
                 context=context,
             )
-
-            self._validate_optional_logic(
-                check,
-                context=context,
-            )
-
-            if "event_type" in check:
+            if "event_type" in node:
                 self._validate_string_or_string_list(
-                    check["event_type"],
+                    node["event_type"],
                     field="event_type",
                     context=context,
                 )
 
-            groups = check.get("groups", [])
-            conditions = check.get("conditions", [])
+        if "description" in node:
+            self._require_nonempty_string(
+                node["description"],
+                field="description",
+                context=context,
+            )
 
-            if not isinstance(groups, list):
-                raise TypeError(
-                    f"{context}: groups must be an array of tables."
-                )
+        if "negate" in node and not isinstance(node["negate"], bool):
+            raise ValueError(f"{context}: negate must be a boolean.")
 
-            if not isinstance(conditions, list):
-                raise TypeError(
-                    f"{context}: conditions must be an array of tables."
-                )
+        groups = node.get("groups", [])
+        conditions = node.get("conditions", [])
 
-            if not groups and not conditions:
-                raise ValueError(
-                    f"{context}: define at least one condition or group."
-                )
+        if not isinstance(groups, list):
+            raise TypeError(f"{context}: groups must be an array of tables.")
 
-            if len(groups) + len(conditions) > 1 and "logic" not in check:
-                raise ValueError(
-                    f"{context}: logic is required when it has more than "
-                    "one direct child."
-                )
+        if not isinstance(conditions, list):
+            raise TypeError(f"{context}: conditions must be an array of tables.")
 
-            for group_index, group in enumerate(groups, start=1):
-                group_context = f"{context}.groups entry #{group_index}"
+        child_count = len(groups) + len(conditions)
 
-                if not isinstance(group, dict):
-                    raise TypeError(
-                        f"{group_context} must be a TOML table."
-                    )
+        if child_count == 0:
+            raise ValueError(
+                f"{context}: define at least one direct condition or group."
+            )
 
-                self._validate_logic_value(
-                    group.get("logic"),
-                    context=group_context,
-                    required=True,
-                )
+        if child_count > 1:
+            self._validate_logic_value(
+                node.get("logic"),
+                context=context,
+                required=True,
+            )
+        else:
+            self._validate_optional_logic(node, context=context)
 
-                group_conditions = group.get("conditions", [])
+        for condition_index, condition in enumerate(conditions, start=1):
+            self._validate_condition(
+                condition,
+                context=f"{context}.conditions entry #{condition_index}",
+                polygon_names=polygon_names,
+            )
 
-                if not isinstance(group_conditions, list):
-                    raise TypeError(
-                        f"{group_context}: conditions must be an array "
-                        "of tables."
-                    )
-
-                if not group_conditions:
-                    raise ValueError(
-                        f"{group_context}: define at least one condition."
-                    )
-
-                for condition_index, condition in enumerate(
-                        group_conditions,
-                        start=1,
-                ):
-                    self._validate_condition(
-                        condition,
-                        context=(
-                            f"{group_context}.conditions "
-                            f"entry #{condition_index}"
-                        ),
-                        polygon_names=polygon_names,
-                    )
-
-            for condition_index, condition in enumerate(conditions, start=1):
-                self._validate_condition(
-                    condition,
-                    context=f"{context}.conditions entry #{condition_index}",
-                    polygon_names=polygon_names,
-                )
+        for group_index, group in enumerate(groups, start=1):
+            self._validate_check_node(
+                group,
+                context=f"{context}.groups entry #{group_index}",
+                polygon_names=polygon_names,
+                is_root=False,
+            )
 
     def _validate_optional_logic(
             self,
@@ -479,6 +482,31 @@ class ConfigValidator:
             field="rule_type",
             context=context,
         )
+
+        allowed_by_rule_type = {
+            "numeric": {
+                "rule_type", "column", "mode", "threshold", "lower", "upper",
+            },
+            "temporal": {
+                "rule_type", "column", "mode", "threshold",
+            },
+            "category": {
+                "rule_type", "column", "mode", "values",
+            },
+            "polygon": {
+                "rule_type", "lat_col", "lon_col", "mode", "polygon",
+            },
+            "column_column": {
+                "rule_type", "left_col", "right_col", "mode", "factor", "offset",
+            },
+        }
+        unknown_keys = set(condition) - allowed_by_rule_type[rule_type]
+
+        if unknown_keys:
+            raise ValueError(
+                f"{context}: unsupported key(s) for {rule_type!r}: "
+                f"{', '.join(sorted(unknown_keys))}."
+            )
 
         if rule_type not in CONDITION_DISPATCHERS:
             available = ", ".join(sorted(CONDITION_DISPATCHERS))
@@ -556,8 +584,8 @@ class ConfigValidator:
 
         elif rule_type == "temporal":
             self._require_nonempty_string(
-                condition.get("value"),
-                field="value",
+                condition.get("threshold"),
+                field="threshold",
                 context=context,
             )
 
@@ -600,7 +628,7 @@ class ConfigValidator:
 
         if mode in {"in", "not_in"}:
             self._validate_string_or_string_list(
-                condition.get("values", condition.get("value")),
+                condition.get("values"),
                 field="values",
                 context=context,
             )
