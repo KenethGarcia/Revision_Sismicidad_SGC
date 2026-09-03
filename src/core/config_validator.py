@@ -6,9 +6,19 @@
 # --------------------------------------------------------------------------------------------------------
 from __future__ import annotations
 from typing import Any, Mapping
+from pathlib import Path
 
 from src.checks.dispatchers import CONDITION_DISPATCHERS
 from src.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
+
+
+_OUTPUT_SUFFIXES = {
+    "csv": {".csv"},
+    "parquet": {".parquet", ".pq"},
+    "json": {".json"},
+    "excel": {".xlsx", ".xls"},
+    "feather": {".feather"},
+}
 
 
 class ConfigValidator:
@@ -16,6 +26,7 @@ class ConfigValidator:
 
     _VALID_LOGIC = {"and", "or", "xor"}
     _VALID_DUPLICATE_METHODS = {"adjacent", "sswa"}
+    _VALID_OUTPUT_FORMATS = {"csv", "parquet", "json", "excel", "feather"}
 
     def __init__(self, config_manager: ConfigManager) -> None:
         self._cm = config_manager
@@ -653,11 +664,63 @@ class ConfigValidator:
                 "Expected [output] to be a TOML table."
             )
 
+        allowed_keys = {"columns", "save", "file_format", "file_path"}
+
+        unknown_keys = set(output) - allowed_keys
+        if unknown_keys:
+            raise ValueError(
+                "[output]: unsupported key(s): "
+                + ", ".join(sorted(unknown_keys))
+            )
+
         if "columns" in output:
             self._require_list_of_nonempty_strings(
                 output["columns"],
                 field="columns",
                 context="[output]",
+            )
+
+        if "save" in output and not isinstance(output["save"], bool):
+            raise ValueError("[output]: save must be a boolean.")
+
+        file_format = output.get("file_format", "csv")
+        file_format = self._require_nonempty_string(
+            file_format,
+            field="file_format",
+            context="[output]",
+        ).lower()
+
+        if file_format not in self._VALID_OUTPUT_FORMATS:
+            allowed = ", ".join(sorted(self._VALID_OUTPUT_FORMATS))
+            raise ValueError(
+                f"[output]: file_format must be one of {allowed}; "
+                f"got {file_format!r}."
+            )
+
+        if "file_path" not in output:
+            return
+
+        file_path = self._require_nonempty_string(
+            output["file_path"],
+            field="file_path",
+            context="[output]",
+        )
+
+        suffix = Path(file_path).suffix.lower()
+
+        if not suffix:
+            raise ValueError(
+                f"[output]: file_path {file_path!r} must include a "
+                f"file extension for format {file_format!r}."
+            )
+
+        allowed_suffixes = _OUTPUT_SUFFIXES[file_format]
+
+        if suffix not in allowed_suffixes:
+            expected = " or ".join(sorted(allowed_suffixes))
+            raise ValueError(
+                f"[output]: file_path extension {suffix!r} does not match "
+                f"file_format {file_format!r}; expected {expected}."
             )
 
     # Helpers
