@@ -30,7 +30,7 @@ from src.core.config_validator import ConfigValidator
 class RunResult:
     total_events: pd.DataFrame
     duplicates: pd.DataFrame
-    flagged: pd.DataFrame
+    checks: pd.DataFrame
     output: pd.DataFrame
 
 
@@ -129,7 +129,7 @@ class Runner:
             A dataclass containing:
             - total_events: pd.DataFrame of all fetched events (before duplicates/checks)
             - duplicates: pd.DataFrame of detected duplicates (if perform_duplicates is True)
-            - flagged: pd.DataFrame of events after checks (if perform_checks is True)
+            - checks: pd.DataFrame of events after checks (if perform_checks is True)
             - output: pd.DataFrame of final output after [output] column selection
         """
         # 0. Load settings from the TOML configuration file
@@ -178,12 +178,18 @@ class Runner:
             flagged_df = events_df.iloc[0:0].copy()
 
         # 5. Apply [output] column selection and return final table
-        output_df = self._apply_output_selection(flagged_df)
+        output_df = self._apply_output_selection(events=events_df, checks=flagged_df, dups=dup_df)
+
+        # 6. Save results to disk if [output] section is defined
+        output_cfg = self._cm.config_data.get("output", {})
+
+        if output_cfg.get("save", False):
+            self._save_output(output_df)
 
         return RunResult(
             total_events=events_df,
             duplicates=dup_df,
-            flagged=flagged_df,
+            checks=flagged_df,
             output=output_df,
         )
 
@@ -282,7 +288,7 @@ class Runner:
             warnings.warn(f"Error occurred while sorting by time column: {e}. Returning unsorted DataFrame.")
             return combined
 
-    def _apply_output_selection(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _apply_output_selection(self, events: pd.DataFrame, checks: pd.DataFrame, dups:pd.DataFrame) -> pd.DataFrame:
         """
         Apply [output] column selection from the TOML configuration.
 
@@ -291,8 +297,9 @@ class Runner:
         cfg_data = self._cm.config_data
         output_cfg = cfg_data.get("output")
 
+        joined_table = self._build_output_table(events=events, duplicates=dups, checks=checks)
         if output_cfg is None:
-            return df
+            return joined_table
 
         if not isinstance(output_cfg, dict):
             raise TypeError(
@@ -301,13 +308,85 @@ class Runner:
 
         columns = output_cfg.get("columns")
         if not columns:
-            return df
+            return joined_table
 
-        missing = [c for c in columns if c not in df.columns]
+        missing = [c for c in columns if c not in joined_table.columns]
         if missing:
             raise ValueError(
                 f"Configured [output].columns {missing!r} are missing from the events DataFrame. "
                 f"Check your SQL SELECT list and [output] configuration."
             )
+        selected_columns = list(columns)
 
-        return df[columns]
+        if "Observations" not in selected_columns:
+            selected_columns.append("Observations")
+
+        return joined_table[selected_columns]
+
+
+    def _build_output_table(
+        self,
+        events: pd.DataFrame,
+        duplicates: pd.DataFrame,
+        checks: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """Return one review row per event with merged observations."""
+        result_frames = [
+            frame[["Observations"]]
+            for frame in (duplicates, checks)
+            if not frame.empty
+        ]
+
+        if not result_frames:
+            review_df = events.iloc[0:0].copy()
+            review_df["Observations"] = pd.Series(dtype="object")
+            return review_df
+
+        all_observations = pd.concat(result_frames, axis=0)
+
+        merged_observations = (
+            all_observations.groupby(level=0, sort=True)["Observations"]
+            .agg(lambda messages: "; ".join(dict.fromkeys(messages)))
+        )
+
+        review_df = events.loc[merged_observations.index].copy()
+        review_df["Observations"] = merged_observations
+
+        return review_df.reset_index(drop=True)
+
+    def _save_output(self, output: pd.DataFrame) -> Path:
+        """Save a completed review table using the [output] settings."""
+        output_cfg = self._cm.config_data.get("output", {})
+
+        file_format = output_cfg.get("file_format", "csv").lower()
+        default_name = f"output.{file_format}"
+
+        raw_path = output_cfg.get("file_path", default_name)
+        path = Path(raw_path)
+
+        if not path.is_absolute():
+            path = Path.cwd() / path
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        writers = {
+            "csv": lambda: output.to_csv(path, index=False),
+            "parquet": lambda: output.to_parquet(path, index=False),
+            "json": lambda: output.to_json(
+                path,
+                orient="records",
+                date_format="iso",
+                indent=2,
+            ),
+            "excel": lambda: output.to_excel(path, index=False),
+            "feather": lambda: output.to_feather(path),
+        }
+
+        try:
+            writers[file_format]()
+        except KeyError as exc:
+            raise ValueError(
+                f"Unsupported output format: {file_format!r}."
+            ) from exc
+
+        return path
