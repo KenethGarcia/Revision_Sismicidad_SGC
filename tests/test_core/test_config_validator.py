@@ -676,3 +676,146 @@ class TestConfigValidator:
 
         with pytest.raises(ValueError, match="columns"):
             make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize(
+        ("file_format", "file_path"),
+        [
+            ("csv", "output/review.csv"),
+            ("parquet", "output/review.parquet"),
+            ("parquet", "output/review.pq"),
+            ("json", "output/review.json"),
+            ("excel", "output/review.xlsx"),
+            ("excel", "output/review.xls"),
+            ("feather", "output/review.feather"),
+        ],
+    )
+    def test_valid_output_file_format_and_path_pass(
+            self,
+            valid_config_data: dict[str, Any],
+            file_format: str,
+            file_path: str,
+    ):
+        """Test that a config with valid output file_format and file_path passes validation."""
+        valid_config_data["output"].update(
+            {
+                "save": True,
+                "file_format": file_format,
+                "file_path": file_path,
+            }
+        )
+
+        make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("save", ["true", 1, 0, None])
+    def test_non_boolean_output_save_raises(
+            self,
+            valid_config_data: dict[str, Any],
+            save: Any,
+    ):
+        """Test that a config with a non-boolean output save value raises a ValueError."""
+        valid_config_data["output"]["save"] = save
+
+        with pytest.raises(ValueError, match="save must be a boolean"):
+            make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("file_format", ["xml", "", 42, None])
+    def test_invalid_output_file_format_raises(
+            self,
+            valid_config_data: dict[str, Any],
+            file_format: Any,
+    ):
+        """Test that a config with an invalid output file_format raises a ValueError."""
+        valid_config_data["output"]["file_format"] = file_format
+
+        with pytest.raises(ValueError, match="file_format"):
+            make_validator(valid_config_data).validate()
+
+    def test_output_file_format_is_case_and_whitespace_insensitive(
+            self,
+            valid_config_data: dict[str, Any],
+    ):
+        """Test that a config with an output file_format that has mixed case and whitespace passes validation."""
+        valid_config_data["output"].update(
+            {
+                "file_format": " CSV ",
+                "file_path": "output/review.CSV",
+            }
+        )
+
+        make_validator(valid_config_data).validate()
+
+    @pytest.mark.parametrize("file_path", ["", "   ", 42, None])
+    def test_invalid_output_file_path_raises(
+            self,
+            valid_config_data: dict[str, Any],
+            file_path: Any,
+    ):
+        """Test that a config with an invalid output file_path raises a ValueError."""
+        valid_config_data["output"]["file_path"] = file_path
+
+        with pytest.raises(ValueError, match="file_path must be a nonempty string"):
+            make_validator(valid_config_data).validate()
+
+    def test_output_file_path_without_extension_raises(
+            self,
+            valid_config_data: dict[str, Any],
+    ):
+        """Test that a config with an output file_path without an extension raises a ValueError."""
+        valid_config_data["output"].update(
+            {
+                "file_format": "csv",
+                "file_path": "output/review",
+            }
+        )
+
+        with pytest.raises(ValueError, match="must include a file extension"):
+            make_validator(valid_config_data).validate()
+
+
+    @pytest.mark.parametrize(
+        ("file_format", "file_path"),
+        [
+            ("csv", "output/review.parquet"),
+            ("parquet", "output/review.csv"),
+            ("json", "output/review.xlsx"),
+            ("excel", "output/review.json"),
+            ("feather", "output/review.csv"),
+        ],
+    )
+    def test_mismatched_output_format_and_file_extension_raise(
+            self,
+            valid_config_data: dict[str, Any],
+            file_format: str,
+            file_path: str,
+    ):
+        """Test that a config with mismatched output file_format and file_path extension raises a ValueError."""
+        valid_config_data["output"].update(
+            {
+                "file_format": file_format,
+                "file_path": file_path,
+            }
+        )
+
+        with pytest.raises(ValueError, match="does not match file_format"):
+            make_validator(valid_config_data).validate()
+
+    def test_output_rejects_unknown_key(
+            self,
+            valid_config_data: dict[str, Any],
+    ):
+        """Test that a config with an unknown key in the output section raises a ValueError."""
+        valid_config_data["output"]["compression"] = "gzip"
+
+        with pytest.raises(ValueError, match="unsupported key"):
+            make_validator(valid_config_data).validate()
+
+    def test_output_defaults_are_valid(
+            self,
+            valid_config_data: dict[str, Any],
+    ):
+        """Test that a config with default output values is valid."""
+        valid_config_data["output"].pop("save", None)
+        valid_config_data["output"].pop("file_format", None)
+        valid_config_data["output"].pop("file_path", None)
+
+        make_validator(valid_config_data).validate()
