@@ -121,8 +121,8 @@ def run_duplicates(
         name = dup.get("name", "<unnamed>")
         subset = dup.get("subset")  # e.g. ["Origin.time_value", "lat", "lon", "publicID"]
         method = dup.get("method", "adjacent")
-        timewindow = dup.get("timewindow", 4)
-        distthreshold = dup.get("distthreshold", 100.0)
+        timewindow = dup.get("time_window", 4)
+        distthreshold = dup.get("dist_threshold", 100.0)
 
         dup_rows = check_duplicates(
             events=events,
@@ -144,7 +144,7 @@ def run_duplicates(
     flagged = events.loc[flagged_positions].copy()
     flagged["Observations"] = ["; ".join(obsmap[i]) for i in flagged_positions]
 
-    return flagged.reset_index(drop=True)
+    return flagged
 
 
 def run_single_check(
@@ -243,4 +243,4 @@ def run_checks(
     flagged = events.loc[flagged_positions].copy()
     flagged["Observations"] = ["; ".join(observations[i]) for i in flagged_positions]
 
-    return flagged.reset_index(drop=True)
+    return flagged
