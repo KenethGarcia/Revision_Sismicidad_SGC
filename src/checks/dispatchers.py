@@ -94,20 +94,20 @@ def dispatch_temporal(
     Expects cond to contain:
     - 'column' (str)
     - 'mode'   (str): gt, ge, lt, le, eq, ne
-    - 'value'  (str): any pandas.Timestamp-friendly string
+    - 'threshold'  (str): any pandas.Timestamp-friendly string
 
     Example TOML:
     checks.conditions
       rule_type = "temporal"
       column = "time_value"
       mode = "ge"
-      value = "2026-03-17T00:00:00Z"
+      threshold = "2026-03-17T00:00:00Z"
     """
     return temporal_mask(
         events=subset,
         column=cond['column'],
         mode=cond['mode'],
-        threshold=cond['value']
+        threshold=cond['threshold']
     )
 
 
