@@ -244,7 +244,7 @@ class DatabaseManager:
                 )
             except pymysql.MySQLError as ce:
                 raise ConnectionError(
-                    f"Failed to connect to database profile {db_name!r} with the provided credentials: {ce}"
+                    f"Failed to connect to database profile {db_name!r} with the provided credentials."
                 )
             try:
                 # Simple progress bar: one step representing the whole query
