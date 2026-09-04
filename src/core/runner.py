@@ -193,6 +193,68 @@ class Runner:
             output=output_df,
         )
 
+    def update_from_cache(
+            self,
+            events_df: pd.DataFrame,
+            reload_config: bool = True
+    ) -> RunResult:
+        """
+        Re-run duplicates, polygons, and checks on an existing DataFrame without re-querying the database.
+        Useful for applying TOML configuration updates quickly.
+
+        Parameters
+        ----------
+        events_df : pd.DataFrame
+            The cached events DataFrame (usually from a previous RunResult.total_events).
+        reload_config : bool, default=True
+            If True, reloads the TOML file to pick up any user changes to checks, duplicates, or output.
+        """
+        # 0. Reload configuration to capture TOML updates
+        if reload_config:
+            self._cm = ConfigManager(self._cm.config_path)
+            ConfigValidator(self._cm).validate()
+            # We don't necessarily need to reload DatabaseManager since we are skipping fetching
+
+        event_type_col = self._cm.get_event_type_column()
+
+        # 1. Reload polygons (in case spatial paths or parameters changed)
+        polygons_cfg = self._cm.get_polygons()
+        polygon_cache = load_polygons(polygons_cfg, base_dir=self._cm.base_dir)
+
+        # 2. Re-evaluate duplicates
+        duplicates_cfg = self._cm.config_data.get("duplicates", [])
+        if isinstance(duplicates_cfg, list) and duplicates_cfg:
+            dup_df = run_duplicates(events_df, duplicates_cfg)
+        else:
+            dup_df = events_df.iloc[0:0].copy()
+
+        # 3. Re-evaluate checks
+        checks_cfg = self._cm.get_checks()
+        if checks_cfg:
+            flagged_df = run_checks(
+                events=events_df,
+                checks=checks_cfg,
+                polygon_cache=polygon_cache,
+                event_type_col=event_type_col
+            )
+        else:
+            flagged_df = events_df.iloc[0:0].copy()
+
+        # 4. Apply output selection based on new configurations
+        output_df = self._apply_output_selection(events=events_df, checks=flagged_df, dups=dup_df)
+
+        # 5. Save output if configured in the updated TOML
+        output_cfg = self._cm.config_data.get("output", {})
+        if output_cfg.get("save", False):
+            self._save_output(output_df)
+
+        # Return a fresh RunResult
+        return RunResult(
+            total_events=events_df,
+            duplicates=dup_df,
+            checks=flagged_df,
+            output=output_df,
+        )
 
     # Internal helpers
     def _fetch_single_query(
