@@ -1,0 +1,85 @@
+[settings]
+event_type_column = "event_type"
+time_column = "time_value"
+author_column = "creationInfo_author"
+
+[[database]]
+name       = "sc6"
+env_file   = ".env"
+env_prefix = "SERVER_SC6"
+
+[[queries]]
+name       = "sc6"
+sql_file   = "./queries/revision.sql"
+description= "Query to retrieve events from SeisComP6 database"
+database   = "sc6"
+
+[[polygons]]
+name        = "local_area"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/arealocal.txt"
+description = "Local area region from Colombia"
+
+[[polygons]]
+name        = "vmm"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/VMM.txt"
+description = "VMM region - MLr_vmm"
+
+[[polygons]]
+name        = "nll"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/NLL.txt"
+description = "NonLinLoc region - NLL"
+
+#[[duplicates]]
+#name           = "General duplicate search"
+#description    = "Detect near-identical events by time and distance proximity"
+#method         = "sswa"                     # "adjacent" or "sswa"
+#event_type     = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
+#subset         = ["time_value", "latitude_value", "longitude_value", "publicID"]
+#time_window    = 4
+#dist_threshold = 100.0
+
+# 24. Correspondence between VMM zone and magnitude MLr_vmm
+[[checks]]
+name = "Incorrect magnitude type for VMM zone"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["not existing", "not locatable"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between VMM zone and magnitude MLr_vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        values = ["MLr_vmm"]
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        values = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        values = "Mw"
