@@ -965,6 +965,143 @@ class TestRunnerRun:
         checks_mock.assert_not_called()
         assert result.checks.empty
 
+    class TestRunnerUpdateFromCache:
+        """Tests for updating and re-running the engine from cached events."""
+
+        def test_update_from_cache_reloads_config_and_runs_engine(
+                self,
+                runner: Runner,
+                monkeypatch: pytest.MonkeyPatch,
+                events_df: pd.DataFrame,
+        ):
+            """Test that update_from_cache reloads configuration by default, skips database queries,
+            and fully re-runs duplicates, checks, and output selection."""
+            # 1. Mock the ConfigManager and Validator so we can verify they are called
+            cm_mock = Mock(return_value=runner._cm)
+            validator_mock = Mock()
+            validator_cls_mock = Mock(return_value=validator_mock)
+
+            monkeypatch.setattr(runner_module, "ConfigManager", cm_mock)
+            monkeypatch.setattr(runner_module, "ConfigValidator", validator_cls_mock)
+
+            # 2. Setup mock configuration returns
+            duplicates_cfg = [{"name": "nearby_events"}]
+            checks_cfg = [{"name": "high_magnitude"}]
+
+            runner._cm.get_event_type_column = Mock(return_value="event_type")
+            runner._cm.get_polygons = Mock(return_value=[{"name": "zone_a"}])
+            runner._cm.get_checks = Mock(return_value=checks_cfg)
+            runner._cm.config_data["duplicates"] = duplicates_cfg
+            runner._cm.config_data["output"] = {"save": True}
+
+            # 3. Setup mock output dataframes
+            duplicate_result = pd.DataFrame({"Observations": ["Possible duplicate"]}, index=[0])
+            check_result = pd.DataFrame({"Observations": ["High magnitude"]}, index=[2])
+            output_result = pd.DataFrame({"publicID": ["event-1", "event-3"]})
+
+            load_polygons_mock = Mock(return_value={"zone_a": Mock()})
+            duplicates_mock = Mock(return_value=duplicate_result)
+            checks_mock = Mock(return_value=check_result)
+
+            monkeypatch.setattr(runner_module, "load_polygons", load_polygons_mock)
+            monkeypatch.setattr(runner_module, "run_duplicates", duplicates_mock)
+            monkeypatch.setattr(runner_module, "run_checks", checks_mock)
+
+            runner._apply_output_selection = Mock(return_value=output_result)
+            runner._save_output = Mock()
+
+            # Execute
+            result = runner.update_from_cache(events_df=events_df, reload_config=True)
+
+            # Assert Config was reloaded
+            cm_mock.assert_called_once_with(runner._cm.config_path)
+            validator_cls_mock.assert_called_once_with(runner._cm)
+            validator_mock.validate.assert_called_once()
+
+            # Assert logic was executed with the cached events_df
+            duplicates_mock.assert_called_once_with(events_df, duplicates_cfg)
+            checks_mock.assert_called_once_with(
+                events=events_df,
+                checks=checks_cfg,
+                polygon_cache={"zone_a": load_polygons_mock.return_value["zone_a"]},
+                event_type_col="event_type",
+            )
+
+            runner._apply_output_selection.assert_called_once_with(
+                events=events_df,
+                checks=check_result,
+                dups=duplicate_result,
+            )
+            runner._save_output.assert_called_once_with(output_result)
+
+            # Assert correct RunResult structure
+            assert isinstance(result, RunResult)
+            pd.testing.assert_frame_equal(result.total_events, events_df)
+            pd.testing.assert_frame_equal(result.duplicates, duplicate_result)
+            pd.testing.assert_frame_equal(result.checks, check_result)
+            pd.testing.assert_frame_equal(result.output, output_result)
+
+        def test_update_from_cache_skips_reload_when_false(
+                self,
+                runner: Runner,
+                monkeypatch: pytest.MonkeyPatch,
+                events_df: pd.DataFrame,
+        ):
+            """Test that update_from_cache does not reload the TOML config if reload_config is False."""
+            cm_mock = Mock()
+            monkeypatch.setattr(runner_module, "ConfigManager", cm_mock)
+
+            # Setup minimal mocks to let it run safely
+            runner._cm.get_event_type_column = Mock(return_value="event_type")
+            runner._cm.get_polygons = Mock(return_value=[])
+            runner._cm.get_checks = Mock(return_value=[])
+            runner._cm.config_data["duplicates"] = []
+            runner._cm.config_data["output"] = {"save": False}
+
+            monkeypatch.setattr(runner_module, "load_polygons", Mock(return_value={}))
+            runner._apply_output_selection = Mock(return_value=events_df)
+
+            # Execute
+            runner.update_from_cache(events_df=events_df, reload_config=False)
+
+            # Assert ConfigManager was NOT re-instantiated
+            cm_mock.assert_not_called()
+
+        def test_update_from_cache_handles_empty_configs_safely(
+                self,
+                runner: Runner,
+                monkeypatch: pytest.MonkeyPatch,
+                events_df: pd.DataFrame,
+        ):
+            """Test that update_from_cache returns empty check and duplicate frames if none are configured."""
+            runner._cm.get_event_type_column = Mock(return_value="event_type")
+            runner._cm.get_polygons = Mock(return_value=[])
+
+            # Empty checks and duplicates
+            runner._cm.get_checks = Mock(return_value=[])
+            runner._cm.config_data["duplicates"] = []
+            runner._cm.config_data["output"] = {"save": False}
+
+            monkeypatch.setattr(runner_module, "load_polygons", Mock(return_value={}))
+
+            # Mock actual run functions to ensure they aren't called
+            duplicates_mock = Mock()
+            checks_mock = Mock()
+            monkeypatch.setattr(runner_module, "run_duplicates", duplicates_mock)
+            monkeypatch.setattr(runner_module, "run_checks", checks_mock)
+
+            runner._apply_output_selection = Mock(return_value=events_df)
+
+            # Execute
+            result = runner.update_from_cache(events_df=events_df, reload_config=False)
+
+            # Assert runners were skipped
+            duplicates_mock.assert_not_called()
+            checks_mock.assert_not_called()
+
+            # Assert results hold empty dataframes (but structurally sound)
+            assert result.duplicates.empty
+            assert result.checks.empty
 
 if __name__ == "__main__":
     pytest.main()
