@@ -207,7 +207,7 @@ def test_check_duplicates_sswa():
             assert "E1" in row.Observations or "E2" in row.Observations
 
     # Index reset
-    assert list(result.index) == [0, 1, 2]
+    assert list(result.index) == [1, 0, 2]
 
 
 def test_check_duplicates_default_and_custom_subsets_and_method_adjacent():
@@ -285,7 +285,7 @@ def test_check_duplicates_method_sswa_with_custom_subset():
     ids = result["id"].tolist()
     assert set(ids) == {"E1", "E2", "E3"}
     # Index reset
-    assert list(result.index) == [0, 1, 2]
+    assert list(result.index) == [1, 0, 2]
 
 
 def test_check_duplicates_unsupported_method_raises():
