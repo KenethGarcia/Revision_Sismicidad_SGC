@@ -156,7 +156,11 @@ class Runner:
         if perform_duplicates:  # Check this for multiple [[duplicates]] settings
             duplicates_cfg = self._cm.config_data.get("duplicates", [])
             if isinstance(duplicates_cfg, list) and duplicates_cfg:
-                dup_df = run_duplicates(events_df, duplicates_cfg)
+                dup_df = run_duplicates(
+                    events=events_df,
+                    duplicates_cfg=duplicates_cfg,
+                    event_type_col=event_type_col
+                )
             else:
                 dup_df = events_df.iloc[0:0].copy()
         else:
@@ -224,7 +228,11 @@ class Runner:
         # 2. Re-evaluate duplicates
         duplicates_cfg = self._cm.config_data.get("duplicates", [])
         if isinstance(duplicates_cfg, list) and duplicates_cfg:
-            dup_df = run_duplicates(events_df, duplicates_cfg)
+            dup_df = run_duplicates(
+                events=events_df,
+                duplicates_cfg=duplicates_cfg,
+                event_type_col=event_type_col
+            )
         else:
             dup_df = events_df.iloc[0:0].copy()
 
