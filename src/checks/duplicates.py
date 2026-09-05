@@ -75,7 +75,7 @@ def check_duplicates_adjacent(
         empty['Observations'] = pd.Series(dtype='object')
         return empty.iloc[0:0]
 
-    sorted_events = events.sort_values(columns[0]).reset_index(drop=True)
+    sorted_events = events.sort_values(columns[0])
 
     times = sorted_events[columns[0]].to_numpy()
     lats  = sorted_events[columns[1]].to_numpy(dtype=np.float64)
@@ -105,7 +105,7 @@ def check_duplicates_adjacent(
     flagged = sorted_events.iloc[flagged_positions].copy()
     flagged['Observations'] = ['; '.join(obs_map[p]) for p in flagged_positions]
 
-    return flagged.reset_index(drop=True)
+    return flagged
 
 
 def check_duplicates_sswa(
