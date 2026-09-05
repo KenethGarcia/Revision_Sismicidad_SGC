@@ -99,8 +99,9 @@ def evaluate_node(
 
 
 def run_duplicates(
-    events: pd.DataFrame,
-    duplicates_cfg: list[dict],
+        events: pd.DataFrame,
+        duplicates_cfg: list[dict],
+        event_type_col: str = "event_type",
 ) -> pd.DataFrame:
     """
     Execute every [[duplicates]] entry and return merged duplicate rows with Observations column.
@@ -111,6 +112,8 @@ def run_duplicates(
         Input seismic Dataframe.
     duplicates_cfg : list[dict]
         List of [[duplicates]] entries from the TOML configuration.
+    event_type_col : str
+        Column holding the event type string, used for root-level filtering. Defaults to "event_type".
     """
     if not duplicates_cfg:
         return events.iloc[0:0].copy()
@@ -124,8 +127,22 @@ def run_duplicates(
         timewindow = dup.get("time_window", 4)
         distthreshold = dup.get("dist_threshold", 100.0)
 
+        # 1. Filter by event_type if specified in the TOML
+        allowed_types = dup.get("event_type")
+        if allowed_types:
+            if isinstance(allowed_types, str):
+                allowed_types = [allowed_types]
+            current_events = events[events[event_type_col].isin(allowed_types)]
+        else:
+            current_events = events
+
+        # 2. Skip if the filtered dataframe is empty
+        if current_events.empty:
+            continue
+
+        # 3. Pass the filtered dataframe to the engine
         dup_rows = check_duplicates(
-            events=events,
+            events=current_events,
             subset=subset,
             method=method,
             time_window=timewindow,
