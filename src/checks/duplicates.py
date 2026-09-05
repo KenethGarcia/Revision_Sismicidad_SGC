@@ -77,10 +77,12 @@ def check_duplicates_adjacent(
 
     sorted_events = events.sort_values(columns[0])
 
-    times = sorted_events[columns[0]].to_numpy()
-    lats  = sorted_events[columns[1]].to_numpy(dtype=np.float64)
-    lons  = sorted_events[columns[2]].to_numpy(dtype=np.float64)
-    ids   = sorted_events[columns[3]].to_numpy()
+    time_col, lat_col, lon_col, id_col = columns
+    times = pd.to_datetime(sorted_events[time_col], utc=True).dt.tz_localize(None).to_numpy()
+    #times = sorted_events[columns[0]].to_numpy()
+    lats  = sorted_events[lat_col].to_numpy(dtype=np.float64)
+    lons  = sorted_events[lon_col].to_numpy(dtype=np.float64)
+    ids   = sorted_events[id_col].to_numpy()
 
     time_diff   = np.abs(times[1:] - times[:-1])
     within_time = time_diff <= np.timedelta64(time_window, 's')
@@ -148,9 +150,9 @@ def check_duplicates_sswa(
         empty['Observations'] = pd.Series(dtype='object')
         return empty.iloc[0:0]
 
-    sorted_events = selections.sort_values(time_col).reset_index(drop=True)
+    sorted_events = selections.sort_values(time_col)
 
-    times = sorted_events[time_col].to_numpy()
+    times = pd.to_datetime(sorted_events[time_col], utc=True).dt.tz_localize(None).to_numpy()
     lats = sorted_events[lat_col].to_numpy(dtype=np.float64)
     lons = sorted_events[lon_col].to_numpy(dtype=np.float64)
     ids = sorted_events[id_col].to_numpy()
@@ -190,7 +192,7 @@ def check_duplicates_sswa(
     flagged = sorted_events.iloc[flagged_positions].copy()
     flagged['Observations'] = ['; '.join(obs_map[p]) for p in flagged_positions]
 
-    return flagged.reset_index(drop=True)
+    return flagged
 
 
 def check_duplicates(
