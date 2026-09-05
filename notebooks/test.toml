@@ -8,11 +8,22 @@ name       = "sc6"
 env_file   = ".env"
 env_prefix = "SERVER_SC6"
 
+[[database]]
+name       = "sc3"
+env_file   = ".env"
+env_prefix = "SERVER_SC3"
+
 [[queries]]
 name       = "sc6"
 sql_file   = "./queries/revision.sql"
 description= "Query to retrieve events from SeisComP6 database"
 database   = "sc6"
+
+[[queries]]
+name       = "sc3"
+sql_file   = "./queries/revision_sc3.sql"
+description= "Query to retrieve events from SeisComP3 database"
+database   = "sc3"
 
 [[polygons]]
 name        = "local_area"
@@ -29,11 +40,22 @@ name        = "nll"
 path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/NLL.txt"
 description = "NonLinLoc region - NLL"
 
-#[[duplicates]]
-#name           = "General duplicate search"
-#description    = "Detect near-identical events by time and distance proximity"
-#method         = "sswa"                     # "adjacent" or "sswa"
-#event_type     = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
-#subset         = ["time_value", "latitude_value", "longitude_value", "publicID"]
-#time_window    = 4
-#dist_threshold = 100.0
+[[duplicates]]
+name           = "General duplicate search"
+description    = "Detect near-identical events by time and distance proximity"
+method         = "adjacent"                     # "adjacent" or "sswa"
+event_type     = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
+subset         = ["time_value", "latitude_value", "longitude_value", "publicID"]
+time_window    = 4
+dist_threshold = 100.0
+
+# 1. Events with high RMS (1.50)
+[[checks]]
+name = "High RMS"
+event_type = "earthquake"
+
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "quality_standardError"
+  mode = "gt"
+  threshold = 1.50
