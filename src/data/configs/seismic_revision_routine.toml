@@ -66,28 +66,28 @@ columns = ["time_value",
 
 # ── Database connection ───────────────────────────────────────
 [[database]]
-name       = "sc3"
+name       = "SeisComP3"
 env_file   = ".env"
 env_prefix = "SERVER_SC3"
 
 [[database]]
-name       = "sc6"
+name       = "SeisComP6"
 env_file   = ".env"
 env_prefix = "SERVER_SC6"
 
 
 # ── SQL query ────────────────────────────────────────────────
 [[queries]]
-name       = "sc3"
+name       = "SeisComP3"
 sql_file   = "./queries/revision.sql"
 description= "Query to retrieve events from SeisComP3 database"
-database   = "sc3"
+database   = "SeisComP3"
 
 [[queries]]
-name       = "sc6"
+name       = "SeisComP6"
 sql_file   = "./queries/revision.sql"
 description= "Query to retrieve events from SeisComP6 database"
-database   = "sc6"
+database   = "SeisComP6"
 
 
 # ── Polygon files ────────────────────────────────────────────
@@ -796,6 +796,13 @@ logic = "and"
     mode = "not_in"
     values = ["not existing", "not locatable"]
 
+    # Condition to avoid LAKYI events with default MLr magnitude type
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = "SGC"
+
     [[checks.groups]]
     logic = "xor"
     description = "Correspondence between zone1 and magnitude MLr_1"
@@ -841,6 +848,13 @@ logic = "and"
     column = "event_type"
     mode = "not_in"
     values = ["not existing", "not locatable"]
+
+    # Condition to avoid LAKYI events with default MLr magnitude type
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = "SGC"
 
     [[checks.groups]]
     logic = "xor"
@@ -1193,3 +1207,19 @@ event_type = ["earthquake", "outside of network interest"]
         column = "quality_standardError"
         mode = "eq"
         threshold = 0.0
+
+# 31. Events with comments diferent from "DESTACADO"
+[[checks]]
+name = "Event with comment different from DESTACADO"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "not_in"
+    values = "DESTACADO"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "is_not_null"
