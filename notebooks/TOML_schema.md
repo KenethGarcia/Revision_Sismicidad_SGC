@@ -339,7 +339,7 @@ Defined as search for a value in a list of categories. The available modes are:
 1.  `in`: the value is in the list of categories
 2.  `not_in`: the value is not in the list of categories
 3.  `is_null`: the value is null
-4.  `is_not_null`: the value is not null
+4.  `not_null`: the value is not null
 
 It is required to define:
 
@@ -382,41 +382,13 @@ It is required to define:
 
 ### Summary of condition types and their required parameters
 
-`rule_type`
-
-Allowed keys
-
-Required keys
-
-`numeric`
-
-`rule_type`, `column`, `mode`, `threshold`, `lower`, `upper`
-
-`rule_type`, `column`, `mode`; use `threshold` for `gt`, `ge`, `lt`, `le`, `eq`, `ne`, `abs_gt`, and `abs_ge`; use both `lower` and `upper` for `between` and `outside`
-
-`temporal`
-
-`rule_type`, `column`, `mode`, `threshold`
-
-All listed keys
-
-`category`
-
-`rule_type`, `column`, `mode`, `values`
-
-`rule_type`, `column`, `mode`; `values` is also required for `in` and `not_in`, but forbidden for `is_null` and `is_not_null`
-
-`polygon`
-
-`rule_type`, `lat_col`, `lon_col`, `mode`, `polygon`
-
-All listed keys
-
-`column_column`
-
-`rule_type`, `left_col`, `right_col`, `mode`, `factor`, `offset`
-
-`rule_type`, `left_col`, `right_col`, `mode`; `factor` and `offset` are optional
+| rule_type | Allowed keys | Required keys |
+|---|---|---|
+| `numeric` | `rule_type`, `column`, `mode`, `threshold`, `lower`, `upper` | `rule_type`, `column`, `mode`; use `threshold` for `gt`, `ge`, `lt`, `le`, `eq`, `ne`, `abs_gt`, and `abs_ge`; use both `lower` and `upper` for `between` and `outside` |
+| `temporal` | `rule_type`, `column`, `mode`, `threshold` | All listed keys |
+| `category` | `rule_type`, `column`, `mode`, `values` | `rule_type`, `column`, `mode`; `values` is required for `in` and `not_in`, but forbidden for `is_null` and `not_null` |
+| `polygon` | `rule_type`, `lat_col`, `lon_col`, `mode`, `polygon` | All listed keys |
+| `column_column` | `rule_type`, `left_col`, `right_col`, `mode`, `factor`, `offset` | `rule_type`, `left_col`, `right_col`, `mode`; `factor` and `offset` are optional |
 
 ## How to define your own conditions
 
