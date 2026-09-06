@@ -491,16 +491,23 @@ logic= "and"
     logic = "or"
     description = "Magnitude conditions based on longitude"
 
-        # Group 1: Events with longitude <= -82.5 and magnitude > 5.0
+        # Group 1: Events with longitude <= -82 latitude in [1.286, 5] and magnitude > 5.0
         [[checks.groups.groups]]
         logic = "and"
-        description = "Longitude <= -82.5 and Magnitude > 5.0"
+        description = "Longitude <= -82 Latitude in [1.286, 5] and Magnitude > 5.0"
 
             [[checks.groups.groups.conditions]]
             rule_type = "numeric"
             column = "longitude_value"
             mode = "le"
-            threshold = -82.5
+            threshold = -82
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "numeric"
+            column = "latitude_value"
+            mode = "between"
+            lower = 1.286
+            upper = 5.0
 
             [[checks.groups.groups.conditions]]
             rule_type = "numeric"
@@ -508,16 +515,16 @@ logic= "and"
             mode = "gt"
             threshold = 5.0
 
-        # Group 2: Events with longitude > -82.5 and magnitude > 4.0
+        # Group 2: Events with longitude > -82 and magnitude > 4.0
         [[checks.groups.groups]]
         logic = "and"
-        description = "Longitude > -82.5 and Magnitude > 4.0"
+        description = "Longitude > -82 and Magnitude > 4.0"
 
             [[checks.groups.groups.conditions]]
             rule_type = "numeric"
             column = "longitude_value"
             mode = "gt"
-            threshold = -82.5
+            threshold = -82
 
             [[checks.groups.groups.conditions]]
             rule_type = "numeric"
