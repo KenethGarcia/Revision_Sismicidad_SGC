@@ -3,27 +3,30 @@ event_type_column = "event_type"
 time_column = "time_value"
 author_column = "creationInfo_author"
 
+# ── Database connection ───────────────────────────────────────
 [[database]]
-name       = "sc6"
-env_file   = ".env"
-env_prefix = "SERVER_SC6"
-
-[[database]]
-name       = "sc3"
+name       = "SeisComP3"
 env_file   = ".env"
 env_prefix = "SERVER_SC3"
 
+[[database]]
+name       = "SeisComP6"
+env_file   = ".env"
+env_prefix = "SERVER_SC6"
+
+
+# ── SQL query ────────────────────────────────────────────────
 [[queries]]
-name       = "sc6"
+name       = "SeisComP3"
 sql_file   = "./queries/revision.sql"
-description= "Query to retrieve events from SeisComP6 database"
-database   = "sc6"
+description= "Query to retrieve events from SeisComP3 database"
+database   = "SeisComP3"
 
 [[queries]]
-name       = "sc3"
-sql_file   = "./queries/revision_sc3.sql"
-description= "Query to retrieve events from SeisComP3 database"
-database   = "sc3"
+name       = "SeisComP6"
+sql_file   = "./queries/revision.sql"
+description= "Query to retrieve events from SeisComP6 database"
+database   = "SeisComP6"
 
 [[polygons]]
 name        = "local_area"
@@ -40,22 +43,242 @@ name        = "nll"
 path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/NLL.txt"
 description = "NonLinLoc region - NLL"
 
+[[polygons]]
+name        = "zone1"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona1.txt"
+description = "Magnitude zone 1 — MLr_1 region"
+
+[[polygons]]
+name        = "zone2"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona2.txt"
+description = "Magnitude zone 2 — MLr_2 region"
+
+[[polygons]]
+name        = "zone3"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona3.txt"
+description = "Magnitude zone 3 — MLr_3 region"
+
+[[polygons]]
+name        = "zone4"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona4.txt"
+description = "Magnitude zone 4 — MLr_4 region"
+
+[[polygons]]
+name        = "zone5"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona5.txt"
+description = "Magnitude zone 5 — MLr_5 region"
+
+[[polygons]]
+name        = "pto_gtn"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/ptogaitan.txt"
+description = "Pto Gaitan region - MLr_PtoGtn"
+
+[[polygons]]
+name        = "carma"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/carma.txt"
+description = "CARMA region - Model CARMA"
+
+[[polygons]]
+name        = "cesar"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/cesar.txt"
+description = "Cesar region - Model Cesar"
+
+[[polygons]]
+name        = "ovsm"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obsman.txt"
+description = "Observatorio Sismológico de Manizales - OVSM region"
+
+[[polygons]]
+name        = "ovspop"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspop.txt"
+description = "Observatorio Sismológico de Popayán - OVSPOP region"
+
+[[polygons]]
+name        = "ovspopvnh"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspopvnh.txt"
+description = "Observatorio Sismológico de Popayán - VNH region"
+
+[[polygons]]
+name        = "ovsp1"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas1.txt"
+description = "Observatorio Sismológico de Pasto - OVS1 region"
+
+[[polygons]]
+name        = "ovsp2"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas2.txt"
+description = "Observatorio Sismológico de Pasto - OVS2 region"
+
+[[polygons]]
+name        = "ovsp3"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas3.txt"
+description = "Observatorio Sismológico de Pasto - OVS3 region"
+
+[[polygons]]
+name        = "ovsp4"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas4.txt"
+description = "Observatorio Sismológico de Pasto - OVS4 region"
+
+[[polygons]]
+name        = "ovsp5"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas5.txt"
+description = "Observatorio Sismológico de Pasto - OVS5 region"
+
+[[polygons]]
+name        = "ovsp6"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas6.txt"
+description = "Observatorio Sismológico de Pasto - OVS6 region"
+
+[[polygons]]
+name        = "ovsp7"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas7.txt"
+description = "Observatorio Sismológico de Pasto - OVS7 region"
+
+[[polygons]]
+name        = "ovsp8"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas8.txt"
+description = "Observatorio Sismológico de Pasto - OVS8 region"
+
+[[polygons]]
+name        = "ovsp9"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas9.txt"
+description = "Observatorio Sismológico de Pasto - OVS9 region"
+
 [[duplicates]]
-name           = "General duplicate search"
+name           = "SSWA"
 description    = "Detect near-identical events by time and distance proximity"
-method         = "adjacent"                     # "adjacent" or "sswa"
+method         = "sswa"                     # "adjacent" or "sswa"
 event_type     = ["earthquake", "volcanic eruption", "explosion", "outside of network interest"]
 subset         = ["time_value", "latitude_value", "longitude_value", "publicID"]
 time_window    = 4
 dist_threshold = 100.0
 
-# 1. Events with high RMS (1.50)
+# 21. Correspondence between zone1 and magnitude MLr_1
 [[checks]]
-name = "High RMS"
-event_type = "earthquake"
+name = "Incorrect magnitude type for zone1"
+logic = "and"
 
-  [[checks.conditions]]
-  rule_type = "numeric"
-  column = "quality_standardError"
-  mode = "gt"
-  threshold = 1.50
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["not existing", "not locatable"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = "SGC"
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone1 and magnitude MLr_1"
+
+        [[checks.groups.conditions]]
+        rule_type = "polygon"
+        lat_col = "latitude_value"
+        lon_col = "longitude_value"
+        mode = "inside"
+        polygon = "zone1"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        values = "MLr_1"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        values = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        values = "Mw"
+
+# 22. Correspondence between zone2 and magnitude MLr_2 (avoiding VMM zone)
+[[checks]]
+name = "Incorrect magnitude type for zone2"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "event_type"
+    mode = "not_in"
+    values = ["not existing", "not locatable"]
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "creationInfo_agencyID"
+    mode = "in"
+    values = ["SGC"]
+
+    [[checks.groups]]
+    logic = "xor"
+    description = "Correspondence between zone2 and magnitude MLr_2"
+
+        [[checks.groups.groups]]
+        logic = "and"
+        description = "Event inside zone2 and outside VMM"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "inside"
+            polygon = "zone2"
+
+            [[checks.groups.groups.conditions]]
+            rule_type = "polygon"
+            lat_col = "latitude_value"
+            lon_col = "longitude_value"
+            mode = "outside"
+            polygon = "vmm"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        values = "MLr_2"
+
+    # Part 3: Not a DESTACADO event with magnitude Mw
+    [[checks.groups]]
+    logic = "and"
+    negate = true
+    description = "Not a DESTACADO event with magnitude Mw"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "comment"
+        mode = "in"
+        values = "DESTACADO"
+
+        [[checks.groups.conditions]]
+        rule_type = "category"
+        column = "magnitude_type"
+        mode = "in"
+        values = "Mw"
+
+# 31. Events with comments diferent from "DESTACADO"
+[[checks]]
+name = "Event with comment different from DESTACADO"
+logic = "and"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "not_in"
+    values = "DESTACADO"
+
+    [[checks.conditions]]
+    rule_type = "category"
+    column = "comment"
+    mode = "is_not_null"
