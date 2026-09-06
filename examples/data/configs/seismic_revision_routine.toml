@@ -1222,4 +1222,4 @@ logic = "and"
     [[checks.conditions]]
     rule_type = "category"
     column = "comment"
-    mode = "is_not_null"
+    mode = "not_null"
