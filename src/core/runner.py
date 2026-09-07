@@ -144,7 +144,10 @@ class Runner:
         # 2. Fetch events (single or multiple queries)
         # If multi_query is set and query_name is None, fetch all non-skipped queries and concatenate results
         if multi_query and not query_name:
-            events_df = self._fetch_all_queries()
+            events_df = self._fetch_all_queries(
+                sql_text_override=sql_text_override,
+                sql_params=sql_params,
+            )
         else:
             events_df = self._fetch_single_query(
                 query_name=query_name,
@@ -294,7 +297,12 @@ class Runner:
         )
         return events_df
 
-    def _fetch_all_queries(self) -> pd.DataFrame:
+    def _fetch_all_queries(
+            self,
+            *,
+            sql_text_override: str | None,
+            sql_params: Mapping[str, Any] | None,
+    ) -> pd.DataFrame:
         """
         Fetch events for all non-skipped [[queries]] entries and concatenate them.
 
@@ -315,16 +323,21 @@ class Runner:
         frames: list[pd.DataFrame] = []
 
         for query_cfg in active_queries:
-            sql_text = load_sql(
-                query_cfg=query_cfg,
-                base_dir=self._cm.base_dir,
-                config_name=self._cm.config_path.name,
-            )
+            # Use the override if provided, otherwise load from file
+            if sql_text_override is not None:
+                sql_text = sql_text_override
+            else:
+                sql_text = load_sql(
+                    query_cfg=query_cfg,
+                    base_dir=self._cm.base_dir,
+                    config_name=self._cm.config_path.name,
+                )
 
+            # Pass the sql_params instead of None
             df = self._dbm.fetch_events(
                 query_cfg=query_cfg,
                 sql_text=sql_text,
-                params=None,  # multi-query core: no auto filters
+                params=sql_params,
                 read_sql_kwargs={},
             )
 
