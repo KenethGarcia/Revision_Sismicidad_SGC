@@ -222,7 +222,10 @@ class TestRunnerFetchAllQueries:
             ]
         )
 
-        result = runner._fetch_all_queries()
+        result = runner._fetch_all_queries(
+            sql_text_override=None,
+            sql_params=None
+        )
 
         assert result.empty
         runner._dbm.fetch_events.assert_not_called()
@@ -268,7 +271,10 @@ class TestRunnerFetchAllQueries:
             Mock(side_effect=["SELECT 1", "SELECT 2"]),
         )
 
-        result = runner._fetch_all_queries()
+        result = runner._fetch_all_queries(
+            sql_params=None,
+            sql_text_override=None
+        )
 
         assert result["publicID"].tolist() == ["event-1", "event-2"]
         assert str(result["time_value"].dtype) == "datetime64[ns, UTC]"
@@ -305,7 +311,10 @@ class TestRunnerFetchAllQueries:
         )
 
         with pytest.warns(UserWarning, match="Error occurred while sorting"):
-            result = runner._fetch_all_queries()
+            result = runner._fetch_all_queries(
+                sql_text_override=None,
+                sql_params=None
+            )
 
         pd.testing.assert_frame_equal(result, returned)
 
@@ -757,7 +766,10 @@ class TestRunnerRun:
             perform_checks=False,
         )
 
-        runner._fetch_all_queries.assert_called_once_with()
+        runner._fetch_all_queries.assert_called_once_with(
+            sql_text_override=None,
+            sql_params=None
+        )
         runner._fetch_single_query.assert_not_called()
         runner._save_output.assert_not_called()
 
@@ -870,7 +882,11 @@ class TestRunnerRun:
 
         result = runner.run()
 
-        duplicates_mock.assert_called_once_with(events_df, duplicates_cfg)
+        duplicates_mock.assert_called_once_with(
+            events=events_df,
+            duplicates_cfg=duplicates_cfg,
+            event_type_col="event_type"
+        )
 
         checks_mock.assert_called_once_with(
             events=events_df,
@@ -1019,7 +1035,11 @@ class TestRunnerRun:
             validator_mock.validate.assert_called_once()
 
             # Assert logic was executed with the cached events_df
-            duplicates_mock.assert_called_once_with(events_df, duplicates_cfg)
+            duplicates_mock.assert_called_once_with(
+                events=events_df,
+                duplicates_cfg=duplicates_cfg,
+                event_type_col="event_type"
+            )
             checks_mock.assert_called_once_with(
                 events=events_df,
                 checks=checks_cfg,
