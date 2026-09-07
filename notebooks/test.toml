@@ -30,117 +30,117 @@ database   = "SeisComP6"
 
 [[polygons]]
 name        = "local_area"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/arealocal.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/arealocal.txt"
 description = "Local area region from Colombia"
 
 [[polygons]]
 name        = "vmm"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/VMM.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/VMM.txt"
 description = "VMM region - MLr_vmm"
 
 [[polygons]]
 name        = "nll"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/NLL.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/NLL.txt"
 description = "NonLinLoc region - NLL"
 
 [[polygons]]
 name        = "zone1"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona1.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/zona1.txt"
 description = "Magnitude zone 1 — MLr_1 region"
 
 [[polygons]]
 name        = "zone2"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona2.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/zona2.txt"
 description = "Magnitude zone 2 — MLr_2 region"
 
 [[polygons]]
 name        = "zone3"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona3.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/zona3.txt"
 description = "Magnitude zone 3 — MLr_3 region"
 
 [[polygons]]
 name        = "zone4"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona4.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/zona4.txt"
 description = "Magnitude zone 4 — MLr_4 region"
 
 [[polygons]]
 name        = "zone5"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/zona5.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/zona5.txt"
 description = "Magnitude zone 5 — MLr_5 region"
 
 [[polygons]]
 name        = "pto_gtn"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/ptogaitan.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/ptogaitan.txt"
 description = "Pto Gaitan region - MLr_PtoGtn"
 
 [[polygons]]
 name        = "carma"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/carma.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/carma.txt"
 description = "CARMA region - Model CARMA"
 
 [[polygons]]
 name        = "cesar"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/RSNC/cesar.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/RSNC/cesar.txt"
 description = "Cesar region - Model Cesar"
 
 [[polygons]]
 name        = "ovsm"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obsman.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obsman.txt"
 description = "Observatorio Sismológico de Manizales - OVSM region"
 
 [[polygons]]
 name        = "ovspop"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspop.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspop.txt"
 description = "Observatorio Sismológico de Popayán - OVSPOP region"
 
 [[polygons]]
 name        = "ovspopvnh"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspopvnh.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspopvnh.txt"
 description = "Observatorio Sismológico de Popayán - VNH region"
 
 [[polygons]]
 name        = "ovsp1"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas1.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas1.txt"
 description = "Observatorio Sismológico de Pasto - OVS1 region"
 
 [[polygons]]
 name        = "ovsp2"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas2.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas2.txt"
 description = "Observatorio Sismológico de Pasto - OVS2 region"
 
 [[polygons]]
 name        = "ovsp3"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas3.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas3.txt"
 description = "Observatorio Sismológico de Pasto - OVS3 region"
 
 [[polygons]]
 name        = "ovsp4"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas4.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas4.txt"
 description = "Observatorio Sismológico de Pasto - OVS4 region"
 
 [[polygons]]
 name        = "ovsp5"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas5.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas5.txt"
 description = "Observatorio Sismológico de Pasto - OVS5 region"
 
 [[polygons]]
 name        = "ovsp6"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas6.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas6.txt"
 description = "Observatorio Sismológico de Pasto - OVS6 region"
 
 [[polygons]]
 name        = "ovsp7"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas7.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas7.txt"
 description = "Observatorio Sismológico de Pasto - OVS7 region"
 
 [[polygons]]
 name        = "ovsp8"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas8.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas8.txt"
 description = "Observatorio Sismológico de Pasto - OVS8 region"
 
 [[polygons]]
 name        = "ovsp9"
-path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/src/data/polygons/SGC/volcanological_observatories/obspas9.txt"
+path        = "/home/keneth/Documents/Academic_Projects/Revision_Sismicidad_SGC/examples/data/polygons/SGC/volcanological_observatories/obspas9.txt"
 description = "Observatorio Sismológico de Pasto - OVS9 region"
 
 [[duplicates]]
@@ -281,4 +281,4 @@ logic = "and"
     [[checks.conditions]]
     rule_type = "category"
     column = "comment"
-    mode = "is_not_null"
+    mode = "not_null"

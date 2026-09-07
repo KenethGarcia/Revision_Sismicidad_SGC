@@ -31,4 +31,9 @@ FROM Event AS EvMF
     LEFT JOIN Event ON Event._oid= POEv._oid
     LEFT JOIN EventDescription ON EvMF._oid = EventDescription._parent_oid
     LEFT JOIN Comment ON Comment._parent_oid = EvMF._oid
--- WHERE Origin.time_value BETWEEN
+WHERE Origin.creationInfo_author LIKE '%kgarcia%' AND Origin.time_value BETWEEN '2026-01-01 00:00:00' AND '2026-04-01 23:59:59'
+ORDER BY Origin.time_value ASC;
+--WHERE Origin.time_value BETWEEN '2026-01-01 00:00:00' AND '2026-09-05 23:59:59'  -- Filter events within the specified time range
+    -- AND Event.type = 'earthquake'  -- Filter for earthquake events
+    -- AND Magnitude.magnitude_value >= 4.0  -- Filter for events with magnitude >= 4.0
+--ORDER BY Origin.time_value ASC;  -- Order results by event origin time in ascending order
