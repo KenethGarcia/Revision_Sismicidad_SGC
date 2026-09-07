@@ -67,25 +67,25 @@ columns = ["time_value",
 # ── Database connection ───────────────────────────────────────
 [[database]]
 name       = "SeisComP3"
-env_file   = ".env"
+env_file   = "../credentials/.env"
 env_prefix = "SERVER_SC3"
 
 [[database]]
 name       = "SeisComP6"
-env_file   = ".env"
+env_file   = "../credentials/.env"
 env_prefix = "SERVER_SC6"
 
 
 # ── SQL query ────────────────────────────────────────────────
 [[queries]]
 name       = "SeisComP3"
-sql_file   = "./queries/revision.sql"
+sql_file   = "../sql/seismic_revision_routine.sql"
 description= "Query to retrieve events from SeisComP3 database"
 database   = "SeisComP3"
 
 [[queries]]
 name       = "SeisComP6"
-sql_file   = "./queries/revision.sql"
+sql_file   = "../sql/seismic_revision_routine.sql"
 description= "Query to retrieve events from SeisComP6 database"
 database   = "SeisComP6"
 
