@@ -449,7 +449,7 @@ logic= "and"
 
 # 13.The event is outside the local zone and event_type is NOT outside of network interest, not locatable or not existing
 [[checks]]
-name = "Event outside local zone with incorrect label"
+name = "Event outside local zone with wrong label"
 logic= "and"
 
     [[checks.conditions]]
@@ -465,7 +465,7 @@ logic= "and"
     mode = "not_in"
     values = ["outside of network interest", "not locatable", "not existing"]
 
-# 14. 'DESTACADO' events with incorrect labeling
+# 14. 'DESTACADO' events with wrong labeling
 [[checks]]
 name = "Event without DESTACADO comment"
 logic= "and"
@@ -693,7 +693,7 @@ event_type = "not locatable"
 
 # 19. Correspondence between zone3 and magnitude MLr_3
 [[checks]]
-name = "Incorrect mag type for zone3"
+name = "Wrong mag type for zone3"
 logic = "and"
 
     [[checks.conditions]]
@@ -739,7 +739,7 @@ logic = "and"
 
 # 20. Correspondence between zone4 and magnitude MLr_4
 [[checks]]
-name = "Incorrect mag type for zone4"
+name = "Wrong mag type for zone4"
 logic = "and"
 
     [[checks.conditions]]
@@ -785,7 +785,7 @@ logic = "and"
 
 # 21. Correspondence between zone1 and magnitude MLr_1
 [[checks]]
-name = "Incorrect mag type for zone1"
+name = "Wrong mag type for zone1"
 logic = "and"
 
     [[checks.conditions]]
@@ -838,7 +838,7 @@ logic = "and"
 
 # 22. Correspondence between zone2 and magnitude MLr_2 (avoiding VMM zone)
 [[checks]]
-name = "Incorrect mag type for zone2"
+name = "Wrong mag type for zone2"
 logic = "and"
 
     [[checks.conditions]]
@@ -902,7 +902,7 @@ logic = "and"
 
 # 23. Correspondence between zone5 and magnitude MLr_5 (avoiding PtoGtn zone)
 [[checks]]
-name = "Incorrect mag type for zone5"
+name = "Wrong mag type for zone5"
 logic = "and"
 
     [[checks.conditions]]
@@ -959,7 +959,7 @@ logic = "and"
 
 # 24. Correspondence between VMM zone and magnitude MLr_vmm
 [[checks]]
-name = "Incorrect mag type for VMM zone"
+name = "Wrong mag type for VMM zone"
 logic = "and"
 
     [[checks.conditions]]
@@ -1005,7 +1005,7 @@ logic = "and"
 
 # 25. Correspondence between PtoGtn zone and magnitude MLr_PtoGtn
 [[checks]]
-name = "Incorrect mag type for PtoGtn zone"
+name = "Wrong mag type for PtoGtn zone"
 logic = "and"
 
     [[checks.conditions]]
