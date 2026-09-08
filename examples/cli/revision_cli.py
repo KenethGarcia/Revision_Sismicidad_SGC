@@ -52,8 +52,12 @@ RSNC_CUTOFF = pd.to_datetime("2026-03-17 00:00:00", utc=True)
     is_flag=True,
     help="Omitir eventos con observación 'Potentially locatable event'."
 )
-
-def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool):
+@click.option(
+    "--output", "-o",
+    is_flag=True,
+    help="Guardar los resultados limpios en un archivo CSV en el directorio actual."
+)
+def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool, output: bool):
     """
     Command Line Interface (CLI) for executing the Seismicity Review Routine in the National Seismological Network (RSNC) of Colombia.
     This CLI allows users to run the routine with a specified configuration file and optional filters for date range and author.
@@ -183,7 +187,6 @@ def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool):
         click.secho("[!] No hay eventos por revisar después de aplicar la rutina.", fg="green")
         return
     else:
-        click.secho("[*] Resultado de la revisión:", fg="blue")
         try:
             mask = final_result.output['text'].notna()
         except KeyError:
@@ -196,6 +199,16 @@ def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool):
 
         # Remove ', Colombia' from the text column to keep the table compact
         final_result.output.loc[mask, 'text'] = final_result.output.loc[mask, 'text'].str.replace(", Colombia", "", regex=False)
+
+        # NEW LOGIC: Save the cleaned data to CSV in the Current Working Directory
+        if output:
+            # Generate a dynamic filename based on the current time to avoid overwriting previous runs
+            timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"revision_RSNC_{timestamp}.csv"
+
+            # Save without the pandas index column
+            final_result.output.to_csv(filename, index=False)
+            click.secho(f"[*] Archivo guardado exitosamente en: {Path.cwd() / filename}", fg="green")
 
         # Create a copy of the output DataFrame
         display_df = final_result.output.copy()
@@ -243,6 +256,7 @@ def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool):
         display_df.rename(columns=short_names, inplace=True)
 
         # 5. Print the beautifully formatted and shortened table
+        click.secho("[*] Resultado de la revisión:", fg="blue")
         click.echo(display_df)
 
 
