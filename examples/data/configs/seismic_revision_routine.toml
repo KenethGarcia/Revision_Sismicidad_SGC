@@ -26,7 +26,6 @@
 #   'quality_associatedPhaseCount': Number of associated phases for the events
 #   'quality_usedPhaseCount': Number of used phases for the events
 #   'creationInfo_author': Author of the events
-#   'quality_usedStationCount': Number of used stations for the events
 #   'quality_associatedStationCount': Number of associated stations for the events
 #   'event_type': Type of the events (e.g., earthquake, explosion, volcanic eruption)
 #   'creationInfo_agencyID': Agency ID of the events
@@ -58,7 +57,6 @@ columns = ["time_value",
     "latitude_uncertainty",
     "longitude_uncertainty",
     "quality_associatedPhaseCount",
-    "quality_associatedStationCount",
     "creationInfo_author",
     "event_type",
     "creationInfo_agencyID"]
