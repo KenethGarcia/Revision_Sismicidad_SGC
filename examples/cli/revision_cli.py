@@ -256,7 +256,7 @@ def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool, o
         display_df.rename(columns=short_names, inplace=True)
 
         # 5. Print the beautifully formatted and shortened table
-        click.secho("[*] Resultado de la revisión:", fg="blue")
+        click.secho("[*] Resultado de la revisión:", fg="blue", bold=True)
         click.echo(display_df)
 
         # 6. Print Execution Summary
