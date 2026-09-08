@@ -6,8 +6,12 @@
 # The CLI is built using the click library and provides a complete advanced example of how strong is the package in
 # terms of usability and functionality.
 # NOTE: THE CLI IS NOT INTENDED FOR PRODUCTION USE. IT IS PROVIDED AS AN EXAMPLE OF HOW TO USE THE PACKAGE.
+
+# To run it, go to the root directory of the package and execute the following command:
+# python -m examples.cli.revision_cli --config examples/data/configs/seismic_revision_routine.toml <other options>
 # ----------------------------------------------------------------------------------------------------------------------
 import sys
+import ftfy
 import click
 import pandas as pd
 from pathlib import Path
@@ -43,8 +47,13 @@ RSNC_CUTOFF = pd.to_datetime("2026-03-17 00:00:00", utc=True)
     type=str,
     help="Filtrado por autor de evento.",
 )
+@click.option(
+    "-f", "--skip-locatable",
+    is_flag=True,
+    help="Omitir eventos con observación 'Potentially locatable event'."
+)
 
-def cli(config: Path, start: str, end: str, author: str):
+def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool):
     """
     Command Line Interface (CLI) for executing the Seismicity Review Routine in the National Seismological Network (RSNC) of Colombia.
     This CLI allows users to run the routine with a specified configuration file and optional filters for date range and author.
@@ -79,19 +88,19 @@ def cli(config: Path, start: str, end: str, author: str):
 
         # Determine SC3 vs SC6 routing based on the cutoff date
         if end_dt <= RSNC_CUTOFF:
-            execution_plan.append(("events_sc3", start_dt, end_dt))
+            execution_plan.append(("SeisComP3", start_dt, end_dt))
         elif start_dt >= RSNC_CUTOFF:
-            execution_plan.append(("events_sc6", start_dt, end_dt))
+            execution_plan.append(("SeisComP6", start_dt, end_dt))
         else:
             # Time window spans both SC3 and SC6, split the execution plan
             click.echo(f"[*] La ventana de tiempo proporcionada abarca eventos en SeisComP3 y SeisComP6. Se solicitará la información de ambos sistemas separado por {RSNC_CUTOFF}.")
-            execution_plan.append(("events_sc3", start_dt, RSNC_CUTOFF))
-            execution_plan.append(("events_sc6", RSNC_CUTOFF, end_dt))
+            execution_plan.append(("SeisComP3", start_dt, RSNC_CUTOFF))
+            execution_plan.append(("SeisComP6", RSNC_CUTOFF, end_dt))
     else:
         # If no time filter is provided (author only), force strict cutoffs to avoid SC6 mirror data
         click.echo("[*] Búsqueda por autor solamente detectada. Se aplicarán cortes estrictos entre SeisComP3 y SeisComP6 para evitar datos duplicados de espejo...")
-        execution_plan.append(("events_sc3", None, RSNC_CUTOFF))
-        execution_plan.append(("events_sc6", RSNC_CUTOFF, None))
+        execution_plan.append(("SeisComP3", None, RSNC_CUTOFF))
+        execution_plan.append(("SeisComP6", RSNC_CUTOFF, None))
 
     # 3. Initialize the Runner
     runner = Runner(config_path=config)
@@ -111,12 +120,12 @@ def cli(config: Path, start: str, end: str, author: str):
 
         # Add dynamic time bounds independently to handle one-sided queries safely
         if q_start:
-            sql_params["start_time"] = q_start.strftime('%Y-%m-%d %H:%M:%SZ')
-            where_clauses.append(f"base_query.{time_col} >= :%(start_time)s")
+            sql_params["start_time"] = q_start.strftime('%Y-%m-%d %H:%M:%S')
+            where_clauses.append(f"base_query.{time_col} >= %(start_time)s")
 
         if q_end:
-            sql_params["end_time"] = q_end.strftime('%Y-%m-%d %H:%M:%SZ')
-            where_clauses.append(f"base_query.{time_col} < :%(end_time)s")
+            sql_params["end_time"] = q_end.strftime('%Y-%m-%d %H:%M:%S')
+            where_clauses.append(f"base_query.{time_col} < %(end_time)s")
 
         # Add dynamic author filter if provided
         if author:
@@ -134,17 +143,12 @@ def cli(config: Path, start: str, end: str, author: str):
         )
 
         # Wrap the query
-        wrapped_sql = f"""
-                    SELECT * 
-                    FROM ({base_sql}) AS base_query
-                    WHERE {where_sql}
-                    ORDER BY base_query.{time_col} ASC
-                """
+        wrapped_sql = f"""SELECT * FROM ({base_sql}) AS base_query WHERE {where_sql} ORDER BY base_query.{time_col} ASC"""
 
         # Fetch the events (skipping checks for now)
-        if q_name == "events_sc3":
+        if q_name == "SeisComP3":
             click.echo(f"[*] Ejecutando consulta para SeisComP3...")
-        elif q_name == "events_sc6":
+        elif q_name == "SeisComP6":
             click.echo(f"[*] Ejecutando consulta para SeisComP6...")
         result = runner.run(
             query_name=q_name,
@@ -157,17 +161,89 @@ def cli(config: Path, start: str, end: str, author: str):
         frames.append(result.total_events)
 
     # 5. Concatenate results and apply the engine across the entire dataset
-    if not frames:
+    combined_events = pd.concat(frames, axis=0, ignore_index=True)
+    if len(combined_events) == 0:
         click.echo("[!] No se encontraron eventos que coincidan con los criterios proporcionados.")
         return
 
-    combined_events = pd.concat(frames, axis=0, ignore_index=True)
-
-    # 6. Run the engine on the combined dataset
     click.echo(f"[*] Encontrados un total de {len(combined_events)} eventos que coinciden con los criterios proporcionados. Ejecutando la rutina de revisión...")
+
+    # 6. Remove the specific check from memory if the flag -f is provided
+    if skip_locatable:
+        click.echo("[*] Omitiendo eventos con observación 'Potentially locatable event'...")
+        original_checks = runner._cm.config_data.get("checks", [])
+        filtered_checks = [check for check in original_checks if check.get("name") != "Potentially locatable event"]
+        runner._cm.config_data["checks"] = filtered_checks
+
+    # 7. Run the engine on the combined dataset
     final_result = runner.update_from_cache(events_df=combined_events, reload_config=False)
-    click.echo(f"[*] Resultado de la revisión:")
-    click.echo(final_result)
+
+    # 8. Pretty print the final result
+    if len(final_result.output) == 0:
+        click.secho("[!] No hay eventos por revisar después de aplicar la rutina.", fg="green")
+        return
+    else:
+        click.secho("[*] Resultado de la revisión:", fg="blue")
+        try:
+            mask = final_result.output['text'].notna()
+        except KeyError:
+            click.secho("[!] La columna 'text' no está presente en el resultado final. Imprimiendo el resultado completo...", fg="red")
+            click.echo(final_result.output)
+            return
+
+        # Apply ftfy to fix text encoding issues in the 'text' column
+        final_result.output.loc[mask, 'text'] = final_result.output.loc[mask, 'text'].astype(str).apply(ftfy.fix_text)
+
+        # Remove ', Colombia' from the text column to keep the table compact
+        final_result.output.loc[mask, 'text'] = final_result.output.loc[mask, 'text'].str.replace(", Colombia", "", regex=False)
+
+        # Create a copy of the output DataFrame
+        display_df = final_result.output.copy()
+
+        # Format magnitude and error columns to exactly 2 decimal places
+        cols_to_round = [
+            "magnitude_value",
+            "quality_standardError",
+            "depth_uncertainty",
+            "latitude_uncertainty",
+            "longitude_uncertainty"
+        ]
+
+        for col in cols_to_round:
+            if col in display_df.columns:
+                # Format the numbers as strings with 2 decimals, keeping NaNs intact for the next step
+                display_df[col] = display_df[col].map(lambda x: f"{x:.2f}" if pd.notna(x) else x)
+
+
+        # Replace all NaN/None values across the entire table with '--'
+        # Explicitly cast columns to 'object' first to prevent Pandas dtype FutureWarnings
+        for col in display_df.columns:
+            display_df[col] = display_df[col].astype(object)
+        display_df.fillna("--", inplace=True)
+
+        # 4. Map the long SeisComP names to short Spanish display names
+        short_names = {
+            "time_value": "Hora UTC",
+            "publicID": "ID",
+            "text": "Región",
+            "depth_value": "Prof",
+            "magnitude_value": "Mag",
+            "magnitude_type": "TipoM",
+            "quality_standardError": "RMS",
+            "depth_uncertainty": "ErrZ",
+            "latitude_uncertainty": "ErrLat",
+            "longitude_uncertainty": "ErrLon",
+            "quality_associatedPhaseCount": "Fases",
+            "creationInfo_author": "Autor",
+            "event_type": "Tipo Evento",
+            "creationInfo_agencyID": "Agencia",
+            "Observations": "Observaciones"
+        }
+
+        display_df.rename(columns=short_names, inplace=True)
+
+        # 5. Print the beautifully formatted and shortened table
+        click.echo(display_df)
 
 
 if __name__ == "__main__":
