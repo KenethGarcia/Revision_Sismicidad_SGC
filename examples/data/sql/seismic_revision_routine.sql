@@ -12,7 +12,6 @@ SELECT
     Origin.quality_usedPhaseCount,  -- Number of used phases
     Origin.creationInfo_author,  -- Author of the origin creation info
     Origin.quality_usedStationCount,  -- Number of used stations
-    Origin.quality_associatedStationCount,  -- Number of associated stations
     Event.type AS event_type,  -- Event type (e.g., earthquake, explosion)
     Origin.creationInfo_agencyID,  -- Agency ID of the origin creation info
     EventDescription.text,  -- Event description text
