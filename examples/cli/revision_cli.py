@@ -259,6 +259,33 @@ def cli(config: Path, start: str, end: str, author: str, skip_locatable: bool, o
         click.secho("[*] Resultado de la revisión:", fg="blue")
         click.echo(display_df)
 
+        # 6. Print Execution Summary
+        click.echo("")  # Add an empty line
+        click.secho("[*] Resumen de Ejecución:", fg="blue", bold=True)
+
+        # Extract the Observations column, dropping NaNs to avoid string errors
+        obs_series = final_result.output["Observations"].dropna().astype(str)
+
+        # Count flagged events (excluding the locatable flag)
+        # We temporarily remove the locatable text and semicolons to see if any other flags remain
+        cleaned_obs = (
+            obs_series
+            .str.replace("Potentially locatable event", "", regex=False)
+            .str.replace(";", "", regex=False)
+            .str.strip()
+        )
+        flagged_count = (cleaned_obs != "").sum()
+
+        if flagged_count != 0:
+            click.echo(f"    • Eventos marcados (con otras observaciones): {flagged_count}")
+
+        # Count locatable events only if the user didn't hide them
+        if not skip_locatable:
+            locatable_count = obs_series.str.contains("Potentially locatable event", regex=False).sum()
+            click.echo(f"    • Eventos potencialmente localizables:        {locatable_count}")
+
+        click.echo("")  # Add a final empty line for terminal cleanliness
+
 
 if __name__ == "__main__":
     cli()
