@@ -247,7 +247,7 @@ event_type = "earthquake"
 # 2. Events with high latitude uncertainty (>12 km)
 [[checks]]
 name = "High Lat Err"
-event_type = ["earthquake", "explosion", "volcanic eruption"]
+event_type = ["earthquake", "volcanic eruption"]
 
     [[checks.conditions]]
     rule_type = "numeric"
@@ -258,7 +258,7 @@ event_type = ["earthquake", "explosion", "volcanic eruption"]
 # 3. Events with high longitude uncertainty (>12 km)
 [[checks]]
 name = "High Lon Err"
-event_type = ["earthquake", "explosion", "volcanic eruption"]
+event_type = ["earthquake", "volcanic eruption"]
 
     [[checks.conditions]]
     rule_type = "numeric"
