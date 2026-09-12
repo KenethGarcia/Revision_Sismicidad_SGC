@@ -1,0 +1,7 @@
+# TOML configuration file for Streamlit
+[theme]
+primaryColor = "#1D63ED"
+backgroundColor = "#F4F6F9"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1E293B"
+font = "sans serif"
