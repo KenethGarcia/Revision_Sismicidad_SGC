@@ -260,7 +260,7 @@ if view == "Revisión Actual":
             categorized_checks = get_categorized_checks(DEFAULT_CONFIG)
             disabled_checks = []
 
-            with st.popover("⚙️ Configurar Chequeos", use_container_width=True):
+            with st.popover("⚙️ Configurar Chequeos", width="stretch"):
                 st.markdown("**Desmarque los chequeos que desea descartar:**")
                 for cat_name, check_list in categorized_checks.items():
                     with st.expander(f"{cat_name} ({len(check_list)})", expanded=False):
@@ -331,7 +331,7 @@ if view == "Revisión Actual":
                         )
                     },
                     disabled=[col for col in df.columns if col != "Revisado" and col != "Notas"],
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True
                 )
 
@@ -355,7 +355,7 @@ if view == "Revisión Actual":
                         )
                     },
                     disabled=[col for col in df_totals.columns if col != "Revisado" and col != "Notas"],
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True
                 )
 
@@ -364,7 +364,7 @@ if view == "Revisión Actual":
             # Save action button
             col_save, _ = st.columns([1, 2])
             with col_save:
-                if st.button("Guardar Eventos Revisados", type="primary", use_container_width=True):
+                if st.button("Guardar Eventos Revisados", type="primary", width="stretch"):
                     # Extract checked rows from BOTH tables
                     rev1 = edited_df[edited_df["Revisado"] == True].copy() if "Revisado" in edited_df.columns else pd.DataFrame()
                     rev2 = edited_df_totals[edited_df_totals["Revisado"] == True].copy() if "Revisado" in edited_df_totals.columns else pd.DataFrame()
@@ -402,14 +402,10 @@ elif view == "Historial de Revisiones":
     if df_hist.empty:
         st.info("No hay registros históricos disponibles aún.")
     else:
-        col_limit_hist, _ = st.columns([1, 5])
-        with col_limit_hist:
-            row_limit_hist = st.selectbox("Mostrar filas", [10, 50, 100, 500], key="limit_hist")
-
         with st.container(border=True):
             # Display history, making sure newer reviews are at the top (sorting by date descending)
             st.dataframe(
-                df_hist.sort_values(by="Fecha Revisión", ascending=False).head(row_limit_hist),
-                use_container_width=True,
+                df_hist.sort_values(by="Fecha Revisión", ascending=False),
+                width="stretch",
                 hide_index=True
             )
