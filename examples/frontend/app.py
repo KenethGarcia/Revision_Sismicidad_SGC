@@ -5,9 +5,6 @@
 # using the command line. The application provides a user-friendly interface for selecting input files,
 # configuring parameters, and visualizing results.
 # ----------------------------------------------------------------------------------------------------------------------
-
-# FALTA VERIFICAR PORQUÉ NOTAS NO ESTÁ APARECIENDO (PONER AL INICIO) Y PORQUE AL CAMBIAR EL NUMERO DE FILAS TIRA ERROR LA RUTINA (SE BORRAN LAS TABLAS)
-
 import os
 import sys
 import ftfy
@@ -310,6 +307,39 @@ if view == "Revisión Actual":
                     if "Notas" not in temp_df.columns:
                         temp_df.insert(1, "Notas", "")  # Insert blank string column for user notes
 
+            # 2. Define the Spanish display names mapping
+            short_names = {
+                "time_value": "Hora UTC",
+                "publicID": "ID",
+                "text": "Región",
+                "depth_value": "Prof",
+                "magnitude_value": "Mag",
+                "magnitude_type": "TipoM",
+                "quality_standardError": "RMS",
+                "depth_uncertainty": "ErrZ",
+                "latitude_uncertainty": "ErrLat",
+                "longitude_uncertainty": "ErrLon",
+                "quality_associatedPhaseCount": "Fases",
+                "creationInfo_author": "Autor",
+                "event_type": "Tipo Evento",
+                "creationInfo_agencyID": "Agencia",
+                "Observations": "Observaciones"
+            }
+
+            # 3. Create the dynamic column configuration for the UI
+            col_cfg = {
+                "Revisado": st.column_config.CheckboxColumn("Revisado", help="Marque si el evento ha sido revisado."),
+                "Notas": st.column_config.TextColumn("Notas", help="Agregue un comentario relevante.")
+            }
+
+            # Append the short names to the config so they render in Spanish
+            for col_orig, col_short in short_names.items():
+                col_cfg[col_orig] = st.column_config.Column(label=col_short)
+
+            # 4. Determine the exact display order (only showing these specific columns on screen)
+            display_order_df = ["Revisado", "Notas"] + [c for c in short_names.keys() if c in df.columns]
+            display_order_tot = ["Revisado", "Notas"] + [c for c in short_names.keys() if c in df_totals.columns]
+
             st.divider()
 
             # Table 1: Display the results with observations
@@ -320,17 +350,9 @@ if view == "Revisión Actual":
             with st.container(border=True):
                 edited_df = st.data_editor(
                     df,
-                    column_config={
-                        "Revisado": st.column_config.CheckboxColumn(
-                            "Revisado",
-                            help="Marque si el evento ha sido revisado."
-                        ),
-                        "Notas": st.column_config.TextColumn(
-                            "Notas",
-                            help="Agregue cualquier comentario relevante sobre la revisión del evento."
-                        )
-                    },
-                    disabled=[col for col in df.columns if col != "Revisado" and col != "Notas"],
+                    column_order=display_order_df,
+                    column_config=col_cfg,
+                    disabled=[col for col in df.columns if col not in ["Revisado", "Notas"]],
                     width="stretch",
                     hide_index=True
                 )
@@ -343,18 +365,9 @@ if view == "Revisión Actual":
             with st.container(border=True):
                 edited_df_totals = st.data_editor(
                     df_totals,
-                    column_config={
-                        "Revisado": st.column_config.CheckboxColumn(
-                            "Revisado",
-                            help="Marque si el evento ha sido revisado.",
-                            default=False
-                        ),
-                        "Notas": st.column_config.TextColumn(
-                            "Notas",
-                            help="Agregue cualquier comentario relevante sobre el evento."
-                        )
-                    },
-                    disabled=[col for col in df_totals.columns if col != "Revisado" and col != "Notas"],
+                    column_order=display_order_tot,
+                    column_config=col_cfg,
+                    disabled=[col for col in df_totals.columns if col not in ["Revisado", "Notas"]],
                     width="stretch",
                     hide_index=True
                 )
@@ -374,11 +387,14 @@ if view == "Revisión Actual":
 
                     # Check if the resulting DataFrame is not empty and has the 'publicID' column
                     if not reviewed.empty and "publicID" in reviewed.columns:
-                        # Drop duplicates (in case the user checked the same event in both tables)
-                        # Assuming 'publicID' is your unique identifier
+
+                        # Ensure 'Observations' exists even if ONLY Table 2 was checked <---
+                        if "Observations" not in reviewed.columns:
+                            reviewed["Observations"] = None
+
+                        # Drop duplicates (keeps the first occurrence from rev1 so observations aren't lost)
                         reviewed = reviewed.drop_duplicates(subset=["publicID"])
 
-                    if not reviewed.empty:
                         # Add audit columns
                         reviewed["Revisor"] = revisor_name
                         reviewed["Fecha Revisión"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -403,9 +419,21 @@ elif view == "Historial de Revisiones":
         st.info("No hay registros históricos disponibles aún.")
     else:
         with st.container(border=True):
-            # Display history, making sure newer reviews are at the top (sorting by date descending)
+            # 1. Define the priority columns you want on the far left
+            front_cols = ["Revisado", "Revisor", "Fecha Revisión", "Notas", "Observations"]
+
+            # Safely check which of those exist to prevent KeyError
+            front_cols_present = [c for c in front_cols if c in df_hist.columns]
+
+            # Put the rest of the columns afterward
+            back_cols = [c for c in df_hist.columns if c not in front_cols_present]
+
+            # Reorder the dataframe
+            df_hist_reordered = df_hist[front_cols_present + back_cols]
+
+            # 2. Display the sorted and reordered DataFrame
             st.dataframe(
-                df_hist.sort_values(by="Fecha Revisión", ascending=False),
+                df_hist_reordered.sort_values(by="Fecha Revisión", ascending=False),
                 width="stretch",
                 hide_index=True
             )
