@@ -5,6 +5,9 @@
 # using the command line. The application provides a user-friendly interface for selecting input files,
 # configuring parameters, and visualizing results.
 # ----------------------------------------------------------------------------------------------------------------------
+
+# FALTA VERIFICAR PORQUÉ NOTAS NO ESTÁ APARECIENDO (PONER AL INICIO) Y PORQUE AL CAMBIAR EL NUMERO DE FILAS TIRA ERROR LA RUTINA (SE BORRAN LAS TABLAS)
+
 import os
 import sys
 import ftfy
@@ -291,109 +294,102 @@ if view == "Revisión Actual":
                 st.session_state["df_totals"] = df_tot
                 st.success(f"Revisión completada con éxito. Los resultados se muestran a continuación.")
 
-        # Simulate running the pipeline and storing results in session state
-        if "df_results" in st.session_state:
-            df = st.session_state["df_results"].copy()
-            df_totals = st.session_state["df_totals"].copy()
+    # Simulate running the pipeline and storing results in session state
+    if "df_results" in st.session_state:
+        df = st.session_state["df_results"].copy()
+        df_totals = st.session_state["df_totals"].copy()
 
-            if df.empty and df_totals.empty:
-                st.warning("No se encontraron eventos que cumplan con los criterios de búsqueda.")
-            else:
-                # Ensure checkbox column exists
-                if "Revisado" not in df.columns and not df.empty:
-                    df.insert(0, "Revisado", False)
-                if "Revisado" not in df_totals.columns and not df_totals.empty:
-                    df_totals.insert(0, "Revisado", False)
+        if df.empty and df_totals.empty:
+            st.warning("No se encontraron eventos que cumplan con los criterios de búsqueda.")
+        else:
+            # Ensure both "Revisado" and "Notas" columns exist in the DataFrames
+            for temp_df in [df, df_totals]:
+                if not temp_df.empty:
+                    if "Revisado" not in temp_df.columns:
+                        temp_df.insert(0, "Revisado", False)
+                    if "Notas" not in temp_df.columns:
+                        temp_df.insert(1, "Notas", "")  # Insert blank string column for user notes
 
-                st.divider()
+            st.divider()
 
-                # Table 1: Display the results with observations
-                st.subheader(f"Resultados de la Revisión ({df.shape[0]} registros)")
-                st.write("Marque los eventos que han sido revisados y agregue observaciones si es necesario.")
+            # Table 1: Display the results with observations
+            st.subheader(f"Resultados de la Revisión ({df.shape[0]} registros)")
+            st.write("Marque los eventos que han sido revisados y agregue observaciones si es necesario.")
 
-                # Row limit control
-                col_limit, _ = st.columns([1, 10])
-                with col_limit:
-                    row_limit = st.selectbox("Número de filas a mostrar", [10, 20, 50, 100], key="limit_obs")
+            # Interactive Data Editor for Observations
+            with st.container(border=True):
+                edited_df = st.data_editor(
+                    df,
+                    column_config={
+                        "Revisado": st.column_config.CheckboxColumn(
+                            "Revisado",
+                            help="Marque si el evento ha sido revisado."
+                        ),
+                        "Notas": st.column_config.TextColumn(
+                            "Notas",
+                            help="Agregue cualquier comentario relevante sobre la revisión del evento."
+                        )
+                    },
+                    disabled=[col for col in df.columns if col != "Revisado" and col != "Notas"],
+                    use_container_width=True,
+                    hide_index=True
+                )
 
-                # Interactive Data Editor for Observations
-                with st.container(border=True):
-                    edited_df = st.data_editor(
-                        df.head(row_limit),
-                        column_config={
-                            "Revisado": st.column_config.CheckboxColumn(
-                                "Revisado",
-                                help="Marque si el evento ha sido revisado."
-                            ),
-                            "Notas": st.column_config.TextColumn(
-                                "Notas",
-                                help="Agregue cualquier comentario relevante sobre la revisión del evento."
-                            )
-                        },
-                        disabled=[col for col in df.columns if col != "Revisado" and col != "Notas"],
-                        use_container_width=True,
-                        hide_index=True
-                    )
+            st.divider()
 
-                st.divider()
+            # Table 2: Display the total results for reference
+            st.subheader(f"Todos los eventos obtenidos ({df_totals.shape[0]} registros)")
 
-                # Table 2: Display the total results for reference
-                st.subheader(f"Todos los eventos obtenidos ({df_totals.shape[0]} registros)")
+            with st.container(border=True):
+                edited_df_totals = st.data_editor(
+                    df_totals,
+                    column_config={
+                        "Revisado": st.column_config.CheckboxColumn(
+                            "Revisado",
+                            help="Marque si el evento ha sido revisado.",
+                            default=False
+                        ),
+                        "Notas": st.column_config.TextColumn(
+                            "Notas",
+                            help="Agregue cualquier comentario relevante sobre el evento."
+                        )
+                    },
+                    disabled=[col for col in df_totals.columns if col != "Revisado" and col != "Notas"],
+                    use_container_width=True,
+                    hide_index=True
+                )
 
-                col_limit_tot, _ = st.columns([1, 10])
-                with col_limit_tot:
-                    row_limit_tot = st.selectbox("Número de filas a mostrar (Totales)", [10, 20, 50, 100], key="limit_totals")
+            st.divider()
 
-                with st.container(border=True):
-                    edited_df_totals = st.data_editor(
-                        df_totals.head(row_limit_tot),
-                        column_config={
-                            "Revisado": st.column_config.CheckboxColumn(
-                                "Revisado",
-                                help="Marque si el evento ha sido revisado.",
-                                default=False
-                            ),
-                            "Notas": st.column_config.TextColumn(
-                                "Notas",
-                                help="Agregue cualquier comentario relevante sobre el evento."
-                            )
-                        },
-                        disabled=[col for col in df_totals.columns if col != "Revisado" and col != "Notas"],
-                        use_container_width=True,
-                        hide_index=True
-                    )
+            # Save action button
+            col_save, _ = st.columns([1, 2])
+            with col_save:
+                if st.button("Guardar Eventos Revisados", type="primary", use_container_width=True):
+                    # Extract checked rows from BOTH tables
+                    rev1 = edited_df[edited_df["Revisado"] == True].copy() if "Revisado" in edited_df.columns else pd.DataFrame()
+                    rev2 = edited_df_totals[edited_df_totals["Revisado"] == True].copy() if "Revisado" in edited_df_totals.columns else pd.DataFrame()
 
-                st.divider()
+                    # Combine them into a single DataFrame
+                    reviewed = pd.concat([rev1, rev2], ignore_index=True)
 
-                # Save action button
-                col_save, _ = st.columns([1, 2])
-                with col_save:
-                    if st.button("Guardar Eventos Revisados", type="primary", use_container_width=True):
-                        # Extract checked rows from BOTH tables
-                        rev1 = edited_df[edited_df["Revisado"] == True].copy() if "Revisado" in edited_df.columns else pd.DataFrame()
-                        rev2 = edited_df_totals[edited_df_totals["Revisado"] == True].copy() if "Revisado" in edited_df_totals.columns else pd.DataFrame()
+                    # Check if the resulting DataFrame is not empty and has the 'publicID' column
+                    if not reviewed.empty and "publicID" in reviewed.columns:
+                        # Drop duplicates (in case the user checked the same event in both tables)
+                        # Assuming 'publicID' is your unique identifier
+                        reviewed = reviewed.drop_duplicates(subset=["publicID"])
 
-                        # Combine them into a single DataFrame
-                        reviewed = pd.concat([rev1, rev2], ignore_index=True)
+                    if not reviewed.empty:
+                        # Add audit columns
+                        reviewed["Revisor"] = revisor_name
+                        reviewed["Fecha Revisión"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                        # Check if the resulting DataFrame is not empty and has the 'publicID' column
-                        if not reviewed.empty and "publicID" in reviewed.columns:
-                            # Drop duplicates (in case the user checked the same event in both tables)
-                            # Assuming 'publicID' is your unique identifier
-                            reviewed = reviewed.drop_duplicates(subset=["publicID"])
+                        # Save to CSV
+                        save_header = not os.path.exists(LOG_FILE)
+                        reviewed.to_csv(LOG_FILE, mode='a', header=save_header, index=False)
 
-                        if not reviewed.empty:
-                            # Add audit columns
-                            reviewed["Revisor"] = revisor_name
-                            reviewed["Fecha Revisión"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-                            # Save to CSV
-                            save_header = not os.path.exists(LOG_FILE)
-                            reviewed.to_csv(LOG_FILE, mode='a', header=save_header, index=False)
-
-                            st.success(f"¡{len(reviewed)} eventos únicos guardados exitosamente en el historial!")
-                        else:
-                            st.warning("No se ha seleccionado ningún evento para guardar.")
+                        st.success(f"¡{len(reviewed)} eventos únicos guardados exitosamente en el historial!")
+                    else:
+                        st.warning("No se ha seleccionado ningún evento para guardar.")
 
 
 # VIEW 2: HISTORIAL DE REVISIONES
