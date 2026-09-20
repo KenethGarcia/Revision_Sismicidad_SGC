@@ -1,1 +1,14 @@
-name: Run Tests
+name: Python Package Tests
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'requirements.txt'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'requirements.txt'
+
