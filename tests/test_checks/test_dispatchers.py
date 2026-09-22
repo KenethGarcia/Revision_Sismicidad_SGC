@@ -174,7 +174,7 @@ def test_dispatch_temporal():
     cond = {
         "column": "t",
         "mode": "ge",
-        "value": "2024-01-02 00:00:00",
+        "threshold": "2024-01-02 00:00:00",
     }
     mask = dispatch_temporal(subset, cond)
     assert mask.dtype == bool
