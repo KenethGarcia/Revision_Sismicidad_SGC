@@ -200,7 +200,7 @@ def test_dispatch_temporal():
 
     # Test case 5: equal (changing format)
     cond["mode"] = "eq"
-    cond["value"] = "2024-01-02T00:00:00"
+    cond["threshold"] = "2024-01-02T00:00:00"
     mask = dispatch_temporal(subset, cond)
     assert mask.dtype == bool
     assert np.array_equal(mask, np.array([False, True, False]))
@@ -226,16 +226,16 @@ def test_dispatch_temporal():
         {"t": right_formats
          })
     cond["mode"] = "eq"
-    cond["value"] = "2024-01-01 00:00:00"
+    cond["threshold"] = "2024-01-01 00:00:00"
     mask = dispatch_temporal(subset, cond)
     assert mask.dtype == bool
     assert mask.all()  # All should be True since all formats represent the same time
 
     # Test case 8: Different valid time formats on right column
-    # Loop over subset and change dynamically the cond["value"] to match each row,
+    # Loop over subset and change dynamically the cond["threshold"] to match each row,
     # and check that the comparison always is true
     for value in right_formats:
-        cond["value"] = value
+        cond["threshold"] = value
         mask = dispatch_temporal(subset, cond)
         assert mask.dtype == bool
         assert mask.all()
