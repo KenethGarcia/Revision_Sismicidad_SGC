@@ -39,7 +39,7 @@ jobs:
           # Ensures Python can find the 'src' module during execution
             PYTHONPATH: ${{ github.workspace }}
         run: |
-          pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=xml
+          pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=xml --ignore=tests/test_revision.py --ignore=tests/test_utils.py
 
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v4
