@@ -16,7 +16,7 @@ from src.io.polygons import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = REPO_ROOT / "src" / "data" / "polygons" / "SGC" / "RSNC"
+DATA_DIR = REPO_ROOT / "examples" / "data" / "polygons" / "SGC" / "RSNC"
 BNA_FILE = DATA_DIR / "ptogaitan.txt"
 GEOJSON_FILE = DATA_DIR / "ptogaitan.geojson"
 @pytest.mark.skipif(not BNA_FILE.exists(), reason="ptogaitan.txt not found")
