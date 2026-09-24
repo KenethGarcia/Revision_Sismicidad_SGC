@@ -9,11 +9,12 @@ import os
 import sys
 import ftfy
 import getpass
+import matplotlib
 import pandas as pd
 import streamlit as st
 from pathlib import Path
 from datetime import datetime
-import matplotlib
+from translations import CHECK_TRANSLATIONS
 matplotlib.use('Agg')  # Prevents Matplotlib from initializing GTK/Gdk display backends
 
 # Package path and backend imports
@@ -35,6 +36,21 @@ RSNC_CUTOFF = pd.to_datetime("2026-03-17 00:00:00", utc=True)
 DEFAULT_CONFIG = ROOT_DIR / "examples" / "data" / "configs" / "seismic_revision_routine.toml"
 # File for persistent storage of logs
 LOG_FILE = "historical_revision_log.csv"
+
+# Function to translate the Observations string based on the selected language
+def translate_flags(obs_string, lang):
+    """Splits, translates, and rejoins the backend Observations string."""
+    if pd.isna(obs_string) or lang == "ES":
+        return obs_string
+
+    # Split the string by the semicolon separator
+    flags = [flag.strip() for flag in str(obs_string).split(";")]
+
+    # Translate each flag using the dictionary.
+    # .get(flag, flag) ensures that if a translation is missing, it safely keeps the Spanish text.
+    translated = [CHECK_TRANSLATIONS.get(flag, flag) for flag in flags]
+
+    return "; ".join(translated)
 
 # Page config
 st.set_page_config(
@@ -181,6 +197,12 @@ def run_backend_pipeline(
             mask = df_target["text"].notna()
             df_target.loc[mask, "text"] = df_target.loc[mask, "text"].astype(str).apply(ftfy.fix_text)
             df_target.loc[mask, "text"] = df_target.loc[mask, "text"].str.replace(", Colombia", "", regex=False)
+
+            # TRANSLATE OBSERVATIONS IF REQUESTED (e.g., for English display)
+            if "Observations" in df_target.columns and not df_target.empty:
+                df_target["Observations"] = df_target["Observations"].apply(
+                    lambda x: translate_flags(x, lang)
+                )
 
     return df_obs, df_tot
 
