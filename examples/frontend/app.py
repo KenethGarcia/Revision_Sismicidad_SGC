@@ -251,35 +251,36 @@ if view == TEXTS["view_1"][lang]:
 
     # Input section
     with st.container(border=True):
-        st.subheader("Parámetros de Búsqueda")
+        st.subheader(TEXTS["search_params"][lang])
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            revisor_name = st.text_input("Nombre del Revisor", value=current_user)
-            author_sel = st.selectbox(
-                "Búsqueda por autor",
-                ["Todos", "gerard", "kgarcia", "dcreina", "muruena", "william", "axlopez", "amarin", "hmoreno", "seismo", "sismologo"]
-            )
+            revisor_name = st.text_input(TEXTS["reviewer_name"][lang], value=current_user)
+            author_list = [
+                TEXTS["all_authors"][lang], "gerard", "kgarcia", "dcreina", "muruena", "william", "axlopez", "amarin",
+                "hmoreno", "seismo", "sismologo"]
+            author_sel = st.selectbox(TEXTS["author_search"][lang], author_list)
         with col2:
             # Start Date & Time
             col_sd, col_st = st.columns([1.2, 1])
             with col_sd:
-                start_d = st.date_input("Fecha Inicio*", value=None, key="start_d")
+                start_d = st.date_input(TEXTS["start_date"][lang], value=None, key="start_d")
             with col_st:
-                start_t = st.time_input("Hora Inicio", value=datetime.strptime("00:00:00", "%H:%M:%S").time(), step=1,
-                                        key="start_t")
+                start_t = st.time_input(TEXTS["start_time"][lang],
+                                        value=datetime.strptime("00:00:00", "%H:%M:%S").time(), step=1, key="start_t")
 
             # End Date & Time (Optional)
             col_ed, col_et = st.columns([1.2, 1])
             with col_ed:
-                end_d = st.date_input("Fecha Fin", value=None, key="end_d")
+                end_d = st.date_input(TEXTS["end_date"][lang], value=None, key="end_d")
             with col_et:
-                end_t = st.time_input("Hora Fin", value=datetime.strptime("23:59:59", "%H:%M:%S").time(), step=1,
-                                      key="end_t")
+                end_t = st.time_input(TEXTS["end_time"][lang], value=datetime.strptime("23:59:59", "%H:%M:%S").time(),
+                                      step=1, key="end_t")
 
             # Combine Date and Time into full Python datetime objects
             start_date = datetime.combine(start_d, start_t) if start_d else None
             end_date = datetime.combine(end_d, end_t) if end_d else None
+
         with col3:
             # Standalone selectbox for Potentially Locatable Event
             eval_locatable = st.selectbox(
