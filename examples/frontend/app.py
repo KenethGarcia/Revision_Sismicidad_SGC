@@ -14,7 +14,7 @@ import pandas as pd
 import streamlit as st
 from pathlib import Path
 from datetime import datetime
-from translations import CHECK_TRANSLATIONS
+from translations import CHECK_TRANSLATIONS, TEXTS
 matplotlib.use('Agg')  # Prevents Matplotlib from initializing GTK/Gdk display backends
 
 # Package path and backend imports
@@ -61,34 +61,45 @@ st.set_page_config(
 )
 
 
-def get_categorized_checks(config_path: Path):
+def get_categorized_checks(config_path: Path, lang: str = "ES") -> dict:
     """Dynamically loads and groups all 30 checks from the TOML configuration."""
     runner = Runner(config_path=config_path)
     all_checks = runner._cm.config_data.get("checks", [])
 
-    categories = {
-        "📊 Calidad e Incertidumbre": [],
-        "🗺️ Modelos de Velocidad": [],
-        "📈 Magnitudes por Zona": [],
-        "🏷️ Etiquetas y Comentarios": [],
-        "⚙️ Reglas Especiales": []
+    cats = {
+        "ES": {
+            "q_unc": "📊 Calidad e Incertidumbre",
+            "vel": "🗺️ Modelos de Velocidad",
+            "mag": "📈 Magnitudes por Zona",
+            "lab": "🏷️ Etiquetas y Comentarios",
+            "spec": "⚙️ Reglas Especiales"
+        },
+        "EN": {
+            "q_unc": "📊 Quality & Uncertainty",
+            "vel": "🗺️ Velocity Models",
+            "mag": "📈 Magnitudes by Zone",
+            "lab": "🏷️ Labels & Comments",
+            "spec": "⚙️ Special Rules"
+        }
     }
+    categories = {v: [] for v in cats[lang].values()}
 
     for check in all_checks:
         name = check.get("name", "")
         if any(k in name for k in ["RMS", "Err", "Depth", "stations", "phases"]):
-            categories["📊 Calidad e Incertidumbre"].append(name)
+            categories[cats[lang]["q_unc"]].append(name)
         elif "model" in name or "NLL" in name:
-            categories["🗺️ Modelos de Velocidad"].append(name)
+            categories[cats[lang]["vel"]].append(name)
         elif "mag type" in name:
-            categories["📈 Magnitudes por Zona"].append(name)
+            categories[cats[lang]["mag"]].append(name)
         elif any(k in name for k in ["label", "unassociated", "DESTACADO", "comment"]):
-            categories["🏷️ Etiquetas y Comentarios"].append(name)
+            categories[cats[lang]["lab"]].append(name)
         else:
-            categories["⚙️ Reglas Especiales"].append(name)
-            # Remove "Potentially locatable event" from the special rules category if present
-            if "Potentially locatable event" in categories["⚙️ Reglas Especiales"]:
-                categories["⚙️ Reglas Especiales"].remove("Potentially locatable event")
+            categories[cats[lang]["spec"]].append(name)
+
+            # Remove "Potentially locatable event" from special rules if present
+            if "Potentially locatable event" in categories[cats[lang]["spec"]]:
+                categories[cats[lang]["spec"]].remove("Potentially locatable event")
 
     return categories
 
@@ -98,7 +109,8 @@ def run_backend_pipeline(
     st_date: datetime | None,
     e_date: datetime | None,
     author: str,
-    disabled: list
+    disabled: list,
+    lang: str = "ES"
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Executes the backend seismic review pipeline across SeisComP databases,
@@ -214,6 +226,9 @@ def load_history():
 
 # Sidebar navigation
 with st.sidebar:
+    lang = st.radio("🌐 Language / Idioma", ["ES", "EN"], horizontal=True, label_visibility="collapsed")
+    st.divider()
+
     # SGC logo placeholder
     if (ROOT_DIR / "sgc.jpg").exists():
         st.image(str(ROOT_DIR / "sgc.jpg"), width=160)
@@ -230,9 +245,9 @@ with st.sidebar:
     st.caption(f"🟢 **{current_user}** @ RSNC")
 
 # View 1: Revisión Actual
-if view == "Revisión Actual":
-    st.title("Rutina de Revisión de Sismicidad")
-    st.write("Filtre, ejecute y marque los eventos revisados.")
+if view == TEXTS["view_1"][lang]:
+    st.title(TEXTS["v1_title"][lang])
+    st.write(TEXTS["v1_subtitle"][lang])
 
     # Input section
     with st.container(border=True):
