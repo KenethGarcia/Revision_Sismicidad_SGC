@@ -50,3 +50,61 @@ CHECK_TRANSLATIONS = {
     "Wrong mag type for VMM zone": "Tipo magnitud erróneo (VMM)",
     "Wrong mag type for PtoGtn zone": "Tipo magnitud erróneo (PtoGtn)",
 }
+
+# CENTRALIZED TRANSLATION DICTIONARY
+TEXTS = {
+    "nav_header": {"ES": "NAVEGACIÓN", "EN": "NAVIGATION"},
+    "view_1": {"ES": "Revisión Actual", "EN": "Current Review"},
+    "view_2": {"ES": "Historial de Revisiones", "EN": "Revision History"},
+    "v1_title": {"ES": "Rutina de Revisión de Sismicidad", "EN": "Seismicity Review Routine"},
+    "v1_subtitle": {"ES": "Filtre, ejecute y marque los eventos revisados.", "EN": "Filter, execute, and mark reviewed events."},
+    "search_params": {"ES": "Parámetros de Búsqueda", "EN": "Search Parameters"},
+    "reviewer_name": {"ES": "Nombre del Revisor", "EN": "Reviewer Name"},
+    "author_search": {"ES": "Búsqueda por autor", "EN": "Search by author"},
+    "all_authors": {"ES": "Todos", "EN": "All"},
+    "start_date": {"ES": "Fecha Inicio*", "EN": "Start Date*"},
+    "start_time": {"ES": "Hora Inicio", "EN": "Start Time"},
+    "end_date": {"ES": "Fecha Fin", "EN": "End Date"},
+    "end_time": {"ES": "Hora Fin", "EN": "End Time"},
+    "eval": {"ES": "Evaluar", "EN": "Evaluate"},
+    "ignore": {"ES": "Ignorar", "EN": "Ignore"},
+    "locatable_help": {
+        "ES": "Seleccione si desea evaluar o ignorar la regla de 'Eventos Potencialmente Localizables'.",
+        "EN": "Select whether to evaluate or ignore the 'Potentially Locatable Events' rule."
+    },
+    "config_checks": {"ES": "⚙️ Configurar Chequeos", "EN": "⚙️ Configure Checks"},
+    "uncheck_msg": {"ES": "**Desmarque los chequeos que desea descartar:**", "EN": "**Uncheck the rules you want to ignore:**"},
+    "btn_run": {"ES": "Ejecutar Revisión", "EN": "Run Review"},
+    "err_no_date": {
+        "ES": "Debe proporcionar al menos una fecha de inicio o seleccionar un autor específico.",
+        "EN": "You must provide at least a start date or select a specific author."
+    },
+    "err_dates": {"ES": "La fecha de inicio no puede ser posterior a la fecha de fin.", "EN": "Start date cannot be after end date."},
+    "spin_run": {
+        "ES": "Conectando a la base de datos de SeisComP y ejecutando la rutina de revisión...",
+        "EN": "Connecting to SeisComP database and executing review routine..."
+    },
+    "succ_run": {"ES": "Revisión completada con éxito. Los resultados se muestran a continuación.", "EN": "Review completed successfully. Results are shown below."},
+    "warn_no_events": {"ES": "No se encontraron eventos que cumplan con los criterios de búsqueda.", "EN": "No events found matching the search criteria."},
+    "revisado": {"ES": "Revisado", "EN": "Reviewed"},
+    "notas": {"ES": "Notas", "EN": "Notes"},
+    "rev_help": {"ES": "Marque si el evento ha sido revisado.", "EN": "Mark if the event has been reviewed."},
+    "not_help": {"ES": "Agregue un comentario relevante.", "EN": "Add a relevant comment."},
+    "res_rev": {"ES": "Resultados de la Revisión", "EN": "Review Results"},
+    "res_msg": {
+        "ES": "Marque los eventos que han sido revisados y agregue observaciones si es necesario.",
+        "EN": "Mark the events that have been reviewed and add observations if necessary."
+    },
+    "locatable_count": {
+        "ES": "📌 Se detectaron **{}** eventos potencialmente localizables.",
+        "EN": "📌 **{}** potentially locatable events were detected."
+    },
+    "all_ev": {"ES": "Todos los eventos obtenidos", "EN": "All Retrieved Events"},
+    "records": {"ES": "registros", "EN": "records"},
+    "btn_save": {"ES": "Guardar Eventos Revisados", "EN": "Save Reviewed Events"},
+    "succ_save": {"ES": "¡{} eventos únicos guardados exitosamente en el historial!", "EN": "{} unique events successfully saved to history!"},
+    "warn_save": {"ES": "No se ha seleccionado ningún evento para guardar.", "EN": "No events selected to save."},
+    "v2_title": {"ES": "Historial de Revisiones", "EN": "Revision History"},
+    "v2_subtitle": {"ES": "Registro histórico de todos los eventos marcados como revisados.", "EN": "Historical log of all events marked as reviewed."},
+    "v2_empty": {"ES": "No hay registros históricos disponibles aún.", "EN": "No historical records available yet."}
+}
