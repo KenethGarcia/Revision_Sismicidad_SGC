@@ -40,7 +40,7 @@ LOG_FILE = "historical_revision_log.csv"
 # Function to translate the Observations string based on the selected language
 def translate_flags(obs_string, lang):
     """Splits, translates, and rejoins the backend Observations string."""
-    if pd.isna(obs_string) or lang == "ES":
+    if pd.isna(obs_string) or lang == "EN":
         return obs_string
 
     # Split the string by the semicolon separator
@@ -160,7 +160,7 @@ def run_backend_pipeline(
         if q_end:
             sql_params["end_time"] = q_end.strftime('%Y-%m-%d %H:%M:%S')
             where_clauses.append(f"base_query.{time_col} < %(end_time)s")
-        if author and author != "Todos":
+        if author and author not in ["Todos", "All"]:
             sql_params["author_pattern"] = f"%{author}%"
             where_clauses.append("base_query.creationInfo_author LIKE %(author_pattern)s")
 
@@ -224,19 +224,27 @@ def load_history():
         return pd.read_csv(LOG_FILE)
     return pd.DataFrame()
 
+# Upper right language selector
+col_spacer, col_lang = st.columns([8, 1])
+with col_lang:
+    lang = st.radio(
+        "🌐 Language / Idioma",
+        ["ES", "EN"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+
 # Sidebar navigation
 with st.sidebar:
-    lang = st.radio("🌐 Language / Idioma", ["ES", "EN"], horizontal=True, label_visibility="collapsed")
-    st.divider()
-
     # SGC logo placeholder
-    if (ROOT_DIR / "sgc.jpg").exists():
-        st.image(str(ROOT_DIR / "sgc.jpg"), width=160)
+    if (APP_DIR / "sgc.jpg").exists():
+        st.image(str(APP_DIR / "sgc.jpg"), width=320)
     st.caption("NAVEGACIÓN")
 
     view = st.radio(
         "Seleccionar vista",
-        ["Revisión Actual", "Historial de Revisiones"],
+        options=["view_1", "view_2"],
+        format_func=lambda x: TEXTS[x][lang],
         label_visibility="collapsed"
     )
 
@@ -245,7 +253,7 @@ with st.sidebar:
     st.caption(f"🟢 **{current_user}** @ RSNC")
 
 # View 1: Revisión Actual
-if view == TEXTS["view_1"][lang]:
+if view == "view_1":
     st.title(TEXTS["v1_title"][lang])
     st.write(TEXTS["v1_subtitle"][lang])
 
@@ -407,6 +415,7 @@ if view == TEXTS["view_1"][lang]:
             with st.container(border=True):
                 edited_df = st.data_editor(
                     df,
+                    key=f"table_1_{lang}",
                     column_order=display_order_df,
                     column_config=col_cfg,
                     disabled=[col for col in df.columns if col not in [TEXTS["revisado"]["ES"], TEXTS["notas"]["ES"]]],
@@ -417,11 +426,12 @@ if view == TEXTS["view_1"][lang]:
             st.divider()
 
             # Table 2: Display the total results for reference
-            st.subheader(f"Todos los eventos obtenidos ({df_totals.shape[0]} registros)")
+            st.subheader(f"{TEXTS["all_ev"][lang]} ({df_totals.shape[0]} registros)")
 
             with st.container(border=True):
                 edited_df_totals = st.data_editor(
                     df_totals,
+                    key=f"table_2_{lang}",
                     column_order=display_order_tot,
                     column_config=col_cfg,
                     disabled=[col for col in df_totals.columns if col not in [TEXTS["revisado"]["ES"], TEXTS["notas"]["ES"]]],
@@ -466,14 +476,14 @@ if view == TEXTS["view_1"][lang]:
 
 
 # VIEW 2: HISTORIAL DE REVISIONES
-elif view == TEXTS["view_2"][lang]:
+elif view == "view_2":
     st.title(TEXTS["v2_title"][lang])
     st.caption(TEXTS["v2_subtitle"][lang])
 
     df_hist = load_history()
 
     if df_hist.empty:
-        st.info(TEXTS["info_hist"][lang])
+        st.info(TEXTS["v2_empty"][lang])
     else:
         with st.container(border=True):
             # Translate historical backend observations if EN is selected
