@@ -391,6 +391,18 @@ if view == TEXTS["view_1"][lang]:
             st.subheader(f"{TEXTS['res_rev'][lang]} ({df.shape[0]} {TEXTS['records'][lang]})")
             st.write(TEXTS["res_msg"][lang])
 
+            # Count and display Potentially Locatable Events if the evaluation is enabled
+            if eval_locatable:
+                # Match the exact string depending on the selected language
+                loc_str = CHECK_TRANSLATIONS.get("Potentially locatable event", "Potentially locatable event") if lang == "ES" else "Potentially locatable event"
+
+                locatable_count = 0
+                if "Observations" in df.columns:
+                    # Count rows where the Observations column contains the target string
+                    locatable_count = df["Observations"].dropna().astype(str).str.contains(loc_str, regex=False).sum()
+
+                st.info(TEXTS["locatable_count"][lang].format(locatable_count))
+
             # Interactive Data Editor for Observations
             with st.container(border=True):
                 edited_df = st.data_editor(
