@@ -314,22 +314,23 @@ if view == TEXTS["view_1"][lang]:
 
     # Main content section
     if run_btn:
-        if not start_date and author_sel == "Todos":
-            st.error("Debe proporcionar al menos una fecha de inicio o seleccionar un autor específico.")
+        if not start_date and author_sel in ["Todos", "All"]:
+            st.error(TEXTS["err_no_date"][lang])
         elif start_date and end_date and start_date > end_date:
-            st.error("La fecha de inicio no puede ser posterior a la fecha de fin.")
+            st.error(TEXTS["err_dates"][lang])
         else:
-            with st.spinner("Conectando a la base de datos de SeisComP y ejecutando la rutina de revisión..."):
+            with st.spinner(TEXTS["spin_run"][lang]):
                 df_obs, df_tot = run_backend_pipeline(
                     config_path=DEFAULT_CONFIG,
                     st_date=start_date,
                     e_date=end_date,
                     author=author_sel,
-                    disabled=disabled_checks
+                    disabled=disabled_checks,
+                    lang=lang
                 )
                 st.session_state["df_results"] = df_obs
                 st.session_state["df_totals"] = df_tot
-                st.success(f"Revisión completada con éxito. Los resultados se muestran a continuación.")
+                st.success(TEXTS["succ_run"][lang])
 
     # Simulate running the pipeline and storing results in session state
     if "df_results" in st.session_state:
@@ -337,39 +338,42 @@ if view == TEXTS["view_1"][lang]:
         df_totals = st.session_state["df_totals"].copy()
 
         if df.empty and df_totals.empty:
-            st.warning("No se encontraron eventos que cumplan con los criterios de búsqueda.")
+            st.warning(TEXTS["warn_no_events"][lang])
         else:
             # Ensure both "Revisado" and "Notas" columns exist in the DataFrames
             for temp_df in [df, df_totals]:
                 if not temp_df.empty:
-                    if "Revisado" not in temp_df.columns:
-                        temp_df.insert(0, "Revisado", False)
-                    if "Notas" not in temp_df.columns:
-                        temp_df.insert(1, "Notas", "")  # Insert blank string column for user notes
+                    if TEXTS["revisado"]["ES"] not in temp_df.columns and TEXTS["revisado"]["EN"] not in temp_df.columns:
+                        temp_df.insert(0, TEXTS["revisado"]["ES"], False)
+                    if TEXTS["notas"]["ES"] not in temp_df.columns and TEXTS["notas"]["EN"] not in temp_df.columns:
+                        temp_df.insert(1, TEXTS["notas"]["ES"], "")  # Insert blank string column for user notes
 
             # 2. Define the Spanish display names mapping
-            short_names = {
-                "time_value": "Hora UTC",
-                "publicID": "ID",
-                "text": "Región",
-                "depth_value": "Prof",
-                "magnitude_value": "Mag",
-                "magnitude_type": "TipoM",
-                "quality_standardError": "RMS",
-                "depth_uncertainty": "ErrZ",
-                "latitude_uncertainty": "ErrLat",
-                "longitude_uncertainty": "ErrLon",
-                "quality_associatedPhaseCount": "Fases",
-                "creationInfo_author": "Autor",
-                "event_type": "Tipo Evento",
-                "creationInfo_agencyID": "Agencia",
-                "Observations": "Observaciones"
-            }
+            if lang == "ES":
+                short_names = {
+                    "time_value": "Hora UTC", "publicID": "ID", "text": "Región",
+                    "depth_value": "Prof", "magnitude_value": "Mag", "magnitude_type": "TipoM",
+                    "quality_standardError": "RMS", "depth_uncertainty": "ErrZ",
+                    "latitude_uncertainty": "ErrLat", "longitude_uncertainty": "ErrLon",
+                    "quality_associatedPhaseCount": "Fases", "creationInfo_author": "Autor",
+                    "event_type": "Tipo Evento", "creationInfo_agencyID": "Agencia",
+                    "Observations": "Observaciones"
+                }
+            else:
+                short_names = {
+                    "time_value": "UTC Time", "publicID": "ID", "text": "Region",
+                    "depth_value": "Depth", "magnitude_value": "Mag", "magnitude_type": "MagType",
+                    "quality_standardError": "RMS", "depth_uncertainty": "ErrZ",
+                    "latitude_uncertainty": "ErrLat", "longitude_uncertainty": "ErrLon",
+                    "quality_associatedPhaseCount": "Phases", "creationInfo_author": "Author",
+                    "event_type": "Event Type", "creationInfo_agencyID": "Agency",
+                    "Observations": "Observations"
+                }
 
             # 3. Create the dynamic column configuration for the UI
             col_cfg = {
-                "Revisado": st.column_config.CheckboxColumn("Revisado", help="Marque si el evento ha sido revisado."),
-                "Notas": st.column_config.TextColumn("Notas", help="Agregue un comentario relevante.")
+                TEXTS["revisado"]["ES"]: st.column_config.CheckboxColumn(TEXTS["revisado"][lang], help=TEXTS["rev_help"][lang]),
+                TEXTS["notas"]["ES"]: st.column_config.TextColumn(TEXTS["notas"][lang], help=TEXTS["not_help"][lang])
             }
 
             # Append the short names to the config so they render in Spanish
@@ -377,14 +381,15 @@ if view == TEXTS["view_1"][lang]:
                 col_cfg[col_orig] = st.column_config.Column(label=col_short)
 
             # 4. Determine the exact display order (only showing these specific columns on screen)
-            display_order_df = ["Revisado", "Notas"] + [c for c in short_names.keys() if c in df.columns]
-            display_order_tot = ["Revisado", "Notas"] + [c for c in short_names.keys() if c in df_totals.columns]
-
+            display_order_df = [TEXTS["revisado"]["ES"], TEXTS["notas"]["ES"]] + [c for c in short_names.keys() if
+                                                                                  c in df.columns]
+            display_order_tot = [TEXTS["revisado"]["ES"], TEXTS["notas"]["ES"]] + [c for c in short_names.keys() if
+                                                                                   c in df_totals.columns]
             st.divider()
 
             # Table 1: Display the results with observations
-            st.subheader(f"Resultados de la Revisión ({df.shape[0]} registros)")
-            st.write("Marque los eventos que han sido revisados y agregue observaciones si es necesario.")
+            st.subheader(f"{TEXTS['res_rev'][lang]} ({df.shape[0]} {TEXTS['records'][lang]})")
+            st.write(TEXTS["res_msg"][lang])
 
             # Interactive Data Editor for Observations
             with st.container(border=True):
@@ -392,7 +397,7 @@ if view == TEXTS["view_1"][lang]:
                     df,
                     column_order=display_order_df,
                     column_config=col_cfg,
-                    disabled=[col for col in df.columns if col not in ["Revisado", "Notas"]],
+                    disabled=[col for col in df.columns if col not in [TEXTS["revisado"]["ES"], TEXTS["notas"]["ES"]]],
                     width="stretch",
                     hide_index=True
                 )
@@ -407,7 +412,7 @@ if view == TEXTS["view_1"][lang]:
                     df_totals,
                     column_order=display_order_tot,
                     column_config=col_cfg,
-                    disabled=[col for col in df_totals.columns if col not in ["Revisado", "Notas"]],
+                    disabled=[col for col in df_totals.columns if col not in [TEXTS["revisado"]["ES"], TEXTS["notas"]["ES"]]],
                     width="stretch",
                     hide_index=True
                 )
@@ -417,10 +422,10 @@ if view == TEXTS["view_1"][lang]:
             # Save action button
             col_save, _ = st.columns([1, 2])
             with col_save:
-                if st.button("Guardar Eventos Revisados", type="primary", width="stretch"):
+                if st.button(TEXTS["btn_save"][lang], type="primary", width="stretch"):
                     # Extract checked rows from BOTH tables
-                    rev1 = edited_df[edited_df["Revisado"] == True].copy() if "Revisado" in edited_df.columns else pd.DataFrame()
-                    rev2 = edited_df_totals[edited_df_totals["Revisado"] == True].copy() if "Revisado" in edited_df_totals.columns else pd.DataFrame()
+                    rev1 = edited_df[edited_df[TEXTS["revisado"]["ES"]] == True].copy() if TEXTS["revisado"]["ES"] in edited_df.columns else pd.DataFrame()
+                    rev2 = edited_df_totals[edited_df_totals[TEXTS["revisado"]["ES"]] == True].copy() if TEXTS["revisado"]["ES"] in edited_df_totals.columns else pd.DataFrame()
 
                     # Combine them into a single DataFrame
                     reviewed = pd.concat([rev1, rev2], ignore_index=True)
@@ -443,37 +448,44 @@ if view == TEXTS["view_1"][lang]:
                         save_header = not os.path.exists(LOG_FILE)
                         reviewed.to_csv(LOG_FILE, mode='a', header=save_header, index=False)
 
-                        st.success(f"¡{len(reviewed)} eventos únicos guardados exitosamente en el historial!")
+                        st.success(TEXTS["succ_save"][lang].format(len(reviewed)))
                     else:
-                        st.warning("No se ha seleccionado ningún evento para guardar.")
+                        st.warning(TEXTS["warn_save"][lang])
 
 
 # VIEW 2: HISTORIAL DE REVISIONES
-elif view == "Historial de Revisiones":
-    st.title("Historial de Revisiones")
-    st.caption("Registro histórico de todos los eventos marcados como revisados.")
+elif view == TEXTS["view_2"][lang]:
+    st.title(TEXTS["v2_title"][lang])
+    st.caption(TEXTS["v2_subtitle"][lang])
 
     df_hist = load_history()
 
     if df_hist.empty:
-        st.info("No hay registros históricos disponibles aún.")
+        st.info(TEXTS["info_hist"][lang])
     else:
         with st.container(border=True):
-            # 1. Define the priority columns you want on the far left
+            # Translate historical backend observations if EN is selected
+            if lang == "EN" and "Observations" in df_hist.columns:
+                df_hist["Observations"] = df_hist["Observations"].apply(
+                    lambda x: translate_flags(x, lang)
+                )
+
             front_cols = ["Revisado", "Revisor", "Fecha Revisión", "Notas", "Observations"]
-
-            # Safely check which of those exist to prevent KeyError
             front_cols_present = [c for c in front_cols if c in df_hist.columns]
-
-            # Put the rest of the columns afterward
             back_cols = [c for c in df_hist.columns if c not in front_cols_present]
 
-            # Reorder the dataframe
             df_hist_reordered = df_hist[front_cols_present + back_cols]
 
-            # 2. Display the sorted and reordered DataFrame
+            # Map column headers to English if EN is selected
+            if lang == "EN":
+                rename_map = {
+                    "Revisado": "Reviewed", "Revisor": "Reviewer",
+                    "Fecha Revisión": "Review Date", "Notas": "Notes"
+                }
+                df_hist_reordered = df_hist_reordered.rename(columns=rename_map)
+
             st.dataframe(
-                df_hist_reordered.sort_values(by="Fecha Revisión", ascending=False),
+                df_hist_reordered.sort_values(by="Review Date" if lang == "EN" else "Fecha Revisión", ascending=False),
                 width="stretch",
                 hide_index=True
             )
