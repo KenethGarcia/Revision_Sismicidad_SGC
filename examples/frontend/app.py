@@ -287,20 +287,22 @@ if view == TEXTS["view_1"][lang]:
                 "Potentially Locatable",
                 options=[True, False],
                 index=1,
-                format_func=lambda x: "Evaluar" if x else "Ignorar",
-                help="Seleccione si desea evaluar o ignorar la regla de 'Eventos Potencialmente Localizables'."
+                format_func=lambda x: TEXTS["eval"][lang] if x else TEXTS["ignore"][lang],
+                help=TEXTS["locatable_help"][lang]
             )
 
             # Popover for configuring the remaining 30 checks
-            categorized_checks = get_categorized_checks(DEFAULT_CONFIG)
+            categorized_checks = get_categorized_checks(DEFAULT_CONFIG, lang)
             disabled_checks = []
 
-            with st.popover("⚙️ Configurar Chequeos", width="stretch"):
-                st.markdown("**Desmarque los chequeos que desea descartar:**")
+            with st.popover(TEXTS["config_checks"][lang], width="stretch"):
+                st.markdown(TEXTS["uncheck_msg"][lang])
                 for cat_name, check_list in categorized_checks.items():
                     with st.expander(f"{cat_name} ({len(check_list)})", expanded=False):
                         for check_name in check_list:
-                            is_active = st.checkbox(check_name, value=True, key=f"chk_{check_name}")
+                            # Display Spanish mapping in UI if ES is selected
+                            display_name = CHECK_TRANSLATIONS.get(check_name, check_name) if lang == "ES" else check_name
+                            is_active = st.checkbox(display_name, value=True, key=f"chk_{check_name}")
                             if not is_active:
                                 disabled_checks.append(check_name)
 
@@ -308,7 +310,7 @@ if view == TEXTS["view_1"][lang]:
             if not eval_locatable:
                 disabled_checks.append("Potentially locatable event")
 
-        run_btn = st.button("Ejecutar Revisión", type="primary")
+        run_btn = st.button(TEXTS["btn_run"][lang], type="primary")
 
     # Main content section
     if run_btn:
