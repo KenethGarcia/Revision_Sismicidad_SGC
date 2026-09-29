@@ -292,7 +292,7 @@ if view == "view_1":
         with col3:
             # Standalone selectbox for Potentially Locatable Event
             eval_locatable = st.selectbox(
-                "Potentially Locatable",
+                TEXTS["locatable_title"][lang],
                 options=[True, False],
                 index=1,
                 format_func=lambda x: TEXTS["eval"][lang] if x else TEXTS["ignore"][lang],
