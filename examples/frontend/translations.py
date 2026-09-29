@@ -106,5 +106,9 @@ TEXTS = {
     "warn_save": {"ES": "No se ha seleccionado ningún evento para guardar.", "EN": "No events selected to save."},
     "v2_title": {"ES": "Historial de Revisiones", "EN": "Revision History"},
     "v2_subtitle": {"ES": "Registro histórico de todos los eventos marcados como revisados.", "EN": "Historical log of all events marked as reviewed."},
-    "v2_empty": {"ES": "No hay registros históricos disponibles aún.", "EN": "No historical records available yet."}
+    "v2_empty": {"ES": "No hay registros históricos disponibles aún.", "EN": "No historical records available yet."},
+    "locatable_title": {
+        "ES": "¿Evaluar eventos potencialmente localizables?",
+        "EN": "Evaluate potentially locatable events?"
+    },
 }
