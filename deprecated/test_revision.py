@@ -1,5 +1,5 @@
 import unittest
-from src.revision_revision import *
+from deprecated.revision_revision import *
 
 
 class TestRevision(unittest.TestCase):
