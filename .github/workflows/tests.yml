@@ -5,12 +5,12 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'requirements.txt'
+      - '../../deprecated/requirements.txt'
   pull_request:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'requirements.txt'
+      - '../../deprecated/requirements.txt'
   workflow_dispatch:
 
 jobs:

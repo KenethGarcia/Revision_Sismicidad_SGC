@@ -1,4 +1,4 @@
-![Logo](docs/images/SGC_logo.png)
+![Logo](deprecated/docs/images/SGC_logo.png)
 
 # Rutina de revisión de sismicidad - Red Sismológica Nacional de Colombia (RSNC)
 
@@ -9,7 +9,7 @@ En este proceso de revisión, se busca identificar eventos sísmicos que no cump
 ## Requisitos
 
 - Python 3.12 o superior
-- Los siguientes paquetes de Python (lista detallada disponible en el archivo `requirements.txt`):
+- Los siguientes paquetes de Python (lista detallada disponible en el archivo `deprecated/requirements.txt`):
   - `pandas` 
   - `numpy`
   - `colorama`
