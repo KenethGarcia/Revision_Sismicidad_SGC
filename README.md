@@ -42,5 +42,14 @@ $ cd Revision_Sismicidad_SGC
 $ pip install .
 ```
 
+# Testing
+
+If you have cloned the complete source code from the GitHub repository, you can verify the installation by running the test suite located in the `tests/` directory. The testing framework for this package is built around `pytest`.
+
+```bash
+$ cd Revision_Sismicidad_SGC
+$ pytest tests/ -v
+```
+
 
 
