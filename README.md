@@ -51,5 +51,58 @@ $ cd Revision_Sismicidad_SGC
 $ pytest tests/ -v
 ```
 
+# Features and Usage
+
+--Package name--'s core functionality is accessed through its Python API. To demonstrate its flexibility and real-world applicability, the repository also includes advanced integration examples based on the operational workflows at the Colombian Seismological Network (Servicio Geológico Colombiano - RSNC SGC).
+
+## 1. High-Level Python API (Core Package Functionality)
+
+You can integrate the evaluation engine directly into your custom scripts using the `Runner` class. This orchestrates database connections, fetches events, runs spatial/duplicate checks, and outputs a refined DataFrame:
+
+```python
+from pathlib import Path
+from src.core.runner import Runner
+
+# 1. Initialize the runner with the example TOML configuration
+config_path = Path("examples/data/configs/seismic_revision_routine.toml")
+runner = Runner(config_path)
+
+# 2. Execute the pipeline
+results = runner.run()
+
+# 3. Access the flagged and filtered events
+filtered_events = results.output
+print(filtered_events.head())
+```
+
+## 2. SGC Real-World Example: Command Line Interface (CLI)
+
+While not part of the core library, the `examples/cli/` directory provides a fully featured CLI script demonstrating how to wrap the package for automated cron jobs or rapid terminal evaluations. Modeled after SGC workflows, it filters events by date or author directly from the command line:
+
+```bash
+$ python -m examples.cli.revision_cli \
+    --config examples/data/configs/seismic_revision_routine.toml \
+    --start "2026-01-01" \
+    --end "2026-01-31" \
+    --author "gerard" \
+    --output
+```
+
+This example automatically parses time windows, routes the queries to the correct databases (e.g., splitting between SeisComP3 and SeisComP6), and saves a cleaned CSV. For more details on the CLI usage, refer to the `examples/cli/README.md` file.
+
+## 3. SGC Real-World Example: Streamlit Frontend Application
+
+For analysts and network reviewers, the `examples/frontend/` directory contains a user-friendly web interface built with Streamlit. This demonstrates a high-level customized frontend for operational environments.
+
+```bash
+$ pip install streamlit click  # Use this command to install Streamlit if you haven't already
+$ streamlit run examples/frontend/app.py
+```
+
+From the GUI example, users can visually configure parameters, dynamically toggle active quality checks, interact with the data in Spanish or English, and append reviewed records to a historical log. For more details on the frontend usage, refer to the `examples/frontend/README.md` file.
+
+
+
+
 
 
