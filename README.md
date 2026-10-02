@@ -101,8 +101,39 @@ $ streamlit run examples/frontend/app.py
 
 From the GUI example, users can visually configure parameters, dynamically toggle active quality checks, interact with the data in Spanish or English, and append reviewed records to a historical log. For more details on the frontend usage, refer to the `examples/frontend/README.md` file.
 
+# Defining Rules in TOML Configuration Files
 
+The core power of the package lies in the TOML schema. You can define logic trees to flag specific seismic conditions without altering any Python code. For example, to flag earthquakes with high RMS and specific depth ranges you can define a rule in the TOML file like this:
 
+```toml
+[[checks]]
+name = "High RMS Shallow Event"
+logic = "and"
+event_type = "earthquake"
 
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "quality_standardError"
+  mode = "gt"
+  threshold = 1.51
 
+  [[checks.conditions]]
+  rule_type = "numeric"
+  column = "depth_value"
+  mode = "between"
+  lower = 0.0
+  upper = 30.0
+```
+
+Please review the `TOML_schema.md` and the provided Jupyter Notebooks for comprehensive tutorials on configuring databases, spatial polygons, duplicate tracking, and complex rule evaluation.
+
+# Enhancement and Support
+
+--Package name-- is an open-source package, and community contributions are highly encouraged. Whether you are a seismologist wanting to add new rule types or a developer improving the engine, your input is welcome.
+
+- **Report a bug:** Open an issue on the GitHub repository.
+- **Request a feature:** Open an issue or submit a pull request. Submit proposals for new validation rules or UI enhancements via GitHub.
+- **Contribute code:** Fork the repository, implement your changes, and submit a pull request. Please follow the existing code style and include tests for new features.
+
+For direct inquiries or academic collaboration, please do not hesitate to contact [Keneth Garcia-Cifuentes](mailto:stivengarcia7113@gmail.com).
 
