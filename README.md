@@ -137,3 +137,6 @@ Please review the `TOML_schema.md` and the provided Jupyter Notebooks for compre
 
 For direct inquiries or academic collaboration, please do not hesitate to contact [Keneth Garcia-Cifuentes](mailto:stivengarcia7113@gmail.com).
 
+# AI Usage Disclosure
+
+In accordance with standard open-source and JOSS transparency guidelines, generative AI tools (including Gemini, Claude, and GPT models) were utilized during the development of this package. AI assistance was scoped to code translation, test scaffolding (`pytest`), CI/CD workflow enhancements, and docstring generation. All core logic, system architecture, and technical tutorials were authored by humans. All AI-assisted outputs were rigorously reviewed and validated by the primary author. For a detailed breakdown of AI usage, please see the `AI_usage_disclosure.md` file in the repository.
