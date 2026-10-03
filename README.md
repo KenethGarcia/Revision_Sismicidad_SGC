@@ -1,16 +1,16 @@
 ![Logo](examples/frontend/SGC_logo.png)
 
---Package name-- is a Python package designed to streamline, automate, and standardize the querying, processing, and filtering of seismic catalog data from SeisComP systems. By leveraging human-readable TOML configuration files, it allows seismological networks to build complex evaluation pipelines without hardcoding logic into scripts. It is distributed under the GNU General Public License Version 3. Please read the complete description of the method and its application in the **publication**.
+_PySeisComP_ is a Python package designed to streamline, automate, and standardize the querying, processing, and filtering of seismic catalog data from SeisComP systems. By leveraging human-readable TOML configuration files, it allows seismological networks to build complex evaluation pipelines without hardcoding logic into scripts. It is distributed under the GNU General Public License Version 3. Please read the complete description of the method and its application in the **publication**.
 
 # Statement of Need
 
 SeisComP is a standard software architecture used by seismological observatories worldwide for real-time earthquake data acquisition and processing. However, integrating SeisComP databases into custom Python workflows often presents a significant bottleneck. Researchers and network operators typically have to manually extract data, write complex, hardcoded SQL queries, and build inflexible scripts to validate event parameters. While robust tools like ObsPy excel at waveform processing and standard FDSN web service interactions, they are not tailored for the complex, relational database-level event filtering and routine quality control checks required by operational networks.
 
---Package name-- addresses this gap by decoupling the logic from the code. It provides an intuitive engine where users define database connections, SQL queries, spatial polygons, duplicate detection windows, and complex boolean quality-control rules entirely within a TOML file. This allows non-programmers to create strict, reproducible data revision workflows. The package features a robust execution engine capable of dynamically evaluating numeric thresholds, temporal bounds, category matches, and spatial polygon intersections. 
+__PySeisComP__ addresses this gap by decoupling the logic from the code. It provides an intuitive engine where users define database connections, SQL queries, spatial polygons, duplicate detection windows, and complex boolean quality-control rules entirely within a TOML file. This allows non-programmers to create strict, reproducible data revision workflows. The package features a robust execution engine capable of dynamically evaluating numeric thresholds, temporal bounds, category matches, and spatial polygon intersections. 
 
 Furthermore, in an AI-accelerated world, this TOML-based approach offers a direct pathway to integrate Artificial Intelligence into SeisComP operations. By abstracting the pipeline into configuration files, it is remarkably easy to build chatbots or agentic AI systems that interact with seismic data. An AI agent can simply read, generate, or modify these human-readable TOML files to execute complex catalog searches and quality control evaluations, all without needing to touch the underlying databases, raw SQL, or Python source code.
 
-Whether running via its high-level Python API or through complex command-line interfaces or frontend applications, --Package name-- significantly reduces the time and programming expertise required to implement rigorous, automated Python workflows in seismological observatories.
+Whether running via its high-level Python API or through complex command-line interfaces or frontend applications, _PySeisComP_ significantly reduces the time and programming expertise required to implement rigorous, automated Python workflows in seismological observatories.
 
 # Attribution
 
@@ -18,10 +18,10 @@ If you use this code in a publication, please refer to the package by its name a
 
 # Dependencies and Installation
 
-This repository requires Python 3.12 or higher and depends on core data processing libraries such as `pandas` and `numpy`. , and spatial libraries for polygon evaluation. UI frameworks like `click` and `streamlit` are only required if you intend to run the provided examples.
+This repository requires Python 3.12 or higher and depends on core data processing libraries such as `pandas` and `numpy`, and spatial libraries for polygon evaluation. UI frameworks like `click` and `streamlit` are only required if you intend to run the provided examples.
 
 >[!IMPORTANT]
-> We strongly recommend installing --Package name-- within an isolated virtual environment (using `conda`, `mamba`, or `venv`) to prevent dependency conflicts with system-level packages, especially considering the specific database drivers (e.g., `pymysql`) required.
+> We strongly recommend installing _PySeisComP_ within an isolated virtual environment (using `conda`, `mamba`, or `venv`) to prevent dependency conflicts with system-level packages, especially considering the specific database drivers (e.g., `pymysql`) required.
 
 ## Using Mamba/Conda
 
@@ -53,7 +53,7 @@ $ pytest tests/ -v
 
 # Features and Usage
 
---Package name--'s core functionality is accessed through its Python API. To demonstrate its flexibility and real-world applicability, the repository also includes advanced integration examples based on the operational workflows at the Colombian Seismological Network (Servicio Geológico Colombiano - RSNC SGC).
+_PySeisComP_'s core functionality is accessed through its Python API. To demonstrate its flexibility and real-world applicability, the repository also includes advanced integration examples based on the operational workflows at the Colombian Seismological Network (Servicio Geológico Colombiano - RSNC SGC).
 
 ## 1. High-Level Python API (Core Package Functionality)
 
@@ -129,7 +129,7 @@ Please review the `TOML_schema.md` and the provided Jupyter Notebooks for compre
 
 # Enhancement and Support
 
---Package name-- is an open-source package, and community contributions are highly encouraged. Whether you are a seismologist wanting to add new rule types or a developer improving the engine, your input is welcome.
+_PySeisComP_ is an open-source package, and community contributions are highly encouraged. Whether you are a seismologist wanting to add new rule types or a developer improving the engine, your input is welcome.
 
 - **Report a bug:** Open an issue on the GitHub repository.
 - **Request a feature:** Open an issue or submit a pull request. Submit proposals for new validation rules or UI enhancements via GitHub.
