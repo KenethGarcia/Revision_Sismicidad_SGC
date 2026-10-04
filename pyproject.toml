@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PySeisComP"
+version = "0.1.0"
+description = "A package to automate and standardize the querying, processing, and filtering of seismic catalog data from SeisComP systems using TOML configurations."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Keneth Garcia", email = "stivengarcia7113@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Geophysics",
+    "Topic :: Scientific/Engineering :: Geology",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "PyMySQL",
+    "python-dotenv",
+    "shapely",
+    "sqlparse",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+# Dependencies specifically required to run the CLI and Streamlit examples
+examples = [
+    "click",
+    "streamlit",
+    "ftfy"
+]
+# Dependencies required for running tests and development
+dev = [
+    "pytest"
+]
+
+[project.urls]
+Homepage = "https://github.com/KenethGarcia/Revision_Sismicidad_SGC"
+Repository = "https://github.com/KenethGarcia/Revision_Sismicidad_SGC.git"
+Issues = "https://github.com/KenethGarcia/Revision_Sismicidad_SGC/issues"
+
+[tool.setuptools.packages.find]
+# Tell setuptools where to find the code and strictly include the src directory
+where = ["."]
+include = ["src*"]
