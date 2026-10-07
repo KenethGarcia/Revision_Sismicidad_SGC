@@ -1,0 +1,15 @@
+site_name: PySeisComP
+site_description: Automate and standardize seismic catalog processing from SeisComP.
+repo_url: https://github.com/KenethGarcia/PySeisComP
+repo_name: KenethGarcia/PySeisComP
+
+theme:
+  name: readthedocs
+
+# Add this plugins section:
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["."]
