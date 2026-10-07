@@ -6,7 +6,6 @@ repo_name: KenethGarcia/PySeisComP
 theme:
   name: readthedocs
 
-# Add this plugins section:
 plugins:
   - search
   - mkdocstrings:
