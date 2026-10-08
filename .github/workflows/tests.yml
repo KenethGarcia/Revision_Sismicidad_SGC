@@ -3,12 +3,12 @@ name: Python Package Tests
 on:
   push:
     paths:
-      - 'src/**'
+      - '../../sievecomp/**'
       - 'tests/**'
       - '../../deprecated/requirements.txt'
   pull_request:
     paths:
-      - 'src/**'
+      - '../../sievecomp/**'
       - 'tests/**'
       - '../../deprecated/requirements.txt'
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
 
       - name: Run pytest
         env:
-          # Ensures Python can find the 'src' module during execution
+          # Ensures Python can find the 'sievecomp' module during execution
             PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=xml --ignore=tests/test_revision.py --ignore=tests/test_utils.py
