@@ -1,6 +1,6 @@
 # API Reference
 
-This section provides the auto-generated API documentation for the core classes of PySeisComP. 
+This section provides the auto-generated API documentation for the core classes of SieveComP. 
 
 ## Core Runner Class
 

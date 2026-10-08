@@ -1,11 +1,11 @@
-# Contributing to _PySeisComP_
+# Contributing to _SieveComP_
 
 First, thank you for considering contributing to this project! We welcome contributions from seismologists, developers, and network operators. By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## How to Contribute
 
 ### 1. Reporting Bugs
-If you find a bug, please open an issue on the [GitHub Issues page](https://github.com/KenethGarcia/Revision_Sismicidad_SGC/issues). When reporting a bug, please include:
+If you find a bug, please open an issue on the [GitHub Issues page](https://github.com/KenethGarcia/SieveComP/issues). When reporting a bug, please include:
 * Your operating system and Python version.
 * The version of the package you are using.
 * A detailed description of the issue.
@@ -26,12 +26,12 @@ We actively welcome pull requests. If you plan to make a significant change, ple
 1. **Fork the repository** on GitHub.
 2. **Clone your fork** locally:
    ```bash
-   git clone [https://github.com/YOUR-USERNAME/Revision_Sismicidad_SGC.git](https://github.com/YOUR-USERNAME/Revision_Sismicidad_SGC.git)
-   cd Revision_Sismicidad_SGC
+   git clone [https://github.com/YOUR-USERNAME/SieveComP.git](https://github.com/YOUR-USERNAME/SieveComP.git)
+   cd SieveComP
 3. **Create a virtual environment** (using `mamba`, `conda`, or `venv`) and activate it:
    ```bash
-   mamba create -n pyseiscomp -c conda-forge python=3.10 pandas numpy pymysql shapely pytest
-   mamba activate pyseiscomp
+   mamba create -n SieveComP -c conda-forge python=3.10 pandas numpy pymysql shapely pytest
+   mamba activate SieveComP
    pip install -e .
    ```
 4. **Create a new branch** for your changes:

@@ -1,10 +1,10 @@
 # Installation
 
-This guide covers the prerequisites and step-by-step instructions to install _PySeisComP_ and its dependencies in an isolated environment.
+This guide covers the prerequisites and step-by-step instructions to install _SieveComP_ and its dependencies in an isolated environment.
 
 ## Prerequisites
 
-Before installing _PySeisComP_, ensure your system meets the following requirements:
+Before installing _SieveComP_, ensure your system meets the following requirements:
 
 1. **Python:** Version 3.11 or higher. The package relies on the native `tomllib` module introduced in Python 3.11 for parsing configuration files.
 2. **Database Access:** Read access to a SeisComP database (MySQL/MariaDB or PostgreSQL) to query event catalogs.
@@ -12,7 +12,7 @@ Before installing _PySeisComP_, ensure your system meets the following requireme
 
 ## Virtual Environment Setup
 
-We strongly recommend installing _PySeisComP_ inside an isolated virtual environment. This prevents version conflicts with system-level packages, especially regarding database drivers (`PyMySQL`) and spatial libraries (`shapely`).
+We strongly recommend installing _SieveComP_ inside an isolated virtual environment. This prevents version conflicts with system-level packages, especially regarding database drivers (`PyMySQL`) and spatial libraries (`shapely`).
 
 ### Option A: Using `venv` (Standard Library)
 
@@ -20,13 +20,13 @@ Using standard library `venv` is a straightforward way to create a virtual envir
 
 ```bash
 # Create the virtual environment
-python3 -m venv pyseiscomp_env
+python3 -m venv SieveComP_env
 
 # Activate it (Linux/macOS)
-source pyseiscomp_env/bin/activate
+source SieveComP_env/bin/activate
 
 # Activate it (Windows)
-pyseiscomp_env\Scripts\activate
+SieveComP_env\Scripts\activate
 ```
 
 ### Option B: Using `conda` (Anaconda/Miniconda)
@@ -34,22 +34,22 @@ pyseiscomp_env\Scripts\activate
 Conda or Mamba handles binary dependencies for spatial libraries seamlessly across operating systems.
 
 ```bash
-# Create a new environment named 'pyseiscomp_env'
-mamba create -n pyseiscomp_env -c conda-forge python=3.11 
+# Create a new environment named 'SieveComP_env'
+mamba create -n SieveComP_env -c conda-forge python=3.11 
 
 # Activate the environment
-mamba activate pyseiscomp_env
+mamba activate SieveComP_env
 ```
 
-## Installing _PySeisComP_
+## Installing _SieveComP_
 
-Currently, _PySeisComP_ is installed directly from the source repository. The package is configured via pyproject.toml to automatically resolve and install all core dependencies (`numpy`, `pandas`, `PyMySQL`, `python-dotenv`, `shapely`, `sqlparse`, and `tqdm`).
+Currently, _SieveComP_ is installed directly from the source repository. The package is configured via pyproject.toml to automatically resolve and install all core dependencies (`numpy`, `pandas`, `PyMySQL`, `python-dotenv`, `shapely`, `sqlparse`, and `tqdm`).
 
 1. Clone the repository:
 
 ```bash
-git clone git@github.com:KenethGarcia/Revision_Sismicidad_SGC.git
-cd Revision_Sismicidad_SGC
+git clone git@github.com:KenethGarcia/SieveComP.git
+cd SieveComP
 ```
 
 2. Install the core package:
@@ -60,7 +60,7 @@ pip install .
 
 ## Installing Optional Dependencies
 
-_PySeisComP_ includes advanced examples, such as an interactive Streamlit GUI and a Command Line Interface (CLI), which require additional libraries.
+_SieveComP_ includes advanced examples, such as an interactive Streamlit GUI and a Command Line Interface (CLI), which require additional libraries.
 
 - Install with UI and CLI support:
 ```bash
@@ -84,7 +84,7 @@ pip install .[examples,dev]
 To confirm the package and its dependencies are correctly installed and discoverable, run a quick import check from your terminal:
 
 ```bash
-python -c "import pyseiscomp; print('PySeisComP installed successfully!')"
+python -c "import SieveComP; print('SieveComP installed successfully!')"
 ```
 
 If the command returns the success message without errors, you are ready to set up your configuration files. Proceed to the **TOML Configuration Guide** to learn how to connect your database and define your quality-control rules.

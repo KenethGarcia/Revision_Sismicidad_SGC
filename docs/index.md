@@ -1,14 +1,14 @@
-# _PySeisComP_: Automated Seismic Catalog Evaluation
+# _SieveComP_: Automated Seismic Catalog Evaluation
 
-**_PySeisComP_** is a robust Python package designed to streamline, automate, and standardize the querying, processing, and filtering of seismic catalog data from SeisComP systems.
+**_SieveComP_** is a robust Python package designed to streamline, automate, and standardize the querying, processing, and filtering of seismic catalog data from SeisComP systems.
 
-By leveraging human-readable TOML configuration files, _PySeisComP_ decouples complex filtering logic from source code. This empowers seismological networks, researchers, and data analysts to build strict, reproducible quality-control pipelines without needing to write hardcoded SQL queries or complex Python evaluation scripts.
+By leveraging human-readable TOML configuration files, _SieveComP_ decouples complex filtering logic from source code. This empowers seismological networks, researchers, and data analysts to build strict, reproducible quality-control pipelines without needing to write hardcoded SQL queries or complex Python evaluation scripts.
 
-## Why _PySeisComP_?
+## Why _SieveComP_?
 
 Integrating SeisComP relational databases into custom Python workflows typically presents a significant bottleneck. Researchers and network operators often resort to manually extracting data, writing complex SQL queries, and building inflexible scripts to validate event parameters.
 
-_PySeisComP_ bridges this gap. It provides a list of intuitive rules engine where users define database connections, queries, spatial polygons, duplicate detection windows, and complex boolean quality-control rules entirely within a TOML file. Whether you are running an automated cron job or conducting an interactive review, _PySeisComP_ ensures your data validation is consistent, scalable, and easy to maintain.
+_SieveComP_ bridges this gap. It provides a list of intuitive rules engine where users define database connections, queries, spatial polygons, duplicate detection windows, and complex boolean quality-control rules entirely within a TOML file. Whether you are running an automated cron job or conducting an interactive review, _SieveComP_ ensures your data validation is consistent, scalable, and easy to maintain.
 
 ## Core Features
 
@@ -20,16 +20,16 @@ _PySeisComP_ bridges this gap. It provides a list of intuitive rules engine wher
 
 ## Documentation Overview
 
-The _PySeisComP_ documentation is structured to provide a comprehensive understanding of the package's capabilities, installation procedures, and usage examples. The following sections are included:
+The _SieveComP_ documentation is structured to provide a comprehensive understanding of the package's capabilities, installation procedures, and usage examples. The following sections are included:
 
 - **Installation Guide:** Step-by-step instructions for setting up your environment, installing the core library, and adding optional dependencies for the UI and CLI examples.
 - **TOML Configuration Guide:** The comprehensive manual on how to structure your TOML files, define databases, set up spatial polygons, and build your quality-control rules.
-- **Tutorials:** Applied examples showing how to use PySeisComP across its different interfaces:
+- **Tutorials:** Applied examples showing how to use SieveComP across its different interfaces:
     - **Command-Line Interface (CLI):** Learn how to run evaluations directly from the terminal.
-    - **Python API:** Explore how to integrate PySeisComP into your Python scripts for programmatic access.
+    - **Python API:** Explore how to integrate SieveComP into your Python scripts for programmatic access.
     - **Jupyter Notebook:** Interactive tutorials demonstrating real-world use cases and data analysis workflows.
-- **Reference Documentation:** Detailed descriptions of all classes, methods, and functions available in the _PySeisComP_ package.
+- **Reference Documentation:** Detailed descriptions of all classes, methods, and functions available in the _SieveComP_ package.
 
 ## Getting Help & Contributing
 
-PySeisComP is an open-source project. If you encounter bugs, have feature requests, or want to contribute, please visit our [GitHub repository](https://github.com/KenethGarcia/Revision_Sismicidad_SGC) to submit issues or pull requests. We welcome contributions from the community to enhance the functionality and usability of the package.
+SieveComP is an open-source project. If you encounter bugs, have feature requests, or want to contribute, please visit our [GitHub repository](https://github.com/KenethGarcia/SieveComP) to submit issues or pull requests. We welcome contributions from the community to enhance the functionality and usability of the package.
