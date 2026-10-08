@@ -18,12 +18,12 @@ from pathlib import Path
 from typing import Any, Mapping
 from dataclasses import dataclass
 
-from src.io.sql import load_sql
-from src.io.polygons import load_polygons
-from src.checks.engine import run_checks, run_duplicates
-from src.core.config_loader import ConfigManager
-from src.core.database_manager import DatabaseManager
-from src.core.config_validator import ConfigValidator
+from sievecomp.io.sql import load_sql
+from sievecomp.io.polygons import load_polygons
+from sievecomp.checks.engine import run_checks, run_duplicates
+from sievecomp.core.config_loader import ConfigManager
+from sievecomp.core.database_manager import DatabaseManager
+from sievecomp.core.config_validator import ConfigValidator
 
 
 @dataclass(frozen=True)

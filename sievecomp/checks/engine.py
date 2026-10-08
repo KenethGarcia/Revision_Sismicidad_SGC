@@ -10,8 +10,8 @@ import numpy as np
 import pandas as pd
 from typing import Any
 
-from src.checks.dispatchers import CONDITION_DISPATCHERS, combine_masks
-from src.checks.duplicates import check_duplicates
+from sievecomp.checks.dispatchers import CONDITION_DISPATCHERS, combine_masks
+from sievecomp.checks.duplicates import check_duplicates
 
 
 def evaluate_node(

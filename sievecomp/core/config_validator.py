@@ -8,8 +8,8 @@ from __future__ import annotations
 from typing import Any, Mapping
 from pathlib import Path
 
-from src.checks.dispatchers import CONDITION_DISPATCHERS
-from src.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
+from sievecomp.checks.dispatchers import CONDITION_DISPATCHERS
+from sievecomp.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
 
 
 _OUTPUT_SUFFIXES = {

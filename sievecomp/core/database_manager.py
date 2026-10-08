@@ -14,8 +14,8 @@ import pandas as pd
 from tqdm import tqdm
 from pathlib import Path
 from typing import Any, Mapping
-from src.io.env import load_credentials
-from src.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
+from sievecomp.io.env import load_credentials
+from sievecomp.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
 
 
 class DatabaseManager:
