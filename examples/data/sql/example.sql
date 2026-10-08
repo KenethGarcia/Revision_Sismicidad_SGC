@@ -1,0 +1,1 @@
+SELECT * FROM Origin ORDER BY _oid DESC LIMIT 20

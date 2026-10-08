@@ -1,0 +1,22 @@
+[[database]]
+name = "connection1"
+env_file = "/home/keneth/Documents/Academic_Projects/SieveComP/examples/data/credentials/.env"
+env_prefix = "SERVER_SC6"
+
+[[queries]]
+name        = "query1"
+sql_file    = "/home/keneth/Documents/Academic_Projects/SieveComP/examples/data/sql/example.sql"
+description = "Query 1 — Get the last 20 events from the Event table"
+
+[[checks]]
+name = "Check events without Hypo71 methodID"
+
+  [[checks.conditions]]
+  rule_type = "category"
+  column = "methodID"
+  mode = "not_in"
+  values = ["Hypo71"]
+
+[output]
+columns = ["_oid", "time_value", "methodID"]
+
