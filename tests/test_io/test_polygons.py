@@ -9,7 +9,7 @@ from pathlib import Path
 from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
 
-from src.io.polygons import (
+from sievecomp.io.polygons import (
     load_polygons,
     _load_bna_polygon,
     _load_geojson_polygon,

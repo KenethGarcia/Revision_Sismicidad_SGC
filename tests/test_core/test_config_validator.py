@@ -10,8 +10,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from src.core.config_loader import ConfigManager
-from src.core.config_validator import ConfigValidator
+from sievecomp.core.config_loader import ConfigManager
+from sievecomp.core.config_validator import ConfigValidator
 
 
 THIS_DIR = Path(__file__).resolve().parent

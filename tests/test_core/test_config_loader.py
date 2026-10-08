@@ -5,7 +5,7 @@
 # --------------------------------------------------------------------------------------------------------
 from pathlib import Path
 import pytest
-from src.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
+from sievecomp.core.config_loader import ConfigManager, DEFAULT_DATABASE_NAME
 
 THIS_DIR = Path(__file__).resolve().parent
 EXAMPLE_CFG_DIR = THIS_DIR / "test_examples"

@@ -7,7 +7,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from shapely.geometry import Polygon
-from src.checks.vectorized_masks import (
+from sievecomp.checks.vectorized_masks import (
     numeric_mask,
     column_column_mask,
     non_numeric_mask,

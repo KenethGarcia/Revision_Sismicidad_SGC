@@ -8,7 +8,7 @@ import pytest
 import warnings
 from pathlib import Path
 
-from src.io.sql import load_sql
+from sievecomp.io.sql import load_sql
 
 THIS_DIR = Path(__file__).resolve().parent
 EXAMPLE_SQL_DIR = THIS_DIR / "test_examples"

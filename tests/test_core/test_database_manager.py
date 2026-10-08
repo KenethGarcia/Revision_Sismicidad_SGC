@@ -7,8 +7,8 @@ import pytest
 from pathlib import Path
 from typing import Any
 
-from src.core.config_loader import ConfigManager
-from src.core.database_manager import DatabaseManager, DEFAULT_DATABASE_NAME
+from sievecomp.core.config_loader import ConfigManager
+from sievecomp.core.database_manager import DatabaseManager, DEFAULT_DATABASE_NAME
 
 THIS_DIR = Path(__file__).resolve().parent
 EXAMPLE_CFG_DIR = THIS_DIR / "test_examples"
@@ -48,7 +48,7 @@ class TestDatabaseManager:
         """
         Common setup: mock load_credentials once for all tests in this class.
         """
-        from src.core import database_manager as dbm_mod
+        from sievecomp.core import database_manager as dbm_mod
 
         def fake_load_credentials(db_cfg: dict, base_dir: Path, config_name: str) -> dict[str, Any]:
             # Minimal behavior: return credentials keyed by profile name

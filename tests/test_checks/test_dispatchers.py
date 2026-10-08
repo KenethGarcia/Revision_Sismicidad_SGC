@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 from shapely.geometry import Polygon
 
-from src.checks.dispatchers import (
+from sievecomp.checks.dispatchers import (
     dispatch_numeric,
     dispatch_non_numeric,
     dispatch_column_column,

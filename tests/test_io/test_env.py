@@ -6,11 +6,11 @@
 import os
 import pytest
 from pathlib import Path
-from src.io.env import load_credentials, _resolve
+from sievecomp.io.env import load_credentials, _resolve
 
 # Adjust these paths to your repo layout if needed.
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE_ENV = REPO_ROOT / "src" / "data" / "credentials" / "example.env"
+EXAMPLE_ENV = REPO_ROOT / "examples" / "data" / "credentials" / "example.env"
 
 
 @pytest.mark.skipif(not EXAMPLE_ENV.exists(), reason="example.env not found")

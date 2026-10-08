@@ -7,7 +7,7 @@ import pytest
 import numpy as np
 import pandas as pd
 
-from src.checks.duplicates import (
+from sievecomp.checks.duplicates import (
     haversine_np,
     check_duplicates_adjacent,
     check_duplicates_sswa,

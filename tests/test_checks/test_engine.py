@@ -7,8 +7,8 @@ import pytest
 import numpy as np
 import pandas as pd
 from typing import Any, Dict
-from src.checks import engine
-from src.checks.vectorized_masks import combine_masks
+from sievecomp.checks import engine
+from sievecomp.checks.vectorized_masks import combine_masks
 
 # Helpers for CONDITION_DISPATCHERS / combine_masks / check_duplicates
 

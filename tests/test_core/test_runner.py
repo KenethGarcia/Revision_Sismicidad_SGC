@@ -12,9 +12,9 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import Mock
 
-import src.core.runner as runner_module
-from src.core.config_loader import ConfigManager
-from src.core.runner import RunResult, Runner
+import sievecomp.core.runner as runner_module
+from sievecomp.core.config_loader import ConfigManager
+from sievecomp.core.runner import RunResult, Runner
 
 
 THIS_DIR = Path(__file__).resolve().parent
