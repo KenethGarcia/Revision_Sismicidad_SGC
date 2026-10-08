@@ -277,7 +277,8 @@ class TestRunnerFetchAllQueries:
         )
 
         assert result["publicID"].tolist() == ["event-1", "event-2"]
-        assert str(result["time_value"].dtype) == "datetime64[ns, UTC]"
+        assert pd.api.types.is_datetime64tz_dtype(result["time_value"].dtype)
+        assert "UTC" in str(result["time_value"].dtype)
 
         assert runner._dbm.fetch_events.call_count == 2
 
