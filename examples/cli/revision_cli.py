@@ -15,8 +15,8 @@ import ftfy
 import click
 import pandas as pd
 from pathlib import Path
-from src.io.sql import load_sql
-from src.core.runner import Runner
+from sievecomp.io.sql import load_sql
+from sievecomp.core.runner import Runner
 
 # Ensure the root directory of the package is in the system path
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))

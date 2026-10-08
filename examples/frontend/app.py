@@ -21,14 +21,14 @@ matplotlib.use('Agg')  # Prevents Matplotlib from initializing GTK/Gdk display b
 # Dynamically locate the project root directory and add it to sys.path for module imports
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR
-while not (ROOT_DIR / "src").exists() and ROOT_DIR != ROOT_DIR.parent:
+while not (ROOT_DIR / "sievecomp").exists() and ROOT_DIR != ROOT_DIR.parent:
     ROOT_DIR = ROOT_DIR.parent
 
 if str(ROOT_DIR) not in sys.path:
     sys.path.append(str(ROOT_DIR))
 
-from src.io.sql import load_sql
-from src.core.runner import Runner
+from sievecomp.io.sql import load_sql
+from sievecomp.core.runner import Runner
 
 # Cutoff constant for SC3/SC6 database migration
 RSNC_CUTOFF = pd.to_datetime("2026-03-17 00:00:00", utc=True)
