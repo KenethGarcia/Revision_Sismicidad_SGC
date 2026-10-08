@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "PySeisComP"
+name = "SieveComP"
 version = "0.1.0"
 description = "A package to automate and standardize the querying, processing, and filtering of seismic catalog data from SeisComP systems using TOML configurations."
 readme = "README.md"
@@ -49,11 +49,11 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/KenethGarcia/Revision_Sismicidad_SGC"
-Repository = "https://github.com/KenethGarcia/Revision_Sismicidad_SGC.git"
-Issues = "https://github.com/KenethGarcia/Revision_Sismicidad_SGC/issues"
+Homepage = "https://github.com/KenethGarcia/SieveComP"
+Repository = "https://github.com/KenethGarcia/SieveComP.git"
+Issues = "https://github.com/KenethGarcia/SieveComP/issues"
 
 [tool.setuptools.packages.find]
-# Tell setuptools where to find the code and strictly include the src directory
+# Tell setuptools where to find the code and strictly include the sievecomp directory
 where = ["."]
 include = ["src*"]

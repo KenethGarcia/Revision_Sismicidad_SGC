@@ -1,7 +1,7 @@
-site_name: PySeisComP
+site_name: SieveComP
 site_description: Automate and standardize seismic catalog processing from SeisComP.
-repo_url: https://github.com/KenethGarcia/PySeisComP
-repo_name: KenethGarcia/PySeisComP
+repo_url: https://github.com/KenethGarcia/SieveComP
+repo_name: KenethGarcia/SieveComP
 
 theme:
   name: readthedocs
